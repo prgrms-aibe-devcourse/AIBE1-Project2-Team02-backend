@@ -1,7 +1,7 @@
-package aibe1.proj2.mentos.feature.initTest.model.mapper;
+package aibe1.proj2.mentoss.feature.initTest.model.mapper;
 
 
-import aibe1.proj2.mentos.feature.initTest.model.entity.TestEntity;
+import aibe1.proj2.mentoss.feature.initTest.model.entity.TestEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;

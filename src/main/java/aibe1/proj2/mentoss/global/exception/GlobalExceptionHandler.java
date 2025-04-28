@@ -1,4 +1,4 @@
-package aibe1.proj2.mentos.global.exception;
+package aibe1.proj2.mentoss.global.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

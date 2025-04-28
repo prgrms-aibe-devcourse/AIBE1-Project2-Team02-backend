@@ -1,4 +1,4 @@
-package aibe1.proj2.mentos.feature.initTest.service;
+package aibe1.proj2.mentoss.feature.initTest.service;
 
 
 import org.springframework.stereotype.Service;

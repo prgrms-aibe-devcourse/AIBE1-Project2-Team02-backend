@@ -7,7 +7,7 @@ server:
   port: 8080
 logging:
   level:
-    aibe1.proj2.mentos.feature.initTest.model.mapper: ERROR
+    aibe1.proj2.mentoss.feature.initTest.model.mapper: ERROR
 springdoc:
   swagger-ui:
     enabled: false

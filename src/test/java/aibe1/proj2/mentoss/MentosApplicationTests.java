@@ -1,4 +1,4 @@
-package aibe1.proj2.mentos;
+package aibe1.proj2.mentoss;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

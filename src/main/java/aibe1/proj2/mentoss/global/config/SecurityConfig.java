@@ -1,4 +1,4 @@
-package aibe1.proj2.mentos.global.config;
+package aibe1.proj2.mentoss.global.config;
 
 
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package aibe1.proj2.mentos.feature.initTest.controller;
+package aibe1.proj2.mentoss.feature.initTest.controller;
 
 
 import org.springframework.stereotype.Controller;
