@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: mentos
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  mybatis:
+    type-aliases-package: aibe1.proj2.mentos
+    configuration:
+      map-underscore-to-camel-case: true

@@ -1,4 +1,9 @@
 package aibe1.proj2.mentos.feature.initTest.service;
 
-public class TestServiceImpl {
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class TestServiceImpl implements TestService {
+
 }

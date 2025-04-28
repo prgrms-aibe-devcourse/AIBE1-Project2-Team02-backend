@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+server:
+  port: 8080
+logging:
+  level:
+    aibe1.proj2.mentos.feature.initTest.model.mapper: ERROR
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
