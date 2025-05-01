@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class User {
-    private String userId;
+    private Long userId;
     private String provider;
     private String providerId;
     private String email;
@@ -16,10 +16,10 @@ public class User {
     private String profileImage;
     private String regionCode;
     private String mbti;
-    private String role;
-    private String status;
-    private Long reportCount;
-    private Boolean isDeleted;
+    private String role = UserRole.MENTEE.name();
+    private String status = UserStatus.AVAILABLE.name();
+    private Long reportCount = 0L;
+    private Boolean isDeleted = false;
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
