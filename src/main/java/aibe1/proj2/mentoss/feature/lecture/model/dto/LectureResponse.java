@@ -1,19 +1,26 @@
 package aibe1.proj2.mentoss.feature.lecture.model.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 강의 기본 정보 응답 DTO
  */
-public record LectureResponse(
-        Long lectureId,
-        String lectureTitle,
-        String mentorNickname,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        String parentCategory,
-        String middleCategory,
-        String subcategory,
-        boolean isClosed,
-        String status
-) {}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LectureResponse {
+    private Long lectureId;
+    private String lectureTitle;
+    private String mentorNickname;
+    private LocalDateTime createdAt;
+    private String parentCategory;
+    private String middleCategory;
+    private String subcategory;
+    private boolean isClosed;
+    private String status;
+}

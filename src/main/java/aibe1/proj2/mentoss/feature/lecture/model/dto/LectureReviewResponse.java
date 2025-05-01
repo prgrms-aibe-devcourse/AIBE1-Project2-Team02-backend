@@ -11,5 +11,4 @@ public record LectureReviewResponse(
         String content,
         Double rating,
         LocalDateTime createdAt
-) {
-}
+) {}
