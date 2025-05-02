@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.lecture.service;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureRegionRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.global.entity.Lecture;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
@@ -97,6 +98,48 @@ public class LectureServiceImpl implements LectureService {
                 regions
         );
     }
+
+    /**
+     * 강의 정보 수정
+     */
+    @Override
+    @Transactional
+    public boolean updateLecture(Long lectureId, LectureUpdateRequest request) throws JsonProcessingException {
+        // 강의 존재 여부 확인
+        int exists = lectureMapper.existsLectureById(lectureId);
+        if (exists == 0) {
+            throw new EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
+        }
+
+        // DTO → 엔티티 변환
+        Lecture lecture = new Lecture();
+        lecture.setLectureId(lectureId);
+        lecture.setLectureTitle(request.lectureTitle());
+        lecture.setDescription(request.description());
+        lecture.setCategoryId(request.categoryId());
+        lecture.setCurriculum(request.curriculum());
+        lecture.setPrice(request.price());
+
+        // 기본 정보 업데이트
+        int updatedRows = lectureMapper.updateLecture(lecture);
+        if (updatedRows == 0) {
+            return false;
+        }
+
+        // 시간 정보 업데이트
+        String timeSlotsJson = objectMapper.writeValueAsString(request.timeSlots());
+        lectureMapper.updateLectureTimeSlots(lectureId, timeSlotsJson);
+
+        // 지역 정보 업데이트 (기존 지역 정보 삭제 후 새로 추가)
+        lectureMapper.deleteLectureRegions(lectureId);
+        for (LectureRegionRequest region : request.regions()) {
+            lectureMapper.insertLectureRegion(lectureId, region.regionCode());
+        }
+
+        return true;
+    }
+
+
 
     /**
      * 강의 커리큘럼 조회

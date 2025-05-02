@@ -8,6 +8,7 @@ public record LectureResponse(
         String lectureTitle,
         String mentorNickname,
         LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         String parentCategory,
         String middleCategory,
         String subcategory,

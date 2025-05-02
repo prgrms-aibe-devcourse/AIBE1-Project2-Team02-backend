@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.lecture.service;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureCurriculumResponse;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureDetailResponse;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureResponse;
@@ -26,6 +27,13 @@ public interface LectureService {
      * 강의 상세 정보 조회
      */
     LectureDetailResponse getLectureDetail(Long lectureId) throws JsonProcessingException;
+
+
+    /**
+     * 강의 정보 수정
+     * @return 수정 성공 여부
+     */
+    boolean updateLecture(Long lectureId, LectureUpdateRequest request) throws JsonProcessingException;
 
     /**
      * 강의 커리큘럼 조회

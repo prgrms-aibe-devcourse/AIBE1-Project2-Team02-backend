@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.lecture.controller;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
@@ -138,4 +139,69 @@ public class LectureController {
         return ResponseEntity.ok(ApiResponseFormat.ok(responseDto));
     }
 
+
+
+    @PutMapping("/{lectureId}")
+    @Operation(summary = "강의 정보 수정", description = "강의의 정보를 수정합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "수정 성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "강의 없음",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            )
+    })
+    public ResponseEntity<ApiResponseFormat<LectureResponse>> updateLecture(
+            @PathVariable Long lectureId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "강의 수정 요청 예시",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = LectureUpdateRequest.class),
+                            examples = @ExampleObject(
+                                    name = "강의 수정 예시",
+                                    value = """
+{
+  "lectureTitle": "수정된 강의 제목",
+  "description": "수정된 강의 설명",
+  "categoryId": 3,
+  "curriculum": "수정된 커리큘럼",
+  "price": 35000,
+  "regions": [
+    { "regionCode": "1111010400" },
+    { "regionCode": "1111010500" }
+  ],
+  "timeSlots": [
+    { "dayOfWeek": "화", "startTime": "14:00", "endTime": "16:00" },
+    { "dayOfWeek": "목", "startTime": "19:00", "endTime": "21:00" }
+  ]
 }
+"""
+                            )
+                    )
+            )
+            @RequestBody LectureUpdateRequest request
+    ) throws JsonProcessingException {
+        boolean result = lectureService.updateLecture(lectureId, request);
+
+        if (!result) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("강의 수정에 실패했습니다."));
+        }
+
+        // 수정된 강의 정보 조회 (업데이트 시간 포함)
+        LectureResponse updatedLecture = lectureService.getLecture(lectureId);
+
+        return ResponseEntity.ok(ApiResponseFormat.ok(updatedLecture));
+    }
+}
+
+

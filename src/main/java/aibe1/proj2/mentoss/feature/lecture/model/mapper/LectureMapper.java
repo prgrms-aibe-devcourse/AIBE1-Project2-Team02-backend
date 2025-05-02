@@ -54,6 +54,7 @@ public interface LectureMapper {
             "l.lecture_title AS lectureTitle, " +
             "u.nickname AS mentorNickname, " +
             "l.created_at AS createdAt, " +
+            "l.updated_at AS updatedAt, " +
             "lc.parent_category AS parentCategory, " +
             "lc.middle_category AS middleCategory, " +
             "lc.subcategory AS subcategory, " +
@@ -70,6 +71,7 @@ public interface LectureMapper {
             @Arg(column = "lectureTitle", javaType = String.class),
             @Arg(column = "mentorNickname", javaType = String.class),
             @Arg(column = "createdAt", javaType = LocalDateTime.class),
+            @Arg(column = "updatedAt", javaType = LocalDateTime.class),
             @Arg(column = "parentCategory", javaType = String.class),
             @Arg(column = "middleCategory", javaType = String.class),
             @Arg(column = "subcategory", javaType = String.class),
@@ -108,6 +110,35 @@ public interface LectureMapper {
             "JOIN region r ON lr.region_code = r.region_code " +
             "WHERE lr.lecture_id = #{lectureId}")
     List<String> getLectureRegions(@Param("lectureId") Long lectureId);
+
+
+    /**
+     * 강의 기본 정보 업데이트
+     */
+    @Update("UPDATE lecture SET " +
+            "lecture_title = #{lectureTitle}, " +
+            "description = #{description}, " +
+            "category_id = #{categoryId}, " +
+            "curriculum = #{curriculum}, " +
+            "price = #{price}, " +
+            "updated_at = CURRENT_TIMESTAMP " +
+            "WHERE lecture_id = #{lectureId} " +
+            "AND is_deleted = FALSE")
+    int updateLecture(Lecture lecture);
+
+    /**
+     * 강의 지역 정보 삭제
+     */
+    @Delete("DELETE FROM lecture_region WHERE lecture_id = #{lectureId}")
+    int deleteLectureRegions(@Param("lectureId") Long lectureId);
+
+    /**
+     * 강의가 존재하는지 확인
+     */
+    @Select("SELECT COUNT(*) FROM lecture WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
+    int existsLectureById(@Param("lectureId") Long lectureId);
+
+
 
     /**
      * 강의 커리큘럼 조회 - 생성자 매핑 사용
