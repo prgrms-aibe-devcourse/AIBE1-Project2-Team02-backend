@@ -4,7 +4,7 @@ import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureCurriculumR
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureDetailResponse;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureResponse;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureReviewResponse;
-import aibe1.proj2.mentoss.feature.lecture.model.entity.Lecture;
+import aibe1.proj2.mentoss.global.entity.Lecture;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
