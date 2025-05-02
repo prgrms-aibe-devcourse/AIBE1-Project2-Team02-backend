@@ -19,7 +19,7 @@ public interface ReviewMapper {
     INSERT INTO review (lecture_id, mentor_id, writer_id, content, rating,
                         status, report_count, is_deleted, deleted_at, created_at)
     VALUES (#{lectureId}, #{mentorId}, #{writerId}, #{content}, #{rating}, 
-            #{status}, #{reportCount}, #{isDeleted}, #{deletedAt} #{createdAt})
+            #{status}, #{reportCount}, #{isDeleted}, #{deletedAt}, #{createdAt})
   """)
     void createReview(Review review);
 
