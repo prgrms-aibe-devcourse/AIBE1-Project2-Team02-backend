@@ -1,10 +1,18 @@
-package aibe1.proj2.mentoss.feature.login.model.entity;
+package aibe1.proj2.mentoss.global.entity;
 
+import aibe1.proj2.mentoss.global.entity.enums.EntityStatus;
+import aibe1.proj2.mentoss.global.entity.enums.UserRole;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppUser {
     private Long userId;
     private String provider;
@@ -17,7 +25,7 @@ public class AppUser {
     private String regionCode;
     private String mbti;
     private String role = UserRole.MENTEE.name();
-    private String status = UserStatus.AVAILABLE.name();
+    private String status = EntityStatus.AVAILABLE.name();
     private Long reportCount = 0L;
     private Boolean isDeleted = false;
     private LocalDateTime deletedAt;

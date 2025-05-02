@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.login.model.entity;
+package aibe1.proj2.mentoss.global.entity.enums;
 
 public enum UserRole {
     MENTEE,
