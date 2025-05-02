@@ -44,3 +44,9 @@ application-dev.yml
 
 ### sql ###
 *.sql
+
+### macOS ###
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
