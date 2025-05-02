@@ -125,4 +125,29 @@ public class LectureServiceImpl implements LectureService {
 
         return new LectureReviewsResponse(reviews, averageRating, reviewCount);
     }
+
+
+    /**
+     * 강의 오픈으로 변경
+     */
+    @Override
+    @Transactional
+    public boolean updateLectureClosed(Long lectureId, boolean isClosed) {
+        // 강의 존재 여부 확인
+        LectureResponse lecture = lectureMapper.getLectureById(lectureId);
+        if (lecture == null) {
+            throw new EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
+        }
+
+        // 이미 동일한 상태인지 확인
+        if (lecture.isClosed() == isClosed) {
+            return false; // 이미 동일한 상태인 경우
+        }
+
+        // 강의 마감 상태 변경
+        int updatedRows = lectureMapper.updateLectureClosed(lectureId, isClosed);
+        return updatedRows > 0;
+    }
+
+
 }

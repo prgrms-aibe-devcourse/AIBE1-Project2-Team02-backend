@@ -36,4 +36,14 @@ public interface LectureService {
      * 강의 리뷰 조회
      */
     LectureReviewsResponse getLectureReviews(Long lectureId);
+
+
+    /**
+     * 강의 마감 상태 변경
+     * @param lectureId 강의 ID
+     * @param isClosed true: 마감, false: 오픈
+     * @return 변경 성공 여부
+     */
+    boolean updateLectureClosed(Long lectureId, boolean isClosed);
+
 }

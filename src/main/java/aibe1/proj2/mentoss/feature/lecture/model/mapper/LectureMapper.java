@@ -169,4 +169,13 @@ public interface LectureMapper {
             "AND is_deleted = FALSE " +
             "AND status = 'AVAILABLE'")
     Long getLectureReviewCount(@Param("lectureId") Long lectureId);
+
+
+    /**
+     * 강의 마감 오픈 상태 변경
+     */
+    @Update("UPDATE lecture SET is_closed = #{isClosed} WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
+    int updateLectureClosed(@Param("lectureId") Long lectureId, @Param("isClosed") boolean isClosed);
+
+
 }

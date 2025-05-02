@@ -13,7 +13,7 @@ public record LectureDetailResponse(
         String timeSlots,
         List<String> regions
 ) {
-    // 생성자 오버로딩 (regions 없는 버전)
+
     public LectureDetailResponse(Long lectureId, String lectureTitle,
                                  String description, Long price, String timeSlots) {
         this(lectureId, lectureTitle, description, price, timeSlots, null);

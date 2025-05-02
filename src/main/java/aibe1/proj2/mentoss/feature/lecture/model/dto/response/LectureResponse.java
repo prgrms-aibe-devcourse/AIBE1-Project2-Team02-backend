@@ -1,10 +1,5 @@
 package aibe1.proj2.mentoss.feature.lecture.model.dto.response;
-
-
-
 import java.time.LocalDateTime;
-
-
 /**
  * 강의 기본 정보 응답 DTO
  */
