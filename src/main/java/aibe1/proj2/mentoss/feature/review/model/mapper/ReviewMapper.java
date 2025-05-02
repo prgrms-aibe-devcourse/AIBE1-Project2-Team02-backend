@@ -9,10 +9,57 @@ import java.util.List;
 @Repository
 @Mapper
 public interface ReviewMapper {
-    @Select("SELECT * FROM review WHERE id = (#{reviewId})")
-    Review findByReviewId(Long reviewId);
+
+    @Select("SELECT COUNT(*) FROM review WHERE review_id = #{reviewId}")
+    int countReview(Long reviewId);
+    default boolean existsReview(Long reviewId) {
+        return countReview(reviewId) > 0;
+    }
+
+    @Select("SELECT COUNT(*) FROM review WHERE review_id = #{reviewId} AND status = 'AVAILABLE' AND is_deleted = FALSE")
+    int countActiveReview(Long reviewId);
+    default boolean isReviewAccessible(Long reviewId) {
+        return countActiveReview(reviewId) > 0;
+    }
+
+    @Select("SELECT COUNT(*) FROM app_user WHERE user_id = #{userId}")
+    int countUser(Long userId);
+    default boolean existsUser(Long userId) {
+        return countUser(userId) > 0;
+    }
+
+    @Select("SELECT COUNT(*) FROM app_user WHERE user_id = #{userId} AND status = 'AVAILABLE' AND is_deleted = FALSE")
+    int countActiveUser(Long userId);
+    default boolean isUserAccessible(Long userId) {
+        return countActiveLecture(userId) > 0;
+    }
+
+    @Select("SELECT COUNT(*) FROM lecture WHERE lecture_id = #{lectureId}")
+    int countLecture(Long lectureId);
+    default boolean existsLecture(Long lectureId) {
+        return countLecture(lectureId) > 0;
+    }
+
+    @Select("SELECT COUNT(*) FROM lecture WHERE lecture_id = #{lectureId} AND status = 'AVAILABLE' AND is_deleted = FALSE")
+    int countActiveLecture(Long lectureId);
+    default boolean isLectureAccessible(Long lectureId) {
+        return countActiveLecture(lectureId) > 0;
+    }
+
+    @Select("SELECT COUNT(*) FROM mentor_profile WHERE mentor_id = #{mentorId}")
+    int countMentor(Long mentorId);
+    default boolean existsMentor(Long mentorId) {
+        return countMentor(mentorId) > 0;
+    }
 
     @Select("SELECT * FROM review WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
+    @Results({
+            @Result(property = "reviewId",  column = "review_id"),
+            @Result(property = "lectureId", column = "lecture_id"),
+            @Result(property = "mentorId",  column = "mentor_id"),
+            @Result(property = "writerId",  column = "writer_id"),
+            @Result(property = "createdAt", column = "created_at")
+    })
     List<Review> findByLectureId(Long lectureId);
 
     @Insert("""

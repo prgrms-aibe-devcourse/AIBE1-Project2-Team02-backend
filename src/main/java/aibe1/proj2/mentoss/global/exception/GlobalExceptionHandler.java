@@ -34,6 +34,36 @@ public class GlobalExceptionHandler {
                 .body(ApiResponseFormat.fail("JSON 처리 중 오류가 발생했습니다: " + e.getMessage()));
     }
 
+    /**
+     * 외래키 참조 오류 (참조할 대상 ID가 존재하지 않을 때) 처리
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
+        String type = ex.getResourceType();
+        String msg  = type + " (id=" + ex.getResourceId() + ") 가 존재하지 않습니다.";
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponseFormat.fail(msg));
+    }
 
+    /**
+     * 별점이 1~5 사이의 정수가 아닐 때의 오류 처리
+     */
+    @ExceptionHandler(InvalidRatingException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleInvalidRating(InvalidRatingException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * 특정 리소스 항목(유저, 강의, 후기 등)이 삭제되었거나 Available하지 않을 때 예외 처리
+     */
+    @ExceptionHandler(ResourceAccessDeniedException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleResourceAccessDenied(ResourceAccessDeniedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
 
 }
