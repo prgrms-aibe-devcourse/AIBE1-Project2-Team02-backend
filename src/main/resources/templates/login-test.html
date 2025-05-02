@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소셜 로그인 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .kakao {
+            background-color: #FEE500;
+            color: #000;
+        }
+        #token-area {
+            word-break: break-all;
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        #response-area {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body>
+<h1>소셜 로그인 테스트</h1>
+
+<div class="container">
+    <h2>소셜 로그인</h2>
+    <button onclick="location.href='/oauth2/authorization/google'">Google 로그인</button>
+    <button class="kakao" onclick="location.href='/oauth2/authorization/kakao'">Kakao 로그인</button>
+</div>
+
+<div class="container">
+    <h2>JWT 토큰</h2>
+    <div>
+        <input type="text" id="token-input" placeholder="JWT 토큰 입력" style="width: 70%; padding: 8px;">
+        <button onclick="saveToken()">저장</button>
+    </div>
+    <div id="token-area"></div>
+</div>
+
+<div class="container">
+    <h2>API 테스트</h2>
+    <button onclick="testPublicEndpoint()">공개 API 테스트</button>
+    <button onclick="testPrivateEndpoint()">인증 API 테스트</button>
+    <div id="response-area"></div>
+</div>
+
+<script>
+    // 페이지 로드 시 URL에서 토큰 파라미터 확인
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        if (token) {
+            document.getElementById('token-input').value = token;
+            saveToken();
+        } else {
+            // 세션 스토리지에서 토큰 불러오기
+            const savedToken = sessionStorage.getItem('jwtToken');
+            if (savedToken) {
+                document.getElementById('token-input').value = savedToken;
+                document.getElementById('token-area').textContent = savedToken;
+            }
+        }
+    };
+
+    // 토큰 저장
+    function saveToken() {
+        const token = document.getElementById('token-input').value;
+        if (token) {
+            sessionStorage.setItem('jwtToken', token);
+            document.getElementById('token-area').textContent = token;
+        }
+    }
+
+    // 공개 API 테스트
+    function testPublicEndpoint() {
+        fetch('/api/auth/test/public')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('response-area').textContent = data;
+            })
+            .catch(error => {
+                document.getElementById('response-area').textContent = '오류 발생: ' + error.message;
+            });
+    }
+
+    // 인증 API 테스트
+    function testPrivateEndpoint() {
+        const token = sessionStorage.getItem('jwtToken');
+        if (!token) {
+            document.getElementById('response-area').textContent = '토큰이 없습니다. 먼저 로그인하세요.';
+            return;
+        }
+
+        fetch('/api/auth/test/private', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('응답 코드: ' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('response-area').textContent = data;
+            })
+            .catch(error => {
+                document.getElementById('response-area').textContent = '오류 발생: ' + error.message;
+            });
+    }
+</script>
+</body>
+</html>
