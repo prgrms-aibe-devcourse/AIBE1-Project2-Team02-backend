@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.login.model.mapper;
 
+import aibe1.proj2.mentoss.global.entity.AppUser;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
