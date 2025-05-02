@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.lecture.controller;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureSearchRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
@@ -16,6 +17,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +86,65 @@ public class LectureController {
         Long lectureId = lectureService.createLecture(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
     }
+
+
+
+    @GetMapping
+    @Operation(summary = "강의 목록 조회", description = "강의 목록을 검색 조건에 따라 조회합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            )
+    })
+    public ResponseEntity<ApiResponseFormat<Page<LectureListResponse>>> getLectures(
+            @Parameter(description = "검색 키워드 (제목, 내용, 멘토 닉네임)")
+            @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "카테고리 (대/중/소분류)")
+            @RequestParam(required = false) String category,
+
+            @Parameter(description = "지역 검색")
+            @RequestParam(required = false) String region,
+
+            @Parameter(description = "최소 가격")
+            @RequestParam(required = false) Long minPrice,
+
+            @Parameter(description = "최대 가격")
+            @RequestParam(required = false) Long maxPrice,
+
+            @Parameter(description = "최소 평점")
+            @RequestParam(required = false) Double minRating,
+
+            @Parameter(description = "멘토 인증 여부")
+            @RequestParam(required = false) Boolean isCertified,
+
+            @Parameter(description = "강의 오픈 여부 (true: 오픈, false: 마감)")
+            @RequestParam(required = false) Boolean isOpen,
+
+            @Parameter(description = "페이지 번호 (0부터 시작)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "페이지 크기")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // 페이지 요청 객체 생성 (스프링 데이터 활용)
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 검색 조건 DTO 생성
+        LectureSearchRequest searchRequest = new LectureSearchRequest(
+                keyword, category, region, minPrice, maxPrice,
+                minRating, isCertified, isOpen);
+
+        // 서비스 호출
+        Page<LectureListResponse> lectures = lectureService.getLectures(searchRequest, pageable);
+
+        return ResponseEntity.ok(ApiResponseFormat.ok(lectures));
+    }
+
+
+
 
     @GetMapping("/{lectureId}")
     @Operation(summary = "강의 기본 정보 조회", description = "강의의 기본 정보를 조회합니다.")
@@ -202,6 +265,40 @@ public class LectureController {
 
         return ResponseEntity.ok(ApiResponseFormat.ok(updatedLecture));
     }
+
+
+
+    @DeleteMapping("/{lectureId}")
+    @Operation(summary = "강의 삭제", description = "강의를 삭제합니다 (소프트 삭제).")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    description = "삭제 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "강의 없음",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            )
+    })
+    public ResponseEntity<ApiResponseFormat<Void>> deleteLecture(@PathVariable Long lectureId) {
+        boolean result = lectureService.deleteLecture(lectureId);
+
+        if (!result) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("강의 삭제에 실패했습니다."));
+        }
+
+        // 삭제 성공 시 204 No Content 반환 (본문 없음)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
+
+
+
 
 

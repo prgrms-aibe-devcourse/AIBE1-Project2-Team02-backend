@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.lecture.service;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureRegionRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureSearchRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.global.entity.Lecture;
@@ -10,6 +11,10 @@ import aibe1.proj2.mentoss.global.entity.Lecture;
 import aibe1.proj2.mentoss.global.exception.EntityNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +66,25 @@ public class LectureServiceImpl implements LectureService {
 
         return lectureId;
     }
+
+    @Override
+    public Page<LectureListResponse> getLectures(LectureSearchRequest searchRequest, Pageable pageable) {
+        // 페이징 정보 추출
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int offset = pageNumber * pageSize; // 오프셋 계산
+
+        // 총 개수 조회
+        long totalCount = lectureMapper.countLectures(searchRequest);
+
+        // 강의 목록 조회
+        List<LectureListResponse> lectures = lectureMapper.findLectures(
+                searchRequest, pageSize, offset); // 계산된 오프셋 전달
+
+        // Page 객체 생성 및 반환 (스프링 데이터 활용)
+        return new PageImpl<>(lectures, pageable, totalCount);
+    }
+
 
     /**
      * 강의 기본 정보 조회
@@ -139,7 +163,22 @@ public class LectureServiceImpl implements LectureService {
         return true;
     }
 
+    /**
+     * 강의 삭제 (soft delete)
+     */
+    @Override
+    @Transactional
+    public boolean deleteLecture(Long lectureId) {
+        // 강의 존재 여부 확인
+        int exists = lectureMapper.existsLectureById(lectureId);
+        if (exists == 0) {
+            throw new EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
+        }
 
+        // 강의 삭제 (soft delete)
+        int deletedRows = lectureMapper.softDeleteLecture(lectureId);
+        return deletedRows > 0;
+    }
 
     /**
      * 강의 커리큘럼 조회
@@ -172,7 +211,7 @@ public class LectureServiceImpl implements LectureService {
 
 
     /**
-     * 강의 오픈으로 변경
+     * 강의 오픈/마감으로 변경
      */
     @Override
     @Transactional
@@ -188,7 +227,7 @@ public class LectureServiceImpl implements LectureService {
             return false; // 이미 동일한 상태인 경우
         }
 
-        // 강의 마감 상태 변경
+        // 강의 오픈/마감 상태 변경
         int updatedRows = lectureMapper.updateLectureClosed(lectureId, isClosed);
         return updatedRows > 0;
     }
