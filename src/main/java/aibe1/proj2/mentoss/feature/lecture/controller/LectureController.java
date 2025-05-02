@@ -3,7 +3,7 @@ package aibe1.proj2.mentoss.feature.lecture.controller;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
-import aibe1.proj2.mentoss.global.dto.ApiResponse;
+import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -47,7 +48,7 @@ public class LectureController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
-    public ResponseEntity<ApiResponse<Long>> createLecture(
+    public ResponseEntity<ApiResponseFormat<Long>> createLecture(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "강의 생성 요청 예시",
                     required = true,
@@ -78,7 +79,7 @@ public class LectureController {
             @RequestBody LectureCreateRequest request
     ) throws JsonProcessingException {
         Long lectureId = lectureService.createLecture(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(lectureId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
     }
 
     @GetMapping("/{lectureId}")
@@ -95,9 +96,9 @@ public class LectureController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
-    public ResponseEntity<ApiResponse<LectureResponse>> getLecture(@PathVariable Long lectureId) {
+    public ResponseEntity<ApiResponseFormat<LectureResponse>> getLecture(@PathVariable Long lectureId) {
         LectureResponse lecture = lectureService.getLecture(lectureId);
-        return ResponseEntity.ok(ApiResponse.ok(lecture));
+        return ResponseEntity.ok(ApiResponseFormat.ok(lecture));
     }
 
     @GetMapping("/{lectureId}/detail")
@@ -114,7 +115,7 @@ public class LectureController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
-    public ResponseEntity<ApiResponse<LectureDetailResponseDto>> getLectureDetail(@PathVariable Long lectureId) throws JsonProcessingException {
+    public ResponseEntity<ApiResponseFormat<LectureDetailResponseDto>> getLectureDetail(@PathVariable Long lectureId) throws JsonProcessingException {
         // 서비스에서 상세 정보 조회
         LectureDetailResponse lectureDetail = lectureService.getLectureDetail(lectureId);
 
@@ -134,7 +135,7 @@ public class LectureController {
                 timeSlots
         );
 
-        return ResponseEntity.ok(ApiResponse.ok(responseDto));
+        return ResponseEntity.ok(ApiResponseFormat.ok(responseDto));
     }
 
 }

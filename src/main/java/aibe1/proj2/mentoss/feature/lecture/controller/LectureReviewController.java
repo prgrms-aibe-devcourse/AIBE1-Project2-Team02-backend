@@ -2,7 +2,7 @@ package aibe1.proj2.mentoss.feature.lecture.controller;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureReviewsResponse;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
-import aibe1.proj2.mentoss.global.dto.ApiResponse;
+import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,17 +31,17 @@ public class LectureReviewController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
                     description = "강의 없음",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             )
     })
-    public ResponseEntity<ApiResponse<LectureReviewsResponse>> getLectureReviews(@PathVariable Long lectureId) {
+    public ResponseEntity<ApiResponseFormat<LectureReviewsResponse>> getLectureReviews(@PathVariable Long lectureId) {
         LectureReviewsResponse reviews = lectureService.getLectureReviews(lectureId);
-        return ResponseEntity.ok(ApiResponse.ok(reviews));
+        return ResponseEntity.ok(ApiResponseFormat.ok(reviews));
     }
 
 }

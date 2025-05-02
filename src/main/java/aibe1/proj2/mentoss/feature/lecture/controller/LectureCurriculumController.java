@@ -2,8 +2,7 @@ package aibe1.proj2.mentoss.feature.lecture.controller;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureCurriculumResponse;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
-import aibe1.proj2.mentoss.global.dto.ApiResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,16 +32,16 @@ public class LectureCurriculumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
                     description = "강의 없음",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             )
     })
-    public ResponseEntity<ApiResponse<LectureCurriculumResponse>> getLectureCurriculum(@PathVariable Long lectureId) {
+    public ResponseEntity<ApiResponseFormat<LectureCurriculumResponse>> getLectureCurriculum(@PathVariable Long lectureId) {
         LectureCurriculumResponse curriculum = lectureService.getLectureCurriculum(lectureId);
-        return ResponseEntity.ok(ApiResponse.ok(curriculum));
+        return ResponseEntity.ok(ApiResponseFormat.ok(curriculum));
     }
 }
