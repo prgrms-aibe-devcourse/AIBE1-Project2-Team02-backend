@@ -1,6 +1,10 @@
 package aibe1.proj2.mentoss.feature.lecture.service;
 
-import aibe1.proj2.mentoss.feature.lecture.model.dto.*;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureCurriculumResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureDetailResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureReviewsResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**

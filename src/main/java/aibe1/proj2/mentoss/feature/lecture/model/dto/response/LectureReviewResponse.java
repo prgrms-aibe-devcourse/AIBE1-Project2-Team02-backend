@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.lecture.model.dto;
+package aibe1.proj2.mentoss.feature.lecture.model.dto.response;
 
 import java.time.LocalDateTime;
 /**

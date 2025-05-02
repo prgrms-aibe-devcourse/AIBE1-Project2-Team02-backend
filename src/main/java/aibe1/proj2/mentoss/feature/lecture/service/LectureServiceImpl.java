@@ -1,6 +1,9 @@
 package aibe1.proj2.mentoss.feature.lecture.service;
 
-import aibe1.proj2.mentoss.feature.lecture.model.dto.*;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureRegionRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
+import aibe1.proj2.mentoss.feature.lecture.model.entity.Lecture;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
 import aibe1.proj2.mentoss.global.exception.EntityNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,17 +33,28 @@ public class LectureServiceImpl implements LectureService {
     @Override
     @Transactional
     public Long createLecture(LectureCreateRequest request) throws JsonProcessingException {
-        // 강의 기본 정보 저장
-        lectureMapper.createLecture(request);
+        // DTO → 엔티티 변환
+        Lecture lecture = new Lecture();
+        lecture.setLectureTitle(request.lectureTitle());
+        lecture.setDescription(request.description());
+        lecture.setCategoryId(request.categoryId());
+        lecture.setCurriculum(request.curriculum());
+        lecture.setPrice(request.price());
+        lecture.setMentorId(1L); // 임시 값
+        lecture.setStatus("AVAILABLE");
+
+        // 엔티티 저장 로직
+        lectureMapper.createLecture(lecture);
         Long lectureId = lectureMapper.getLastInsertId();
 
-        // 강의 지역 정보 저장
+        // 지역 정보 저장
         for (LectureRegionRequest region : request.regions()) {
             lectureMapper.insertLectureRegion(lectureId, region.regionCode());
         }
 
-        // 강의 시간 정보 저장 (JSON 형태로)
+        // 시간 정보 저장
         String timeSlotsJson = objectMapper.writeValueAsString(request.timeSlots());
+        lecture.setAvailableTimeSlots(timeSlotsJson);
         lectureMapper.updateLectureTimeSlots(lectureId, timeSlotsJson);
 
         return lectureId;
@@ -71,12 +85,16 @@ public class LectureServiceImpl implements LectureService {
 
         // 지역 정보 조회
         List<String> regions = lectureMapper.getLectureRegions(lectureId);
-        lectureDetail.setRegions(regions);
 
-        // 이 시점에서 lectureDetail.timeSlots()는 JSON 문자열입니다.
-        // Controller에서 필요에 따라 파싱하여 사용할 수 있습니다.
-
-        return lectureDetail;
+        // 새 Record 인스턴스 생성 (이미 regions가 포함된 생성자 호출)
+        return new LectureDetailResponse(
+                lectureDetail.lectureId(),
+                lectureDetail.lectureTitle(),
+                lectureDetail.description(),
+                lectureDetail.price(),
+                lectureDetail.timeSlots(),
+                regions
+        );
     }
 
     /**

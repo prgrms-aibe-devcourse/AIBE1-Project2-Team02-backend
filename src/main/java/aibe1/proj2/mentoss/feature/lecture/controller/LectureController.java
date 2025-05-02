@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.lecture.controller;
 
-import aibe1.proj2.mentoss.feature.lecture.model.dto.*;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateRequest;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
 import aibe1.proj2.mentoss.global.dto.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -118,17 +119,17 @@ public class LectureController {
 
         // JSON 문자열을 객체 리스트로 파싱
         List<TimeSlotResponse> timeSlots = objectMapper.readValue(
-                lectureDetail.getTimeSlots(),  // getter 사용
+                lectureDetail.timeSlots(),  // Record 필드 직접 접근
                 new TypeReference<List<TimeSlotResponse>>() {}
         );
 
         // 클라이언트에게 반환할 DTO 생성
         LectureDetailResponseDto responseDto = new LectureDetailResponseDto(
-                lectureDetail.getLectureId(),  // getter 사용
-                lectureDetail.getLectureTitle(),
-                lectureDetail.getDescription(),
-                lectureDetail.getPrice(),
-                lectureDetail.getRegions(),
+                lectureDetail.lectureId(),  // Record 필드 직접 접근
+                lectureDetail.lectureTitle(),
+                lectureDetail.description(),
+                lectureDetail.price(),
+                lectureDetail.regions(),
                 timeSlots
         );
 

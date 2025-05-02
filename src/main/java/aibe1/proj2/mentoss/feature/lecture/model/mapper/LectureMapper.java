@@ -1,9 +1,14 @@
 package aibe1.proj2.mentoss.feature.lecture.model.mapper;
 
-import aibe1.proj2.mentoss.feature.lecture.model.dto.*;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureCurriculumResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureDetailResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureReviewResponse;
+import aibe1.proj2.mentoss.feature.lecture.model.entity.Lecture;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -18,8 +23,8 @@ public interface LectureMapper {
             "price, mentor_id, available_time_slots, status) " +
             "VALUES (" +
             "#{lectureTitle}, #{description}, #{categoryId}, #{curriculum}, " +
-            "#{price}, 1, '[]', 'AVAILABLE')")
-    void createLecture(LectureCreateRequest request);
+            "#{price}, #{mentorId}, '[]', #{status})")
+    void createLecture(Lecture lecture);
 
     /**
      * 강의 ID 조회 (생성 후)
@@ -42,7 +47,7 @@ public interface LectureMapper {
     void updateLectureTimeSlots(@Param("lectureId") Long lectureId, @Param("timeSlots") String timeSlotsJson);
 
     /**
-     * 강의 기본 정보 조회 - 컬럼 별칭 명시적으로 지정
+     * 강의 기본 정보 조회 - 생성자 매핑 사용
      */
     @Select("SELECT " +
             "l.lecture_id AS lectureId, " +
@@ -53,28 +58,28 @@ public interface LectureMapper {
             "lc.middle_category AS middleCategory, " +
             "lc.subcategory AS subcategory, " +
             "l.is_closed AS isClosed, " +
-            "l.status AS status " +  // 별칭 추가
+            "l.status AS status " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
             "JOIN app_user u ON mp.user_id = u.user_id " +
             "JOIN lecture_category lc ON l.category_id = lc.category_id " +
             "WHERE l.lecture_id = #{lectureId} " +
             "AND l.is_deleted = FALSE")
-    @Results({
-            @Result(property = "lectureId", column = "lectureId"),
-            @Result(property = "lectureTitle", column = "lectureTitle"),
-            @Result(property = "mentorNickname", column = "mentorNickname"),
-            @Result(property = "createdAt", column = "createdAt"),
-            @Result(property = "parentCategory", column = "parentCategory"),
-            @Result(property = "middleCategory", column = "middleCategory"),
-            @Result(property = "subcategory", column = "subcategory"),
-            @Result(property = "isClosed", column = "isClosed"),
-            @Result(property = "status", column = "status")
+    @ConstructorArgs({
+            @Arg(column = "lectureId", javaType = Long.class),
+            @Arg(column = "lectureTitle", javaType = String.class),
+            @Arg(column = "mentorNickname", javaType = String.class),
+            @Arg(column = "createdAt", javaType = LocalDateTime.class),
+            @Arg(column = "parentCategory", javaType = String.class),
+            @Arg(column = "middleCategory", javaType = String.class),
+            @Arg(column = "subcategory", javaType = String.class),
+            @Arg(column = "isClosed", javaType = boolean.class),
+            @Arg(column = "status", javaType = String.class)
     })
     LectureResponse getLectureById(@Param("lectureId") Long lectureId);
 
     /**
-     * 강의 상세 정보 조회 - 명시적 컬럼 매핑 추가
+     * 강의 상세 정보 조회 - 생성자 매핑 사용
      */
     @Select("SELECT " +
             "l.lecture_id AS lectureId, " +
@@ -85,12 +90,12 @@ public interface LectureMapper {
             "FROM lecture l " +
             "WHERE l.lecture_id = #{lectureId} " +
             "AND l.is_deleted = FALSE")
-    @Results({
-            @Result(property = "lectureId", column = "lectureId"),
-            @Result(property = "lectureTitle", column = "lectureTitle"),
-            @Result(property = "description", column = "description"),
-            @Result(property = "price", column = "price"),
-            @Result(property = "timeSlots", column = "timeSlots")
+    @ConstructorArgs({
+            @Arg(column = "lectureId", javaType = Long.class),
+            @Arg(column = "lectureTitle", javaType = String.class),
+            @Arg(column = "description", javaType = String.class),
+            @Arg(column = "price", javaType = Long.class),
+            @Arg(column = "timeSlots", javaType = String.class)
     })
     LectureDetailResponse getLectureDetailById(@Param("lectureId") Long lectureId);
 
@@ -105,7 +110,7 @@ public interface LectureMapper {
     List<String> getLectureRegions(@Param("lectureId") Long lectureId);
 
     /**
-     * 강의 커리큘럼 조회
+     * 강의 커리큘럼 조회 - 생성자 매핑 사용
      */
     @Select("SELECT " +
             "lecture_id AS lectureId, " +
@@ -113,10 +118,14 @@ public interface LectureMapper {
             "FROM lecture " +
             "WHERE lecture_id = #{lectureId} " +
             "AND is_deleted = FALSE")
+    @ConstructorArgs({
+            @Arg(column = "lectureId", javaType = Long.class),
+            @Arg(column = "curriculum", javaType = String.class)
+    })
     LectureCurriculumResponse getLectureCurriculum(@Param("lectureId") Long lectureId);
 
     /**
-     * 강의 리뷰 목록 조회
+     * 강의 리뷰 목록 조회 - 생성자 매핑 사용
      */
     @Select("SELECT " +
             "r.review_id AS reviewId, " +
@@ -131,6 +140,14 @@ public interface LectureMapper {
             "AND r.is_deleted = FALSE " +
             "AND r.status = 'AVAILABLE' " +
             "ORDER BY r.created_at DESC")
+    @ConstructorArgs({
+            @Arg(column = "reviewId", javaType = Long.class),
+            @Arg(column = "lectureId", javaType = Long.class),
+            @Arg(column = "writerNickname", javaType = String.class),
+            @Arg(column = "content", javaType = String.class),
+            @Arg(column = "rating", javaType = Double.class),
+            @Arg(column = "createdAt", javaType = LocalDateTime.class)
+    })
     List<LectureReviewResponse> getLectureReviews(@Param("lectureId") Long lectureId);
 
     /**

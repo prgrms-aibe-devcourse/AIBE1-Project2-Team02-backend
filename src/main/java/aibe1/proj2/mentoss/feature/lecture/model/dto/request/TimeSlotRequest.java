@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.lecture.model.dto;
+package aibe1.proj2.mentoss.feature.lecture.model.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
