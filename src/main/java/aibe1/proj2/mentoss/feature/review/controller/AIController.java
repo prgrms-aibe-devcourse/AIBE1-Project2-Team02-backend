@@ -24,10 +24,8 @@ public class AIController {
 
         String tag = aiService.answer(prompt);
 
-        // 3) 멘토 프로필의 tag 컬럼에 저장 (Service/Mapper 구현부에서 처리)
-        // mentorProfileService.updateTag(mentorId, tag);
+        aiService.updateMentorTag(mentorId, tag);
 
-        // 4) 생성된 태그를 응답
         return ResponseEntity.ok(ApiResponseFormat.ok(tag));
     }
 }

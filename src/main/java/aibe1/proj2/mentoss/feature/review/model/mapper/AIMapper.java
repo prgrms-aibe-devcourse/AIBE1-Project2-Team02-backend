@@ -5,6 +5,7 @@ import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,4 +29,13 @@ public interface AIMapper {
     LIMIT 10
     """)
     List<ReviewResponseDto> selectReviewsByMentorId(@Param("mentorId") Long mentorId);
+
+
+    @Update("""
+        UPDATE mentor_profile
+        SET tag = #{tag}
+        WHERE mentor_id = #{mentorId}
+    """)
+    void updateMentorTag(@Param("mentorId") Long mentorId,
+                   @Param("tag") String tag);
 }
