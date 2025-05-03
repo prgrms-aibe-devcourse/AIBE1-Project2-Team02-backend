@@ -42,3 +42,6 @@ spring:
 jwt:
   secret: ${JWT_SECRET_KEY}
   expiration-ms: 3600000  # 토큰 유효 시간 (1시간)
+together:
+  api-key: ${TOGETHER_API_KEY}
+  model: ${TOGETHER_MODEL}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tag Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { padding: 8px; margin: 5px 0; width: 200px; }
+        #tagResult { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+<h1>멘토 태그 생성 테스트</h1>
+<label for="mentorId">Mentor ID:</label><br>
+<input type="number" id="mentorId" placeholder="예: 1" /><br>
+<button id="generateBtn">태그 생성</button>
+
+<div id="tagResult"></div>
+
+<script>
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+        const mentorId = document.getElementById('mentorId').value;
+        if (!mentorId) {
+            alert('멘토 ID를 입력해주세요.');
+            return;
+        }
+        try {
+            const response = await fetch(`/api/ai/mentor/${mentorId}/tag`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById('tagResult').innerText = `생성된 태그: ${result.data}`;
+            } else {
+                document.getElementById('tagResult').innerText = `오류: ${result.message}`;
+            }
+        } catch (error) {
+            document.getElementById('tagResult').innerText = '요청 중 오류가 발생했습니다.';
+            console.error(error);
+        }
+    });
+</script>
+</body>
+</html>
