@@ -29,11 +29,6 @@ public interface LectureService {
      */
     LectureResponse getLecture(Long lectureId);
 
-    /**
-     * 강의 상세 정보 조회
-     */
-    LectureDetailResponse getLectureDetail(Long lectureId) throws JsonProcessingException;
-
 
     /**
      * 강의 정보 수정

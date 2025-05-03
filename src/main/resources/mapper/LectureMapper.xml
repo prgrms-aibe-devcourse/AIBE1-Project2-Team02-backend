@@ -171,19 +171,6 @@
           AND l.is_deleted = FALSE
     </select>
 
-    <!-- 강의 상세 정보 조회 -->
-    <select id="getLectureDetailById" resultType="aibe1.proj2.mentoss.feature.lecture.model.dto.response.LectureDetailResponse">
-        SELECT
-            l.lecture_id AS lectureId,
-            l.lecture_title AS lectureTitle,
-            l.description,
-            l.price,
-            l.available_time_slots AS timeSlots
-        FROM lecture l
-        WHERE l.lecture_id = #{lectureId}
-          AND l.is_deleted = FALSE
-    </select>
-
     <!-- 강의 지역 정보 조회 -->
     <select id="getLectureRegions" resultType="string">
         SELECT

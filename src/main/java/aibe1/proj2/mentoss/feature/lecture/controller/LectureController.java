@@ -194,42 +194,7 @@ public class LectureController {
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
-    @GetMapping("/{lectureId}/detail")
-    @Operation(summary = "강의 상세 정보 조회", description = "강의의 상세 정보를 조회합니다.")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "강의 없음",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-            )
-    })
-    public ResponseEntity<ApiResponseFormat<LectureDetailResponseDto>> getLectureDetail(@PathVariable Long lectureId) throws JsonProcessingException {
-        // 서비스에서 상세 정보 조회
-        LectureDetailResponse lectureDetail = lectureService.getLectureDetail(lectureId);
 
-        // JSON 문자열을 객체 리스트로 파싱
-        List<TimeSlotResponse> timeSlots = objectMapper.readValue(
-                lectureDetail.timeSlots(),  // Record 필드 직접 접근
-                new TypeReference<List<TimeSlotResponse>>() {}
-        );
-
-        // 클라이언트에게 반환할 DTO 생성
-        LectureDetailResponseDto responseDto = new LectureDetailResponseDto(
-                lectureDetail.lectureId(),  // Record 필드 직접 접근
-                lectureDetail.lectureTitle(),
-                lectureDetail.description(),
-                lectureDetail.price(),
-                lectureDetail.regions(),
-                timeSlots
-        );
-
-        return ResponseEntity.ok(ApiResponseFormat.ok(responseDto));
-    }
 
 
 

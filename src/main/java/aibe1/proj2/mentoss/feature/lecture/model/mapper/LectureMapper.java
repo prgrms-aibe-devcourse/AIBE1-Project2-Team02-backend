@@ -51,10 +51,6 @@ public interface LectureMapper {
      */
     LectureResponse getLectureById(@Param("lectureId") Long lectureId);
 
-    /**
-     * 강의 상세 정보 조회
-     */
-    LectureDetailResponse getLectureDetailById(@Param("lectureId") Long lectureId);
 
     /**
      * 강의 지역 정보 조회
