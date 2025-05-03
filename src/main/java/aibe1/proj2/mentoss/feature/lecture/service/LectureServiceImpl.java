@@ -8,9 +8,9 @@ import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.global.entity.Lecture;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
 import aibe1.proj2.mentoss.global.entity.Lecture;
-import aibe1.proj2.mentoss.global.exception.EntityNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +93,7 @@ public class LectureServiceImpl implements LectureService {
     public LectureResponse getLecture(Long lectureId) {
         LectureResponse lecture = lectureMapper.getLectureById(lectureId);
         if (lecture == null) {
-            throw new EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
+            throw new jakarta.persistence.EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
         }
         return lecture;
     }
@@ -108,7 +108,7 @@ public class LectureServiceImpl implements LectureService {
         // 강의 존재 여부 확인
         int exists = lectureMapper.existsLectureById(lectureId);
         if (exists == 0) {
-            throw new EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
+            throw new jakarta.persistence.EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
         }
 
         // DTO → 엔티티 변환
