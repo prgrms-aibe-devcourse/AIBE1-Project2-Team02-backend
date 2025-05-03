@@ -66,4 +66,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 
+    /**
+     * 누락된 필드/잘못된 값 예외 처리
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
 }
