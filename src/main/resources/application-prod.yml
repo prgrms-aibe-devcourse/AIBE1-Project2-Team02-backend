@@ -1,13 +1,13 @@
 server:
-  port: 8081
+  port: 8080
 logging:
   level:
-    aibe1.proj2.mentoss.feature.initTest.model.mapper: DEBUG
+    aibe1.proj2.mentoss.feature.initTest.model.mapper: ERROR
 springdoc:
   swagger-ui:
-    enabled: true
+    enabled: false
   api-docs:
-    enabled: true
+    enabled: false
 spring:
   datasource:
     url: ${DB_URL}
