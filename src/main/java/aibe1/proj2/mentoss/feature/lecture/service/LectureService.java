@@ -37,7 +37,6 @@ public interface LectureService {
     boolean updateLecture(Long lectureId, LectureUpdateRequest request) throws JsonProcessingException;
 
 
-
     /**
      * 강의 삭제 (soft delete)
      * @param lectureId 삭제할 강의 ID

@@ -15,8 +15,6 @@ public record LectureResponse(
         String subcategory,
         boolean isClosed,
         String status,
-
-        // 상세 정보 (필수 포함)
         String description,
         Long price,
         String curriculum,
