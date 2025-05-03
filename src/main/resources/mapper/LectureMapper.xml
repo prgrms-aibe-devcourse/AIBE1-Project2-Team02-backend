@@ -152,7 +152,17 @@
             lc.middle_category AS middleCategory,
             lc.subcategory AS subcategory,
             l.is_closed AS isClosed,
-            l.status AS status
+            l.status AS status,
+            l.description AS description,
+            l.price AS price,
+            l.curriculum AS curriculum,
+            (SELECT JSON_ARRAYAGG(
+                            CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))
+                    ) FROM lecture_region lr
+                               JOIN region r ON lr.region_code = r.region_code
+             WHERE lr.lecture_id = l.lecture_id
+            ) AS regions,
+            l.available_time_slots AS timeSlots
         FROM lecture l
                  JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
                  JOIN app_user u ON mp.user_id = u.user_id

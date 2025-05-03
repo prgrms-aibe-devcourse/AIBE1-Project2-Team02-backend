@@ -24,7 +24,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lectures")
@@ -143,26 +145,53 @@ public class LectureController {
         return ResponseEntity.ok(ApiResponseFormat.ok(lectures));
     }
 
-
-
-
     @GetMapping("/{lectureId}")
-    @Operation(summary = "강의 기본 정보 조회", description = "강의의 기본 정보를 조회합니다.")
+    @Operation(summary = "강의 정보 조회", description = "강의의 모든 정보를 조회합니다.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
                     description = "강의 없음",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             )
     })
-    public ResponseEntity<ApiResponseFormat<LectureResponse>> getLecture(@PathVariable Long lectureId) {
+    public ResponseEntity<ApiResponseFormat<Object>> getLecture(@PathVariable Long lectureId) throws JsonProcessingException {
         LectureResponse lecture = lectureService.getLecture(lectureId);
-        return ResponseEntity.ok(ApiResponseFormat.ok(lecture));
+
+        // 클라이언트에게 반환할 형태로 가공
+        Map<String, Object> response = new HashMap<>();
+        response.put("lectureId", lecture.lectureId());
+        response.put("lectureTitle", lecture.lectureTitle());
+        response.put("mentorNickname", lecture.mentorNickname());
+        response.put("createdAt", lecture.createdAt());
+        response.put("updatedAt", lecture.updatedAt());
+        response.put("parentCategory", lecture.parentCategory());
+        response.put("middleCategory", lecture.middleCategory());
+        response.put("subcategory", lecture.subcategory());
+        response.put("isClosed", lecture.isClosed());
+        response.put("status", lecture.status());
+        response.put("description", lecture.description());
+        response.put("price", lecture.price());
+        response.put("curriculum", lecture.curriculum());
+
+        // JSON 문자열을 객체로 파싱
+        List<String> regionList = null;
+        if (lecture.regions() != null && !lecture.regions().isEmpty()) {
+            regionList = objectMapper.readValue(lecture.regions(), new TypeReference<List<String>>() {});
+        }
+        response.put("regions", regionList);
+
+        List<TimeSlotResponse> timeSlotList = null;
+        if (lecture.timeSlots() != null && !lecture.timeSlots().isEmpty()) {
+            timeSlotList = objectMapper.readValue(lecture.timeSlots(), new TypeReference<List<TimeSlotResponse>>() {});
+        }
+        response.put("timeSlots", timeSlotList);
+
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
     @GetMapping("/{lectureId}/detail")
