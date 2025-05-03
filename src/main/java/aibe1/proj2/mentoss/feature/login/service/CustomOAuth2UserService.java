@@ -1,0 +1,103 @@
+package aibe1.proj2.mentoss.feature.login.service;
+
+import aibe1.proj2.mentoss.feature.login.model.mapper.AppUserMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+
+    private final AppUserMapper appUserMapper;
+
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
+        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+
+        String provider = userRequest.getClientRegistration().getRegistrationId();
+
+        String providerId = getProviderId(oAuth2User, provider);
+        String email = getEmail(oAuth2User, provider);
+        String nickname = getNickname(oAuth2User, provider);
+        String profileImage = getProfileImage(oAuth2User, provider);
+
+
+        log.info("소셜 로그인 성공: provider={}, providerId={}, email={}", provider, providerId, email);
+
+        return oAuth2User;
+    }
+
+    private String getProviderId(OAuth2User oAuth2User, String provider) {
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        if("google".equals(provider)) {
+            return (String) attributes.get("sub");
+        } else if ("kakao".equals(provider)) {
+            return String.valueOf(attributes.get("id"));
+        }
+
+        return null;
+    }
+
+    private String getEmail(OAuth2User oAuth2User, String provider) {
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        if("google".equals(provider)) {
+            return (String) attributes.get("email");
+        } else if ("kakao".equals(provider)) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            return kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+        }
+
+        return null;
+    }
+
+    private String getNickname(OAuth2User oAuth2User, String provider) {
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        if ("google".equals(provider)) {
+            return (String) attributes.get("name");
+        } else if ("kakao".equals(provider)) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            if (kakaoAccount != null) {
+                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+                return profile != null ? (String) profile.get("nickname") : null;
+            }
+        }
+
+        return null;
+    }
+
+    private String getProfileImage(OAuth2User oAuth2User, String provider) {
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        if("google".equals(provider)) {
+            return (String) attributes.get("picture");
+        } else if ("kakao".equals(provider)) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            if (kakaoAccount != null) {
+                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+                return profile != null ? (String) profile.get("profile_image_url") : null;
+            }
+        }
+
+        return null;
+    }
+
+
+
+
+}
+
+
