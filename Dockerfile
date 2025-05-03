@@ -17,4 +17,8 @@ WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
+
+# Spring 프로필을 'prod'로 설정
+ENV SPRING_PROFILES_ACTIVE=prod
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
