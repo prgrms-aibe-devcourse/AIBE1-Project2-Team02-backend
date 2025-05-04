@@ -14,16 +14,30 @@ public interface MessageMapper {
     @Select("""
                 SELECT * FROM message
                 WHERE sender_id = #{userId} AND is_deleted = 0
-                ORDER BY created_at DESC
+                ORDER BY message_id DESC
+                LIMIT #{limit} OFFSET #{offset}
             """)
-    List<Message> findSentMessages(Long userId);
+    List<Message> findSentMessages(Long userId, int limit, int offset);
 
     @Select("""
                 SELECT * FROM message
                 WHERE receiver_id = #{userId} AND is_deleted = 0
-                ORDER BY created_at DESC
+                ORDER BY message_id DESC
+                LIMIT #{limit} OFFSET #{offset}
             """)
-    List<Message> findReceivedMessages(Long userId);
+    List<Message> findReceivedMessages(Long userId, int limit, int offset);
+
+    @Select("""
+                SELECT COUNT(*) FROM message
+                WHERE sender_id = #{userId} AND is_deleted = 0
+            """)
+    int countSentMessages(Long userId);
+
+    @Select("""
+                SELECT COUNT(*) FROM message
+                WHERE receiver_id = #{userId} AND is_deleted = 0
+            """)
+    int countReceivedMessages(Long userId);
 
 
     @Select("SELECT * FROM message WHERE message_id = #{id} AND is_deleted = 0")

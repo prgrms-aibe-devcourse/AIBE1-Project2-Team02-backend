@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.message.controller;
 
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageResponseDto;
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageSendRequestDto;
+import aibe1.proj2.mentoss.feature.message.model.dto.PageResponse;
 import aibe1.proj2.mentoss.feature.message.service.MessageService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,17 +28,23 @@ public class MessageController {
 
     @Operation(summary = "보낸 편지함 조회", description = "현재 로그인한 사용자가 보낸 메시지를 조회합니다.")
     @GetMapping("/sent")
-    public ResponseEntity<ApiResponseFormat<List<MessageResponseDto>>> getSentMessages(Authentication authentication) {
-//        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
-        List<MessageResponseDto> messages = messageService.getSentMessages(userId);
-        return ResponseEntity.ok(ApiResponseFormat.ok(messages));
+    public ResponseEntity<ApiResponseFormat<PageResponse<MessageResponseDto>>> getSentMessages(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<MessageResponseDto> response = messageService.getSentMessages(userId, page, size);
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
     @Operation(summary = "받은 편지함 조회", description = "현재 로그인한 사용자가 받은 메시지를 조회합니다.")
     @GetMapping("/received")
-    public ResponseEntity<ApiResponseFormat<List<MessageResponseDto>>> getReceivedMessages(Authentication authentication) {
-        List<MessageResponseDto> messages = messageService.getReceivedMessages(userId);
-        return ResponseEntity.ok(ApiResponseFormat.ok(messages));
+    public ResponseEntity<ApiResponseFormat<PageResponse<MessageResponseDto>>> getReceivedMessages(
+            Authentication authentication,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<MessageResponseDto> response = messageService.getReceivedMessages(userId, page, size);
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
     @Operation(summary = "쪽지 조회", description = "쪽지 ID를 통해 쪽지를 조회합니다.")
