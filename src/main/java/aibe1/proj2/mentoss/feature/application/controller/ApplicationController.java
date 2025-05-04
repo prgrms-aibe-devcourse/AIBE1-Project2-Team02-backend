@@ -69,4 +69,22 @@ public class ApplicationController {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
+    @Operation(summary = "과외 신청 폼 데이터 조회", description = "과외 ID를 통해 신청 폼에 필요한 정보를 조회합니다.")
+    @GetMapping("/{lectureId}/apply-form")
+    public ResponseEntity<ApiResponseFormat<LectureApplyFormDto>> getLectureApplyForm(
+            @PathVariable Long lectureId
+    ) {
+        LectureApplyFormDto dto = applicationService.getLectureApplyForm(lectureId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(dto));
+    }
+
+
+    @Operation(summary = "과외 신청", description = "특정 과외에 대해 신청을 보냅니다. 신청 시간과 선택 메시지를 포함합니다.")
+    @PostMapping("/apply")
+    public ResponseEntity<ApiResponseFormat<Void>> applyForLecture(
+            @RequestBody LectureApplyRequestDto dto
+    ) {
+        applicationService.applyForLecture(dto, menteeId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
 }

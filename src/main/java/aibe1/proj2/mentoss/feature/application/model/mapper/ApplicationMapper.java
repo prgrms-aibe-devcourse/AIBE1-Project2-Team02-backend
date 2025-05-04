@@ -1,11 +1,9 @@
 package aibe1.proj2.mentoss.feature.application.model.mapper;
 
-import aibe1.proj2.mentoss.feature.application.model.dto.ApplicationInfoDto;
-import aibe1.proj2.mentoss.feature.application.model.dto.AppliedLectureResponseDto;
-import aibe1.proj2.mentoss.feature.application.model.dto.LectureApplicantDto;
-import aibe1.proj2.mentoss.feature.application.model.dto.LectureResponseDto;
+import aibe1.proj2.mentoss.feature.application.model.dto.*;
 import aibe1.proj2.mentoss.global.entity.Application;
 import aibe1.proj2.mentoss.global.entity.Lecture;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -39,6 +37,7 @@ public interface ApplicationMapper {
                     SELECT lecture_id, ROUND(AVG(rating), 1) AS average_rating
                     FROM review
                     WHERE is_deleted = 0
+                    AND status = 'AVAILABLE'
                     GROUP BY lecture_id
                 ) rv_avg ON rv_avg.lecture_id = l.lecture_id
                 LEFT JOIN (
@@ -75,6 +74,7 @@ public interface ApplicationMapper {
                     SELECT lecture_id, ROUND(AVG(rating), 1) AS average_rating
                     FROM review
                     WHERE is_deleted = 0
+                    AND status = 'AVAILABLE'
                     GROUP BY lecture_id
                 ) rv_avg ON rv_avg.lecture_id = l.lecture_id
                 LEFT JOIN (
@@ -116,7 +116,7 @@ public interface ApplicationMapper {
     // 수락 처리
     @Update("""
         UPDATE application
-        SET status = 'ACCEPTED', updated_at = CURRENT_TIMESTAMP
+        SET status = 'APPROVED', updated_at = CURRENT_TIMESTAMP
         WHERE application_id = #{applicationId}
     """)
     void acceptApplication(Long applicationId);
@@ -146,4 +146,46 @@ public interface ApplicationMapper {
                 WHERE application_id = #{applicationId}
             """)
     String findStatusByApplicationId(Long applicationId);
+
+
+    @Select("""
+                SELECT
+                    l.lecture_id,
+                    l.lecture_title,
+                    l.available_time_slots,
+                    u.profile_image,
+                    u.nickname,
+                    mp.education,
+                    mp.major,
+                    mp.is_certified,
+                    COALESCE(rv_avg.average_rating, 0) AS average_rating
+                FROM lecture l
+                JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
+                JOIN app_user u ON mp.user_id = u.user_id
+                LEFT JOIN (
+                    SELECT mentor_id, ROUND(AVG(rating), 1) AS average_rating
+                    FROM review
+                    WHERE is_deleted = 0
+                    AND status = 'AVAILABLE'
+                    GROUP BY mentor_id
+                ) rv_avg ON rv_avg.mentor_id = l.mentor_id
+                WHERE
+                    l.lecture_id = #{lectureId}
+                    AND l.is_deleted = 0
+                    AND l.status = 'AVAILABLE'
+            """)
+    LectureApplyFormRawDto findLectureApplyFormData(Long lectureId);
+
+    @Insert("""
+                INSERT INTO application (lecture_id, mentee_id, requested_time_slots, status, is_deleted, created_at, updated_at) 
+                VALUES (#{lectureId}, #{menteeId}, #{requestedTimeSlots},'PENDING',0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            """)
+    void insertApplication(Long lectureId, Long menteeId, String requestedTimeSlots);
+
+    @Select("""
+                SELECT lecture_title, mentor_id
+                FROM lecture
+                WHERE lecture_id = #{lectureId}
+            """)
+    LectureSimpleInfoDto findLectureSimpleInfo(Long lectureId);
 }
