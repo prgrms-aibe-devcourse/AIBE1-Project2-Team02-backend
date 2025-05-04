@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.message.service;
 
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageResponseDto;
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageSendRequestDto;
+import aibe1.proj2.mentoss.feature.message.model.dto.PageResponse;
 import aibe1.proj2.mentoss.feature.message.model.mapper.MessageMapper;
 import aibe1.proj2.mentoss.global.entity.Message;
 import lombok.AllArgsConstructor;
@@ -16,19 +17,28 @@ public class MessageServiceImpl implements MessageService{
     private final MessageMapper messageMapper;
 
     @Override
-    public List<MessageResponseDto> getSentMessages(Long senderId) {
-        List<Message> messages = messageMapper.findSentMessages(senderId);
-        return messages.stream()
-                .map(message -> MessageResponseDto.fromEntity(message, senderId))
+    public PageResponse<MessageResponseDto> getSentMessages(Long senderId, int page, int size) {
+        int offset = (page - 1) * size;
+        List<Message> messages = messageMapper.findSentMessages(senderId, size, offset);
+        int totalCount = messageMapper.countSentMessages(senderId);
+
+        List<MessageResponseDto> content = messages.stream()
+                .map(m -> MessageResponseDto.fromEntity(m, senderId))
                 .toList();
+
+        return PageResponse.of(content, page, size, totalCount);
     }
 
     @Override
-    public List<MessageResponseDto> getReceivedMessages(Long receiverId) {
-        List<Message> messages = messageMapper.findReceivedMessages(receiverId);
-        return messages.stream()
+    public PageResponse<MessageResponseDto> getReceivedMessages(Long receiverId, int page, int size) {
+        int offset = (page - 1) * size;
+        List<Message> messages = messageMapper.findReceivedMessages(receiverId, size, offset);
+        int totalCount = messageMapper.countSentMessages(receiverId);
+
+        List<MessageResponseDto> content = messages.stream()
                 .map(message -> MessageResponseDto.fromEntity(message, receiverId))
                 .toList();
+        return PageResponse.of(content, page, size, totalCount);
     }
 
     @Override

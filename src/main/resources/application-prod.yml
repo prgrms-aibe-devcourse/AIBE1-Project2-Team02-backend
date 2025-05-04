@@ -42,3 +42,15 @@ spring:
 jwt:
   secret: ${JWT_SECRET_KEY}
   expiration-ms: 3600000  # 토큰 유효 시간 (1시간)
+together:
+  api-key: ${TOGETHER_API_KEY}
+  model: ${TOGETHER_MODEL}
+  prompt: ${TOGETHER_PROMPT}
+
+cloudflare:
+  r2:
+    endpoint: ${CLOUDFLARE_R2_ENDPOINT}
+    access-key: ${CLOUDFLARE_R2_ACCESS_KEY}
+    secret-key: ${CLOUDFLARE_R2_SECRET_KEY}
+    bucket: ${CLOUDFLARE_R2_BUCKET}
+    public-url: ${CLOUDFLARE_R2_PUBLIC_URL}
