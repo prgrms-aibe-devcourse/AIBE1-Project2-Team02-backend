@@ -1,0 +1,147 @@
+[33mcommit b2f37e91df40cfa4e6ab5216f748f35df34ae5c8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/lecture[m[33m)[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Sat May 3 04:51:09 2025 +0900
+
+    feat:필터검색 기능 추가
+
+[33mcommit 5b9aa570caf6995a4283672465b5d5c28ac44518[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 15:43:31 2025 +0900
+
+    feat: 수정 기능 추가
+
+[33mcommit a6db38a22b0d4d750b4ee36f10389fc1d2bbef8d[m
+Merge: cd13153 d3de334
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 14:38:38 2025 +0900
+
+    chore: dev 브랜치 최신 커밋 병합
+
+[33mcommit d3de3343dec07711b5c9c05c2aa0f8a879368ade[m[33m ([m[1;31mupstream/dev[m[33m)[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Fri May 2 14:29:47 2025 +0900
+
+    Remove: test파일 삭제
+
+[33mcommit cd1315329351180cdcfc1f37f4fe3f1becccd2f9[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 14:16:15 2025 +0900
+
+    chore: dev 브랜치 최신 커밋 병합
+
+[33mcommit b22268a83099a22d133de6c1ae492ab2fe47ed60[m
+Merge: 9d345e5 7a8eccf
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 14:07:07 2025 +0900
+
+    Merge branch 'dev' of https://github.com/prgrms-aibe-devcourse/AIBE1-Project2-Team02-backend into feature/lecture
+
+[33mcommit 9d345e5723e7eb94f9f791e9c5ab8fcfc9b51a84[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 14:06:53 2025 +0900
+
+    refactor:controller 기능ë별 분할
+
+[33mcommit 7a8eccf5c8ec37ebf34408dc28dd6901d4138b85[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Fri May 2 13:02:21 2025 +0900
+
+    Rename: ApiResponse 이름 변경
+
+[33mcommit 0cc1247bf238ef8b9eb0413c60b1b99f7b9e55d4[m
+Merge: d5141b3 1235c27
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 12:11:50 2025 +0900
+
+    chore: dev 브랜치 최신 커밋 병합
+
+[33mcommit d5141b334aed1f18384c6de908acbb119d3775ee[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 11:47:24 2025 +0900
+
+    feat:강의 사상태변경 기능 추가
+
+[33mcommit 1235c271500be14080d76dbd4cf8e4a7d23a5fbf[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Fri May 2 11:30:41 2025 +0900
+
+    Refactor: Global Entity추가, Exception추가, AppConfig 추가, jackson의존성 추가
+
+[33mcommit 5675c0a0a4bb543fccadf82c83035394f8282578[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 11:02:44 2025 +0900
+
+    ããrefactor: ãclass -> recode타입으로 변환
+
+[33mcommit 256981a2ef995af9d92357118c4270d55d9be6ed[m[33m ([m[1;31morigin/feature/lecture[m[33m)[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Fri May 2 03:12:39 2025 +0900
+
+    feat: 강의 조회/생성 기능 추가
+
+[33mcommit 464a30d64456f876b1835574a3f6a021d7bcde22[m
+Author: YoungBeen <rhdudqls73@gmail.com>
+Date:   Thu May 1 16:34:14 2025 +0900
+
+    feat: ê과외 생성,ì¡상세조회 DTO ã작성
+
+[33mcommit 2baee0b361b42edc45ba14004920a609961eaa2b[m[33m ([m[1;31morigin/dev[m[33m, [m[1;32mdev[m[33m)[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Thu May 1 14:10:29 2025 +0900
+
+    Feaeaeaãeat: API 응답 dto 추가
+
+[33mcommit bc3aca1c56c7687184d225b7f9b9b93f272ecef9[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Wed Apr 30 15:31:10 2025 +0900
+
+    Chore: DockerFile 추ã가
+
+[33mcommit d9cfd8eb3995cd62778e706ab75979f0f5aa4685[m
+Merge: 4ab45a3 c37a594
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Mon Apr 28 18:23:28 2025 +0900
+
+    Merge branch 'dev' of https://github.com/prgrms-aibe-devcourse/AIBE1-Project2-Team02-backend into dev
+
+[33mcommit 4ab45a30170a34c523139e75f0dc853497435baf[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Mon Apr 28 18:23:07 2025 +0900
+
+    Rename: 프로젝트명 mentoss로  변경
+
+[33mcommit c37a59425f1b09f47a8aed7d38b0985223578675[m
+Merge: f542884 f8df036
+Author: YB L <87692810+dldudqlsdlqslek@users.noreply.github.com>
+Date:   Mon Apr 28 15:00:23 2025 +0900
+
+    Chore:  DB드라이버 변경
+    
+    Chore:  DB드라이버 변경
+
+[33mcommit f8df03641a9a820311d509561767bf1b1cc331b7[m[33m ([m[1;31morigin/main[m[33m)[m
+Merge: 952286f f542884
+Author: YB L <87692810+dldudqlsdlqslek@users.noreply.github.com>
+Date:   Mon Apr 28 14:55:33 2025 +0900
+
+    Merge pull request #1 from prgrms-aibe-devcourse/dev
+    
+    Chore:  DB드라이버 변경
+
+[33mcommit f5428841c356349b4422976d6cd87bb284de64dc[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Mon Apr 28 14:54:08 2025 +0900
+
+    Chore:  DB드라이버 변경
+
+[33mcommit 952286fc58ca643045ce0574b64f621e472724d0[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Mon Apr 28 12:43:07 2025 +0900
+
+    Initial commit
+
+[33mcommit b4370a33c56af5ea2be473e5e19235b0f294c452[m
+Author: dldsudqlsdlqslek <tina4686@gmail.com>
+Date:   Mon Apr 28 12:42:59 2025 +0900
+
+    Initial commit
