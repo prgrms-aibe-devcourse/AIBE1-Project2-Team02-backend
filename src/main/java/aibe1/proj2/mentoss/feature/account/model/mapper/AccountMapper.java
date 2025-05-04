@@ -50,4 +50,11 @@ public interface AccountMapper {
             "AND birth_date IS NOT NULL " +
             "AND sex IS NOT NULL")
     boolean isProfileCompleted(Long userId);
+
+
+    @Update("UPDATE app_user SET " +
+            "is_deleted = #{isDeleted}, " +
+            "deleted_at = #{deletedAt} " +
+            "WHERE user_id = #{userId}")
+    void softDeleteUser(AppUser appUser);
 }

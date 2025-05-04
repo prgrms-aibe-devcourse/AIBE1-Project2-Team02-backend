@@ -49,4 +49,13 @@ public class AccountController {
         boolean isCompleted = accountService.isProfileCompleted(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(isCompleted));
     }
+
+    @Operation(summary = "회원 탈퇴", description = "로그인한 사용자의 계정을 삭제 합니다")
+    @DeleteMapping("/profile")
+    public ResponseEntity<ApiResponseFormat<Void>> deleteAccount(
+            Authentication authentication) {
+        Long userId = 1L;
+        accountService.deleteAccount(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
 }

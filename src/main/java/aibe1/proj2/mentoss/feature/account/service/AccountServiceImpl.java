@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -94,5 +95,18 @@ public class AccountServiceImpl implements AccountService {
         return appUser.getNickname() != null &&
                 appUser.getBirthDate() != null &&
                 appUser.getSex() != null;
+    }
+
+    @Override
+    public void deleteAccount(Long userId) {
+        AppUser appUser = accountMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+
+        appUser.setIsDeleted(true);
+        appUser.setDeletedAt(LocalDateTime.now());
+
+        accountMapper.softDeleteUser(appUser);
+
+        accountMapper.deleteUserRegion(userId);
     }
 }

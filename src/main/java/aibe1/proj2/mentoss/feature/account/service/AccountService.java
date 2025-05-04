@@ -12,4 +12,6 @@ public interface AccountService {
     Long calculateAge(String birthDate);
 
     boolean isProfileCompleted(Long userId);
+
+    void deleteAccount(Long userId);
 }
