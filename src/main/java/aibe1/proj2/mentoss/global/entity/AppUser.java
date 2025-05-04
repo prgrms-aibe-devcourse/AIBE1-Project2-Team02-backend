@@ -19,6 +19,7 @@ public class AppUser {
     private String providerId;
     private String email;
     private String nickname;
+    private String birthDate;
     private Long age;
     private String sex;
     private String profileImage;
