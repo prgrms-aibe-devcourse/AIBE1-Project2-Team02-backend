@@ -3,6 +3,7 @@ package aibe1.proj2.mentoss.feature.account.controller;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import aibe1.proj2.mentoss.feature.account.service.AccountService;
+import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,8 +23,7 @@ public class AccountController {
     @Operation(summary = "프로필 조회", description = "로그인한 사용자의 프로필 정보를 조회합니다")
     @GetMapping("/profile")
     public ResponseEntity<ApiResponseFormat<ProfileResponseDto>> getProfile(Authentication authentication) {
-        // 개발 중에는 임시로 고정 ID 사용
-        Long userId = 1L; // 나중에 실제 인증 구현으로 대체
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         ProfileResponseDto profileDto = accountService.getProfile(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(profileDto));
     }
@@ -35,7 +35,7 @@ public class AccountController {
             Authentication authentication,
             @RequestBody ProfileUpdateRequestDto requestDto
     ) {
-        Long userId = 1L;
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.updateProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
@@ -45,7 +45,7 @@ public class AccountController {
     @GetMapping("/profile/completed")
     public ResponseEntity<ApiResponseFormat<Boolean>> isProfileCompleted(
             Authentication authentication) {
-        Long userId = 1L;
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         boolean isCompleted = accountService.isProfileCompleted(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(isCompleted));
     }
@@ -54,7 +54,7 @@ public class AccountController {
     @DeleteMapping("/profile")
     public ResponseEntity<ApiResponseFormat<Void>> deleteAccount(
             Authentication authentication) {
-        Long userId = 1L;
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.deleteAccount(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
