@@ -1,0 +1,11 @@
+package aibe1.proj2.mentoss.feature.review.service;
+
+import aibe1.proj2.mentoss.feature.review.model.dto.TagResponseDto;
+
+public interface AIService {
+    TagResponseDto answer(String prompt) throws Exception;
+
+    String createPrompt(Long mentorId);
+
+    void updateMentorTag(Long mentorId, String tag);
+}
