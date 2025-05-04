@@ -81,7 +81,7 @@ public class SecurityConfig {
                 // 요청에 대한 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         // 공개 API 엔드포인트
-                        .requestMatchers("/test/**", "/api/test/**", "/api/auth/test/public", "/oauth2/**", "/login/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/test/**", "/api/test/**", "/api/auth/test/public", "/oauth2/**", "/login/**", "/css/**", "/js/**", "/images/**", "/api/ping").permitAll()
                         // 관리자만 접근 가능한 엔드포인트
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 인증된 사용자만 접근 가능한 나머지 엔드포인트
