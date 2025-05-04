@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.review.service;
 
 
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
+import aibe1.proj2.mentoss.feature.review.model.dto.TagResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.TogetherApiDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.TogetherApiResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.mapper.AIMapper;
@@ -27,9 +28,11 @@ public class AIServiceImpl implements AIService {
     private String apiKey;
     @Value("${together.model}")
     private String model;
+    @Value("${together.prompt}")
+    private String prePrompt;
 
     @Override
-    public String answer(String prompt) throws Exception {
+    public TagResponseDto answer(String prompt) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(new TogetherApiDto(model, List.of(new TogetherApiDto.Message("user", prompt))));
@@ -41,7 +44,7 @@ public class AIServiceImpl implements AIService {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 200) {
-            return mapper.readValue(response.body(), TogetherApiResponseDto.class).choices().get(0).message().content();
+            return new TagResponseDto(mapper.readValue(response.body(), TogetherApiResponseDto.class).choices().get(0).message().content());
         }
         throw new Exception("Inavlid response");
     }
@@ -53,7 +56,7 @@ public class AIServiceImpl implements AIService {
                 .map(ReviewResponseDto::content)
                 .collect(Collectors.joining("\n"));
 
-        return "아래 후기들은 과외 강사에게 달린 후기 10개 입니다. 이 내용을 바탕으로 이 강사의 특징을 파악해 짧고 간결하게 한 문장으로 요약해주세요. :\n" + allContents;
+        return prePrompt + allContents;
     }
 
     @Override

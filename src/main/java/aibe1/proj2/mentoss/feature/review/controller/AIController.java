@@ -1,14 +1,13 @@
 package aibe1.proj2.mentoss.feature.review.controller;
 
 
+import aibe1.proj2.mentoss.feature.review.model.dto.CreateTagRequestDto;
+import aibe1.proj2.mentoss.feature.review.model.dto.TagResponseDto;
 import aibe1.proj2.mentoss.feature.review.service.AIService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -16,16 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AIController {
     private final AIService aiService;
 
-    @PostMapping("/mentor/{mentorId}/tag")
-    public ResponseEntity<ApiResponseFormat<String>> generateMentorTag(
-            @PathVariable Long mentorId) throws Exception {
+    @PostMapping("/tag")
+    public ResponseEntity<ApiResponseFormat<TagResponseDto>> generateMentorTag(
+            @RequestBody CreateTagRequestDto dto) throws Exception {
 
-        String prompt = aiService.createPrompt(mentorId);
+        String prompt = aiService.createPrompt(dto.mentorId());
 
-        String tag = aiService.answer(prompt);
+        TagResponseDto response = aiService.answer(prompt);
 
-        aiService.updateMentorTag(mentorId, tag);
+        aiService.updateMentorTag(dto.mentorId(), response.tag());
 
-        return ResponseEntity.ok(ApiResponseFormat.ok(tag));
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 }
