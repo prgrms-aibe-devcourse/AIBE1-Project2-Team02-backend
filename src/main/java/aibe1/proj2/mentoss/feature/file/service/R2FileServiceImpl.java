@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -54,5 +55,34 @@ public class R2FileServiceImpl implements FileService {
         r2Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
 
         return publicUrl + "/" + key;
+    }
+
+    @Override
+    public boolean deleteFile(String fileUrl) {
+
+        if (fileUrl == null || !fileUrl.startsWith(publicUrl)) {
+            return false;
+        }
+
+        String key;
+
+        try {
+            if (fileUrl.length() > publicUrl.length() + 1) {
+                key = fileUrl.substring(publicUrl.length() + 1);
+            } else {
+                return false;
+            }
+
+            DeleteObjectRequest request = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+
+            r2Client.deleteObject(request);
+            return true;
+        } catch (Exception e) {
+            log.error("파일 삭제 중 오류 발생: {}", e.getMessage(), e);
+            return false;
+        }
     }
 }
