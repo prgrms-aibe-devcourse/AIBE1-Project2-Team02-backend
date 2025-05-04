@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.test;
 
+import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @GetMapping("/api/test/hello")
-    public String helloTest() {
-        return "CORS 설정이 잘 되었습니다!";
+    public ApiResponseFormat<String> helloTest() {
+        return ApiResponseFormat.ok("CORS 설정이 잘 되었습니다!");
     }
 }
