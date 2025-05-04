@@ -23,7 +23,7 @@ public class ApplicationController {
             summary = "내가 신청한 과외 목록 조회",
             description = "현재 로그인한 사용자가 신청한 과외 목록을 조회합니다."
     )
-    @GetMapping("/my-applied")
+    @GetMapping("/apply/list")
     public ResponseEntity<ApiResponseFormat<List<AppliedLectureResponseDto>>> getMyAppliedLectures() {
         List<AppliedLectureResponseDto> result = applicationService.getMyAppliedLectures(menteeId);
         return ResponseEntity.ok(ApiResponseFormat.ok(result));
@@ -33,7 +33,7 @@ public class ApplicationController {
             summary = "내가 등록한 과외 목록 조회",
             description = "현재 로그인한 사용자가 등록한 과외 목록을 조회합니다."
     )
-    @GetMapping("/my-lectures")
+    @GetMapping("/apply/lectures/list")
     public ResponseEntity<ApiResponseFormat<List<LectureResponseDto>>> getLecturesByMentor() {
         List<LectureResponseDto> result = applicationService.getLecturesByMentor(mentorId);
         return ResponseEntity.ok(ApiResponseFormat.ok(result));
@@ -70,7 +70,7 @@ public class ApplicationController {
     }
 
     @Operation(summary = "과외 신청 폼 데이터 조회", description = "과외 ID를 통해 신청 폼에 필요한 정보를 조회합니다.")
-    @GetMapping("/{lectureId}/apply-form")
+    @GetMapping("/{lectureId}/form/list")
     public ResponseEntity<ApiResponseFormat<LectureApplyFormDto>> getLectureApplyForm(
             @PathVariable Long lectureId
     ) {
