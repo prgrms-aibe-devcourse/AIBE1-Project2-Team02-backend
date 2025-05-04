@@ -10,4 +10,6 @@ public interface AccountService {
     void updateProfile(Long userId, ProfileUpdateRequestDto requestDto);
 
     Long calculateAge(String birthDate);
+
+    boolean isProfileCompleted(Long userId);
 }

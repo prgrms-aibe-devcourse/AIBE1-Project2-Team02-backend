@@ -39,4 +39,14 @@ public class AccountController {
         accountService.updateProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
+
+
+    @Operation(summary = "프로필 완성 여부 확인", description = "로그인한 사용자의 프로필이 완성되었는지 확인합니다")
+    @GetMapping("/profile/completed")
+    public ResponseEntity<ApiResponseFormat<Boolean>> isProfileCompleted(
+            Authentication authentication) {
+        Long userId = 1L;
+        boolean isCompleted = accountService.isProfileCompleted(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(isCompleted));
+    }
 }

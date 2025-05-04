@@ -85,4 +85,14 @@ public class AccountServiceImpl implements AccountService {
             return null;
         }
     }
+
+    @Override
+    public boolean isProfileCompleted(Long userId) {
+        AppUser appUser = accountMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+
+        return appUser.getNickname() != null &&
+                appUser.getBirthDate() != null &&
+                appUser.getSex() != null;
+    }
 }
