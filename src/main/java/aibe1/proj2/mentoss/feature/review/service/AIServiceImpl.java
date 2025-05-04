@@ -6,6 +6,9 @@ import aibe1.proj2.mentoss.feature.review.model.dto.TagResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.TogetherApiDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.TogetherApiResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.mapper.AIMapper;
+import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
+import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
+import aibe1.proj2.mentoss.global.exception.TogetherApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AIServiceImpl implements AIService {
     private final AIMapper aiMapper;
+    private final ReviewMapper reviewMapper;
 
 
     @Value("${together.api-key}")
@@ -46,11 +50,14 @@ public class AIServiceImpl implements AIService {
         if (response.statusCode() == 200) {
             return new TagResponseDto(mapper.readValue(response.body(), TogetherApiResponseDto.class).choices().get(0).message().content());
         }
-        throw new Exception("Inavlid response");
+        throw new TogetherApiException("TogetherAI API 응답이 올바르지 않습니다. Api Status : " + response.statusCode());
     }
 
     @Override
     public String createPrompt(Long mentorId) {
+        if (!reviewMapper.existsMentor(mentorId)) {
+            throw new ResourceNotFoundException("Mentor", mentorId);
+        }
         List<ReviewResponseDto> reviews = aiMapper.selectReviewsByMentorId(mentorId);
         String allContents = reviews.stream()
                 .map(ReviewResponseDto::content)

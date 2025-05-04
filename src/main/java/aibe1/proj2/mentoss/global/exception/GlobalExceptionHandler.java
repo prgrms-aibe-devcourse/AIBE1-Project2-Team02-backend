@@ -75,4 +75,14 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
+
+    /**
+     * TogetherAI LLM API 응답 오류 처리
+     */
+    @ExceptionHandler(TogetherApiException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleTogetherApiException(TogetherApiException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
 }
