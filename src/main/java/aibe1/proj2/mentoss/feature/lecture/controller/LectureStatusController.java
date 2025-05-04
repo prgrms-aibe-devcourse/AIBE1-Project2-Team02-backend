@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/lectures")
-@Tag(name = "강의 API", description = "강의 오픈/마감 API")
+@Tag(name = "과외 게시글 API", description = "과외게시글 관련 API")
 public class LectureStatusController {
     private final LectureService lectureService;
 

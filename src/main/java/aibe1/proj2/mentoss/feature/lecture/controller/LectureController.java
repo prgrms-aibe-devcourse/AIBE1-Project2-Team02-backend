@@ -30,7 +30,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lectures")
-@Tag(name = "강의 API", description = "강의 생성 및 조회 관련 API")
+@Tag(name = "과외 게시글 API", description = "과외게시글 관련 API")
 public class LectureController {
 
     private final LectureService lectureService;
