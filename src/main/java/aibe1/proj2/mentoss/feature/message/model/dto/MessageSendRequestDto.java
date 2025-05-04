@@ -3,7 +3,6 @@ package aibe1.proj2.mentoss.feature.message.model.dto;
 import aibe1.proj2.mentoss.global.entity.Message;
 
 public record MessageSendRequestDto(
-
         Long receiverId,
         String content
 ) {

@@ -13,4 +13,8 @@ public interface ApplicationService {
     List<LectureResponseDto> getLecturesByMentor(Long mentorId);
 
     List<LectureApplicantDto> getApplicantsByLectureId(Long lectureId);
+
+    void approveApplication(Long applicationId, Long senderId);
+
+    void rejectApplication(Long applicationId, String rejectReason , Long senderId);
 }

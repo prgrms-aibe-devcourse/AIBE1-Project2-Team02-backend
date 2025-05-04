@@ -1,8 +1,6 @@
 package aibe1.proj2.mentoss.feature.application.controller;
 
-import aibe1.proj2.mentoss.feature.application.model.dto.AppliedLectureResponseDto;
-import aibe1.proj2.mentoss.feature.application.model.dto.LectureApplicantDto;
-import aibe1.proj2.mentoss.feature.application.model.dto.LectureResponseDto;
+import aibe1.proj2.mentoss.feature.application.model.dto.*;
 import aibe1.proj2.mentoss.feature.application.service.ApplicationService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +41,7 @@ public class ApplicationController {
 
     @Operation(
             summary = "신청한 멘티 리스트 조회",
-            description = "특정 강의에 대해 신청한 멘티들의 목록을 조회합니다."
+            description = "특정 과외에 대해 신청한 멘티들의 목록을 조회합니다."
     )
     @GetMapping("/{lectureId}/applicants")
     public ResponseEntity<ApiResponseFormat<List<LectureApplicantDto>>> getLectureApplicants(
@@ -52,4 +50,23 @@ public class ApplicationController {
         List<LectureApplicantDto> applicants = applicationService.getApplicantsByLectureId(lectureId);
         return ResponseEntity.ok(ApiResponseFormat.ok(applicants));
     }
+
+    @Operation(summary = "과외 신청 수락", description = "applicationId를 받아 해당 신청을 수락 처리합니다.")
+    @PostMapping("/approve")
+    public ResponseEntity<ApiResponseFormat<Void>> approveApplication(
+            @RequestBody ApproveApplicationRequestDto dto
+    ) {
+        applicationService.approveApplication(dto.applicationId(), mentorId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    @Operation(summary = "과외 신청 반려", description = "applicationId와 반려 사유를 받아 신청을 반려 처리합니다.")
+    @PostMapping("/reject")
+    public ResponseEntity<ApiResponseFormat<Void>> rejectApplication(
+            @RequestBody RejectApplicationRequestDto dto
+            ) {
+        applicationService.rejectApplication(dto.applicationId(), dto.reason(), mentorId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
 }

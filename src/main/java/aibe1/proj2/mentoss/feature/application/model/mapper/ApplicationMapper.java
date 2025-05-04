@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.application.model.mapper;
 
+import aibe1.proj2.mentoss.feature.application.model.dto.ApplicationInfoDto;
 import aibe1.proj2.mentoss.feature.application.model.dto.AppliedLectureResponseDto;
 import aibe1.proj2.mentoss.feature.application.model.dto.LectureApplicantDto;
 import aibe1.proj2.mentoss.feature.application.model.dto.LectureResponseDto;
@@ -128,6 +129,21 @@ public interface ApplicationMapper {
     """)
     void rejectApplication(Long applicationId);
 
+    @Select("""
+                SELECT 
+                    a.mentee_id,
+                    l.lecture_title
+                FROM application a
+                JOIN lecture l ON a.lecture_id = l.lecture_id
+                WHERE a.application_id = #{applicationId}
+            """)
+    ApplicationInfoDto findApplicationInfo(Long applicationId);
 
 
+    @Select("""
+                SELECT status
+                FROM application
+                WHERE application_id = #{applicationId}
+            """)
+    String findStatusByApplicationId(Long applicationId);
 }
