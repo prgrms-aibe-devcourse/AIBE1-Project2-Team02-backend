@@ -5,7 +5,9 @@ import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureSearchReques
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.lecture.service.LectureService;
+import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
+import aibe1.proj2.mentoss.global.entity.AppUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -53,6 +56,11 @@ public class LectureController {
                     responseCode = "400",
                     description = "잘못된 요청",
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
     public ResponseEntity<ApiResponseFormat<Long>> createLecture(
@@ -83,13 +91,22 @@ public class LectureController {
                             )
                     )
             )
-            @RequestBody LectureCreateRequest request
+            @RequestBody LectureCreateRequest request,
+            Authentication authentication
     ) throws JsonProcessingException {
-        Long lectureId = lectureService.createLecture(request);
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
+
+        // 사용자 정보 조회 및 권한 확인
+        AppUser currentUser = lectureService.getUserById(userId);
+        if (!currentUser.getRole().equals("ADMIN") && !currentUser.getRole().equals("MENTOR")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponseFormat.fail("강의 생성 권한이 없습니다."));
+        }
+
+        Long lectureId = lectureService.createLecture(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
     }
-
-
 
     @GetMapping
     @Operation(summary = "강의 목록 조회", description = "강의 목록을 검색 조건에 따라 조회합니다.")
@@ -194,10 +211,6 @@ public class LectureController {
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
-
-
-
-
     @PutMapping("/{lectureId}")
     @Operation(summary = "강의 정보 수정", description = "강의의 정보를 수정합니다.")
     @ApiResponses(value = {
@@ -214,6 +227,11 @@ public class LectureController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
                     description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음",
                     content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             )
     })
@@ -246,8 +264,24 @@ public class LectureController {
                             )
                     )
             )
-            @RequestBody LectureUpdateRequest request
+            @RequestBody LectureUpdateRequest request,
+            Authentication authentication
     ) throws JsonProcessingException {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
+
+        AppUser currentUser = lectureService.getUserById(userId);
+        LectureResponse lecture = lectureService.getLecture(lectureId);
+
+        // 권한 확인: ADMIN 또는 작성자만 수정 가능
+        boolean isAdmin = currentUser.getRole().equals("ADMIN");
+        boolean isOwner = lectureService.isLectureOwner(lectureId, userId);
+
+        if (!isAdmin && !isOwner) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponseFormat.fail("강의 수정 권한이 없습니다."));
+        }
+
         boolean result = lectureService.updateLecture(lectureId, request);
 
         if (!result) {
@@ -259,8 +293,6 @@ public class LectureController {
 
         return ResponseEntity.ok(ApiResponseFormat.ok(updatedLecture));
     }
-
-
 
     @DeleteMapping("/{lectureId}")
     @Operation(summary = "강의 삭제", description = "강의를 삭제합니다 (소프트 삭제).")
@@ -278,9 +310,31 @@ public class LectureController {
                     responseCode = "400",
                     description = "잘못된 요청",
                     content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음",
+                    content = @Content(schema = @Schema(implementation = ApiResponseFormat.class))
             )
     })
-    public ResponseEntity<ApiResponseFormat<Void>> deleteLecture(@PathVariable Long lectureId) {
+    public ResponseEntity<ApiResponseFormat<Void>> deleteLecture(
+            @PathVariable Long lectureId,
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
+
+        AppUser currentUser = lectureService.getUserById(userId);
+
+        // 권한 확인: ADMIN 또는 작성자만 삭제 가능
+        boolean isAdmin = currentUser.getRole().equals("ADMIN");
+        boolean isOwner = lectureService.isLectureOwner(lectureId, userId);
+
+        if (!isAdmin && !isOwner) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponseFormat.fail("강의 삭제 권한이 없습니다."));
+        }
+
         boolean result = lectureService.deleteLecture(lectureId);
 
         if (!result) {
@@ -291,8 +345,3 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
-
-
-
-
-
