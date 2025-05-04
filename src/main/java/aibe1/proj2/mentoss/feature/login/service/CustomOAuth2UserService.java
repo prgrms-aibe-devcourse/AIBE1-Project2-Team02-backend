@@ -1,6 +1,9 @@
 package aibe1.proj2.mentoss.feature.login.service;
 
 import aibe1.proj2.mentoss.feature.login.model.mapper.AppUserMapper;
+import aibe1.proj2.mentoss.global.entity.AppUser;
+import aibe1.proj2.mentoss.global.entity.enums.EntityStatus;
+import aibe1.proj2.mentoss.global.entity.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -11,6 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +36,34 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String nickname = getNickname(oAuth2User, provider);
         String profileImage = getProfileImage(oAuth2User, provider);
 
+        saveOrUpdateUser(provider, providerId, email, nickname, profileImage);
 
         log.info("소셜 로그인 성공: provider={}, providerId={}, email={}", provider, providerId, email);
 
         return oAuth2User;
+    }
+
+    private void saveOrUpdateUser(String provider, String providerId, String email, String nickname, String profileImage) {
+        Optional<AppUser> existingUser = appUserMapper.findByProviderAndProviderId(provider, providerId);
+
+        if (existingUser.isPresent()) {
+            log.info("기존 사용자 로그인 : userId={}", existingUser.get().getUserId());
+        } else {
+            AppUser newUser = AppUser.builder()
+                    .provider(provider)
+                    .providerId(providerId)
+                    .email(email)
+                    .nickname(nickname)
+                    .profileImage(profileImage)
+                    .role(UserRole.MENTEE.name())
+                    .status(EntityStatus.AVAILABLE.name())
+                    .reportCount(0L)
+                    .isDeleted(false)
+                    .build();
+
+            appUserMapper.save(newUser);
+            log.info("신규 사용자 등록 : userId={}", newUser.getUserId());
+        }
     }
 
     private String getProviderId(OAuth2User oAuth2User, String provider) {
@@ -94,10 +122,4 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         return null;
     }
-
-
-
-
 }
-
-

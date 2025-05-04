@@ -63,6 +63,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable);
+
+//        http
+//                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+//                .csrf(AbstractHttpConfigurer::disable)
+//                // OAuth2 로그인 설정 추가
+//                .oauth2Login(oauth -> oauth
+//                        .userInfoEndpoint(user -> user.userService(customOAuth2UserService))
+//                        .successHandler(oAuth2LoginSuccessHandler)
+//                );
         return http.build();
     }
 

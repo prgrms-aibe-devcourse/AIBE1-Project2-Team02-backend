@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,23 +33,50 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(Authentication authentication, List<String> roles) {
+    public String generateToken(Authentication authentication, List<String> roles, Long userId) {
         String username = authentication.getName();
         Instant now = Instant.now();
         Date expiration = new Date(now.toEpochMilli() + expirationMs);
 
-        Claims claims = Jwts.claims()
-                .subject(username)
-                .add("roles", roles)
-                .build();
+        Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("roles", roles);
+
+        if (userId != null) {
+            claimsMap.put("userId", userId);
+        }
 
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(Date.from(now))
                 .expiration(expiration)
-                .claims(claims)
+                .claims(claimsMap)
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
+    }
+
+    public Long getUserId(String token) {
+        Object userIdObj = Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userId");
+
+        if (userIdObj != null) {
+            if(userIdObj instanceof Integer) {
+                return ((Integer) userIdObj).longValue();
+            } else if (userIdObj instanceof Long) {
+                return (Long) userIdObj;
+            } else {
+                try {
+                    return Long.valueOf(userIdObj.toString());
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        }
+
+        return null;
     }
 
     public String getUsername(String token) {
@@ -82,14 +111,21 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails user = new User(
-                getUsername(token),
-                "",
-                getRoles(token).stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList())
-        );
+        String username = getUsername(token);
+        Long userId = getUserId(token);
 
-        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        List<SimpleGrantedAuthority> authorities = getRoles(token).stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toList());
+
+        UserDetails userDetails;
+
+        if(userId != null) {
+            userDetails = new CustomUserDetails(username, "", authorities, userId);
+        } else {
+            userDetails = new User(username, "", authorities);
+        }
+
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
