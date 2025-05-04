@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,23 +38,20 @@ public class JwtTokenProvider {
         Instant now = Instant.now();
         Date expiration = new Date(now.toEpochMilli() + expirationMs);
 
-        Claims claims = Jwts.claims()
-                .subject(username)
-                .add("roles", roles)
-                .add("userId", userId)
-                .build();
+        Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("roles", roles);
+
+        if (userId != null) {
+            claimsMap.put("userId", userId);
+        }
 
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(Date.from(now))
                 .expiration(expiration)
-                .claims(claims)
+                .claims(claimsMap)
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
-    }
-
-    public String generateToken(Authentication authentication, List<String> roles) {
-        return generateToken(authentication, roles, null);
     }
 
     public Long getUserId(String token) {
@@ -63,7 +62,21 @@ public class JwtTokenProvider {
                 .getPayload()
                 .get("userId");
 
-        return userIdObj != null ? Long.valueOf(userIdObj.toString()) : null;
+        if (userIdObj != null) {
+            if(userIdObj instanceof Integer) {
+                return ((Integer) userIdObj).longValue();
+            } else if (userIdObj instanceof Long) {
+                return (Long) userIdObj;
+            } else {
+                try {
+                    return Long.valueOf(userIdObj.toString());
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        }
+
+        return null;
     }
 
     public String getUsername(String token) {

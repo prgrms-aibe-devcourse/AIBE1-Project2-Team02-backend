@@ -30,8 +30,18 @@ public class SecurityConfig {
     @Profile("dev") // 개발 환경일 때만 이 빈이 활성화됨
     public SecurityFilterChain devSecurityFilterChain(HttpSecurity http) throws Exception {
         // 개발 모드에서는 모든 요청 허용
-        http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .csrf(AbstractHttpConfigurer::disable);
+//        http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+//                .csrf(AbstractHttpConfigurer::disable);
+//        return http.build();
+
+        http
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
+                // OAuth2 로그인 설정 추가
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(user -> user.userService(customOAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                );
         return http.build();
     }
 
