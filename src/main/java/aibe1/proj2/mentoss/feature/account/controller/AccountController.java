@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.account.controller;
 
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
+import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import aibe1.proj2.mentoss.feature.account.service.AccountService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,9 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Account API", description = "회원 계정 관련 API")
 @RestController
@@ -27,6 +26,17 @@ public class AccountController {
         Long userId = 1L; // 나중에 실제 인증 구현으로 대체
         ProfileResponseDto profileDto = accountService.getProfile(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(profileDto));
+    }
 
+
+    @Operation(summary = "프로필 업데이트", description = "로그인한 사용자의 프로필 정보를 업데이트합니다")
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponseFormat<Void>> updateProfile(
+            Authentication authentication,
+            @RequestBody ProfileUpdateRequestDto requestDto
+    ) {
+        Long userId = 1L;
+        accountService.updateProfile(userId, requestDto);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 }

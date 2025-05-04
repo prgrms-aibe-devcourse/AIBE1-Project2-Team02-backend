@@ -7,4 +7,7 @@ public interface AccountService {
 
     ProfileResponseDto getProfile(Long userId);
 
+    void updateProfile(Long userId, ProfileUpdateRequestDto requestDto);
+
+    Long calculateAge(String birthDate);
 }
