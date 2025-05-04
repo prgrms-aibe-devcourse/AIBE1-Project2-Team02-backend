@@ -2,14 +2,15 @@ package aibe1.proj2.mentoss.feature.message.service;
 
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageResponseDto;
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageSendRequestDto;
+import aibe1.proj2.mentoss.feature.message.model.dto.PageResponse;
 
 import java.util.List;
 
 public interface MessageService {
 
-    List<MessageResponseDto> getSentMessages(Long senderId);
+    PageResponse<MessageResponseDto> getSentMessages(Long senderId, int page, int size);;
 
-    List<MessageResponseDto> getReceivedMessages(Long receiverId);
+    PageResponse<MessageResponseDto> getReceivedMessages(Long receiverId, int page, int size);
 
     MessageResponseDto getMessage(Long messageId, Long viewerId);
 
