@@ -31,7 +31,7 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(Authentication authentication, List<String> roles) {
+    public String generateToken(Authentication authentication, List<String> roles, Long userId) {
         String username = authentication.getName();
         Instant now = Instant.now();
         Date expiration = new Date(now.toEpochMilli() + expirationMs);
@@ -39,6 +39,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims()
                 .subject(username)
                 .add("roles", roles)
+                .add("userId", userId)
                 .build();
 
         return Jwts.builder()
@@ -48,6 +49,21 @@ public class JwtTokenProvider {
                 .claims(claims)
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
+    }
+
+    public String generateToken(Authentication authentication, List<String> roles) {
+        return generateToken(authentication, roles, null);
+    }
+
+    public Long getUserId(String token) {
+        Object userIdObj = Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userId");
+
+        return userIdObj != null ? Long.valueOf(userIdObj.toString()) : null;
     }
 
     public String getUsername(String token) {
@@ -82,14 +98,21 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails user = new User(
-                getUsername(token),
-                "",
-                getRoles(token).stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList())
-        );
+        String username = getUsername(token);
+        Long userId = getUserId(token);
 
-        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        List<SimpleGrantedAuthority> authorities = getRoles(token).stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toList());
+
+        UserDetails userDetails;
+
+        if(userId != null) {
+            userDetails = new CustomUserDetails(username, "", authorities, userId);
+        } else {
+            userDetails = new User(username, "", authorities);
+        }
+
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
