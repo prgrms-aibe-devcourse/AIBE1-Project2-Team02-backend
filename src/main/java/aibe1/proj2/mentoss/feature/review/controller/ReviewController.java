@@ -5,6 +5,7 @@ import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.UpdateReviewRequestDto;
 import aibe1.proj2.mentoss.feature.review.service.ReviewService;
+import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,8 +66,8 @@ public class ReviewController {
             """)))
     })
     @PostMapping
-    public ResponseEntity<ApiResponseFormat<Void>> createReview(@RequestBody CreateReviewRequestDto dto) {
-        reviewService.createReview(dto);
+    public ResponseEntity<ApiResponseFormat<Void>> createReview(@AuthenticationPrincipal CustomUserDetails user, @RequestBody CreateReviewRequestDto dto) {
+        reviewService.createReview(dto, user.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(null));
     }
 
@@ -187,9 +189,10 @@ public class ReviewController {
     })
     @PatchMapping("/{reviewId}")
     public ResponseEntity<ApiResponseFormat<Void>> updateReview(
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long reviewId,
             @RequestBody UpdateReviewRequestDto req) {
-        reviewService.updateReview(reviewId, req.content(), req.rating());
+        reviewService.updateReview(reviewId, req.content(), req.rating(), user.getUserId());
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
@@ -233,8 +236,9 @@ public class ReviewController {
     })
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ApiResponseFormat<Void>> deleteReview(
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long reviewId) {
-        reviewService.deleteReview(reviewId);
+        reviewService.deleteReview(reviewId, user.getUserId());
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
