@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.lecture.model.mapper;
 
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureSearchRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
+import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.Lecture;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
@@ -162,4 +163,28 @@ public interface LectureMapper {
             "WHERE lecture_id = #{lectureId} " +
             "AND is_deleted = FALSE")
     int updateLectureClosed(@Param("lectureId") Long lectureId, @Param("isClosed") boolean isClosed);
+
+    /**
+     * 사용자 아이디 조회
+     */
+    @Select("SELECT * FROM app_user WHERE user_id = #{userId}")
+    AppUser findUserById(@Param("userId") Long userId);
+
+    @Select("SELECT COUNT(*) > 0 FROM lecture l " +
+            "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
+            "WHERE l.lecture_id = #{lectureId} AND mp.user_id = #{userId}")
+    boolean checkLectureOwner(@Param("lectureId") Long lectureId, @Param("userId") Long userId);
+
+    /**
+     * 사용자가 멘토 프로필을 가지고 있는지 확인
+     */
+    @Select("SELECT COUNT(*) > 0 FROM mentor_profile WHERE user_id = #{userId}")
+    boolean checkMentorProfileByUserId(@Param("userId") Long userId);
+
+    /**
+     * 사용자의 멘토 ID 조회
+     */
+    @Select("SELECT mentor_id FROM mentor_profile WHERE user_id = #{userId}")
+    Long getMentorIdByUserId(@Param("userId") Long userId);
+
 }
