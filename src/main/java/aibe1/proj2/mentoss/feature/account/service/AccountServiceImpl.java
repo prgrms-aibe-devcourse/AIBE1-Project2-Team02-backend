@@ -1,10 +1,11 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
-import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
+import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
 import aibe1.proj2.mentoss.feature.file.service.FileService;
 import aibe1.proj2.mentoss.global.entity.AppUser;
+import aibe1.proj2.mentoss.global.entity.MentorProfile;
 import aibe1.proj2.mentoss.global.entity.Region;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
     private final FileService fileService;
+    private final MentorMapper mentorMapper;
 
     @Override
     public ProfileResponseDto getProfile(Long userId) {
@@ -129,5 +131,83 @@ public class AccountServiceImpl implements AccountService {
         accountMapper.updateProfileImage(userId, imageUrl);
 
         return imageUrl;
+    }
+
+    @Override
+    public boolean isMentor(Long userId) {
+        return mentorMapper.existsByUserId(userId);
+    }
+
+    @Override
+    public MentorProfileResponseDto getMentorProfile(Long userId) {
+        MentorProfile mentorProfile = mentorMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", userId));
+
+        return MentorProfileResponseDto.fromEntity(mentorProfile);
+    }
+
+    @Override
+    @Transactional
+    public void applyMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException {
+        if (mentorMapper.existsByUserId(userId)) {
+            throw new IllegalArgumentException("이미 멘토 신청을 하였습니다");
+        }
+
+        if (requestDto.content() == null || requestDto.content().length() < 10) {
+            throw new IllegalArgumentException("자기소개는 최소 10자 이상 작성해주세요");
+        }
+
+        String appealFileUrl = null;
+        if (requestDto.appealFile() != null && !requestDto.appealFile().isEmpty()) {
+            appealFileUrl = fileService.uploadFile(requestDto.appealFile(), "mentor-appeals");
+        }
+
+        MentorProfile mentorProfile = MentorProfile.builder()
+                .userId(userId)
+                .content(requestDto.content())
+                .appealFileUrl(appealFileUrl)
+                .isCertified(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        mentorMapper.insertMentorProfile(mentorProfile);
+        mentorMapper.updateToMentorRole(userId);
+    }
+
+    @Override
+    public void updateMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException {
+        MentorProfile mentorProfile = mentorMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", userId));
+
+        if (requestDto.content() == null || requestDto.content().length() < 10) {
+            throw new IllegalArgumentException("자기소개는 최소 10자 이상 작성해주세요");
+        }
+
+        String appealFileUrl = null;
+        if (requestDto.appealFile() != null && !requestDto.appealFile().isEmpty()){
+            if (mentorProfile.getAppealFileUrl() != null && !mentorProfile.getAppealFileUrl().isEmpty()) {
+                fileService.deleteFile(mentorProfile.getAppealFileUrl());
+            }
+
+            appealFileUrl = fileService.uploadFile(requestDto.appealFile(), "mentor-appeals");
+            mentorProfile.setAppealFileUrl(appealFileUrl);
+        }
+
+        mentorProfile.setContent(requestDto.content());
+        mentorMapper.updateMentorProfile(mentorProfile);
+    }
+
+    @Override
+    public MentorStatusResponseDto getMentorStatus(Long userId) {
+        boolean isMentor = mentorMapper.existsByUserId(userId);
+        boolean isCertified = false;
+
+        if (isMentor) {
+            MentorProfile mentorProfile = mentorMapper.findByUserId(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", userId));
+            isCertified = mentorProfile.getIsCertified();
+        }
+
+        return new MentorStatusResponseDto(isMentor, isCertified);
     }
 }
