@@ -4,6 +4,7 @@ import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureCreateReques
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureSearchRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
+import aibe1.proj2.mentoss.global.entity.AppUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ public interface LectureService {
     /**
      * 강의 생성
      */
-    Long createLecture(LectureCreateRequest request) throws JsonProcessingException;
+    Long createLecture(LectureCreateRequest request, Long userId) throws JsonProcessingException;
 
 
     /**
@@ -62,6 +63,16 @@ public interface LectureService {
      * @return 변경 성공 여부
      */
     boolean updateLectureClosed(Long lectureId, boolean isClosed);
+
+    /**
+     * 아이디 조회
+     */
+    AppUser getUserById(Long userId);
+
+    /**
+     * 게시글 주인 확인
+     */
+    boolean isLectureOwner(Long lectureId, Long userId);
 
 
 }
