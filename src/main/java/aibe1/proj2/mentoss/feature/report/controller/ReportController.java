@@ -87,11 +87,10 @@ public class ReportController {
     @PostMapping
     public ResponseEntity<ApiResponseFormat<ReportResponseDto>> createReport(
             @RequestBody CreateReportRequestDto dto) {
-
-        ReportResponseDto response = reportService.createReport(dto);
+        reportService.createReport(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponseFormat.ok(response));
+                .body(ApiResponseFormat.ok(null));
     }
 
 }
