@@ -3,13 +3,16 @@ package aibe1.proj2.mentoss.feature.account.service;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
+import aibe1.proj2.mentoss.feature.file.service.FileService;
 import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.Region;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -22,6 +25,7 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
+    private final FileService fileService;
 
     @Override
     public ProfileResponseDto getProfile(Long userId) {
@@ -108,5 +112,22 @@ public class AccountServiceImpl implements AccountService {
         accountMapper.softDeleteUser(appUser);
 
         accountMapper.deleteUserRegion(userId);
+    }
+
+    @Override
+    @Transactional
+    public String updateProfileImage(Long userId, MultipartFile file) throws IOException {
+        AppUser appUser = accountMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+
+        if (appUser.getProfileImage() != null && !appUser.getProfileImage().isEmpty()) {
+            fileService.deleteFile(appUser.getProfileImage());
+        }
+
+        String imageUrl = fileService.uploadFile(file, "profiles");
+
+        accountMapper.updateProfileImage(userId, imageUrl);
+
+        return imageUrl;
     }
 }
