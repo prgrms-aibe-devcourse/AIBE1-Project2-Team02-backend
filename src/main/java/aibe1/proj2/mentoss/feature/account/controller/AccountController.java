@@ -73,4 +73,14 @@ public class AccountController {
         String imageUrl = accountService.updateProfileImage(userId, file);
         return ResponseEntity.ok(ApiResponseFormat.ok(imageUrl));
     }
+
+    @Operation(summary = "멘토 여부 확인", description = "사용자가 멘토인지 확인합니다")
+    @GetMapping("/mentor/check")
+    public ResponseEntity<ApiResponseFormat<Boolean>> isMentor(
+            Authentication authentication
+    ) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        boolean isMentor = accountService.isMentor(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(isMentor));
+    }
 }

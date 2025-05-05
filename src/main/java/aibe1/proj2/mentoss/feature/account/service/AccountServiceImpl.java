@@ -3,6 +3,7 @@ package aibe1.proj2.mentoss.feature.account.service;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
+import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
 import aibe1.proj2.mentoss.feature.file.service.FileService;
 import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.Region;
@@ -26,6 +27,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
     private final FileService fileService;
+    private final MentorMapper mentorMapper;
 
     @Override
     public ProfileResponseDto getProfile(Long userId) {
@@ -129,5 +131,10 @@ public class AccountServiceImpl implements AccountService {
         accountMapper.updateProfileImage(userId, imageUrl);
 
         return imageUrl;
+    }
+
+    @Override
+    public boolean isMentor(Long userId) {
+        return mentorMapper.existsByUserId(userId);
     }
 }

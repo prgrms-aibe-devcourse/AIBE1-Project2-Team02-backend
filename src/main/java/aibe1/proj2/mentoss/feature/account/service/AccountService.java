@@ -19,4 +19,6 @@ public interface AccountService {
     void deleteAccount(Long userId);
 
     String updateProfileImage(Long userId, MultipartFile file) throws IOException;
+
+    boolean isMentor(Long userId);
 }
