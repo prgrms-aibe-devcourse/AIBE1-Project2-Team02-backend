@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.controller;
 
+import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileRequestDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
@@ -93,5 +94,16 @@ public class AccountController {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         MentorProfileResponseDto mentorProfile = accountService.getMentorProfile(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(mentorProfile));
+    }
+
+    @Operation(summary = "멘토 신청", description = "멘토 프로필을 생성하고 역할을 업데이트합니다")
+    @PostMapping(value = "/mentor/apply", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseFormat<Void>> applyMentorProfile(
+            Authentication authentication,
+            @ModelAttribute MentorProfileRequestDto requestDto
+    ) throws IOException {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        accountService.applyMentorProfile(userId, requestDto);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 }

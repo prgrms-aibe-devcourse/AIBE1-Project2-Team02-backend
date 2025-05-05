@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
+import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileRequestDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
@@ -146,5 +147,29 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", userId));
 
         return MentorProfileResponseDto.fromEntity(mentorProfile);
+    }
+
+    @Override
+    @Transactional
+    public void applyMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException {
+        if (mentorMapper.existsByUserId(userId)) {
+            throw new IllegalArgumentException("이미 멘토 신청을 하였습니다");
+        }
+
+        String appealFileUrl = null;
+        if (requestDto.appealFile() != null && !requestDto.appealFile().isEmpty()) {
+            appealFileUrl = fileService.uploadFile(requestDto.appealFile(), "mentor-appeals");
+        }
+
+        MentorProfile mentorProfile = MentorProfile.builder()
+                .userId(userId)
+                .content(requestDto.content())
+                .appealFileUrl(appealFileUrl)
+                .isCertified(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        mentorMapper.insertMentorProfile(mentorProfile);
+        mentorMapper.updateToMentorRole(userId);
     }
 }

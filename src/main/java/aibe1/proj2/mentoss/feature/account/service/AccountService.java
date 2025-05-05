@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
+import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileRequestDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
@@ -24,4 +25,6 @@ public interface AccountService {
     boolean isMentor(Long userId);
 
     MentorProfileResponseDto getMentorProfile(Long userId);
+
+    void applyMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException;
 }
