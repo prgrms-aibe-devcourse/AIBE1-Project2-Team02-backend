@@ -1,9 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
-import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileRequestDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,4 +27,5 @@ public interface AccountService {
 
     void updateMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException;
 
+    MentorStatusResponseDto getMentorStatus(Long userId);
 }

@@ -1,9 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.controller;
 
-import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileRequestDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
-import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.service.AccountService;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
@@ -116,5 +113,15 @@ public class AccountController {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.updateMentorProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    @Operation(summary = "멘토 상태 확인", description = "멘토의 인증 상태를 확인합니다")
+    @GetMapping("/mentor/status")
+    public ResponseEntity<ApiResponseFormat<MentorStatusResponseDto>> getMentorStatus(
+            Authentication authentication
+    ) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        MentorStatusResponseDto mentorStatus = accountService.getMentorStatus(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(mentorStatus));
     }
 }
