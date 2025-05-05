@@ -1,6 +1,10 @@
 package aibe1.proj2.mentoss.global.exception;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
+import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
+import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
+import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
+import aibe1.proj2.mentoss.global.exception.review.TogetherApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -83,6 +87,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseFormat<Void>> handleTogetherApiException(TogetherApiException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * 수강하지 않은 강의에 대한 후기 작성 시
+     */
+    @ExceptionHandler(NotAttendedLectureException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleNotAttendedLecture(NotAttendedLectureException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * 본인이 작성한 항목이 아닐 때 수정, 삭제 시도 시 예외
+     */
+    @ExceptionHandler(NotOwnerException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleNotReviewOwner(NotOwnerException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 }

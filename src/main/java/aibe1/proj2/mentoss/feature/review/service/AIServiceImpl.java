@@ -8,7 +8,7 @@ import aibe1.proj2.mentoss.feature.review.model.dto.TogetherApiResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.mapper.AIMapper;
 import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
-import aibe1.proj2.mentoss.global.exception.TogetherApiException;
+import aibe1.proj2.mentoss.global.exception.review.TogetherApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
