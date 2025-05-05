@@ -106,4 +106,15 @@ public class AccountController {
         accountService.applyMentorProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
+
+    @Operation(summary = "멘토 프로필 업데이트", description = "멘토 프로필 정보를 업데이트합니다")
+    @PutMapping(value = "/mentor/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseFormat<Void>> updateMentorProfile(
+            Authentication authentication,
+            @ModelAttribute MentorProfileRequestDto requestDto
+    ) throws IOException {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        accountService.updateMentorProfile(userId, requestDto);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
 }

@@ -172,4 +172,23 @@ public class AccountServiceImpl implements AccountService {
         mentorMapper.insertMentorProfile(mentorProfile);
         mentorMapper.updateToMentorRole(userId);
     }
+
+    @Override
+    public void updateMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException {
+        MentorProfile mentorProfile = mentorMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", userId));
+
+        String appealFileUrl = null;
+        if (requestDto.appealFile() != null && !requestDto.appealFile().isEmpty()){
+            if (mentorProfile.getAppealFileUrl() != null && !mentorProfile.getAppealFileUrl().isEmpty()) {
+                fileService.deleteFile(mentorProfile.getAppealFileUrl());
+            }
+
+            appealFileUrl = fileService.uploadFile(requestDto.appealFile(), "mentor-appeals");
+            mentorProfile.setAppealFileUrl(appealFileUrl);
+        }
+
+        mentorProfile.setContent(requestDto.content());
+        mentorMapper.updateMentorProfile(mentorProfile);
+    }
 }

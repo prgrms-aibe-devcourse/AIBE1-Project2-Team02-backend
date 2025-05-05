@@ -27,4 +27,11 @@ public interface MentorMapper {
     @Update("UPDATE app_user SET role = 'MENTOR' " +
             "WHERE user_id = #{userId}")
     int updateToMentorRole(Long userId);
+
+
+    @Update("UPDATE mentor_profile SET " +
+            "content = #{content}, " +
+            "appeal_file_url = #{appealFileUrl} " +
+            "WHERE user_id = #{userId}")
+    int updateMentorProfile(MentorProfile mentorProfile);
 }
