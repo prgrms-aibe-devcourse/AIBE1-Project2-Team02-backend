@@ -5,6 +5,7 @@ import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureRegionReques
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureSearchRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.request.LectureUpdateRequest;
 import aibe1.proj2.mentoss.feature.lecture.model.dto.response.*;
+import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.Lecture;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
 import aibe1.proj2.mentoss.global.entity.Lecture;
@@ -39,7 +40,13 @@ public class LectureServiceImpl implements LectureService {
      */
     @Override
     @Transactional
-    public Long createLecture(LectureCreateRequest request) throws JsonProcessingException {
+    public Long createLecture(LectureCreateRequest request, Long userId) throws JsonProcessingException {
+
+        boolean isExistMentorProfile = lectureMapper.checkMentorProfileByUserId(userId);
+        if (!isExistMentorProfile) {
+            throw new IllegalStateException("멘토 프로필이 등록되어 있지 않습니다.");
+        }
+
         // DTO → 엔티티 변환
         Lecture lecture = new Lecture();
         lecture.setLectureTitle(request.lectureTitle());
@@ -47,7 +54,10 @@ public class LectureServiceImpl implements LectureService {
         lecture.setCategoryId(request.categoryId());
         lecture.setCurriculum(request.curriculum());
         lecture.setPrice(request.price());
-        lecture.setMentorId(1L); // 임시 값
+
+        // 사용자의 멘토 ID 가져오기
+        Long mentorId = lectureMapper.getMentorIdByUserId(userId);
+        lecture.setMentorId(mentorId); // 실제 멘토 ID 사용
         lecture.setStatus("AVAILABLE");
 
         // 엔티티 저장 로직
@@ -206,6 +216,26 @@ public class LectureServiceImpl implements LectureService {
         // 강의 오픈/마감 상태 변경
         int updatedRows = lectureMapper.updateLectureClosed(lectureId, isClosed);
         return updatedRows > 0;
+    }
+
+
+    /**
+     * 아이디 정보 가져오기
+     */
+    @Override
+    public AppUser getUserById(Long userId) {
+        AppUser user = lectureMapper.findUserById(userId);
+        if (user == null) {
+            throw new IllegalStateException("사용자 정보를 찾을 수 없습니다.");
+        }
+        return user;
+    }
+    /**
+     * 과외 게시글 주인확인
+     */
+    @Override
+    public boolean isLectureOwner(Long lectureId, Long userId) {
+        return lectureMapper.checkLectureOwner(lectureId, userId);
     }
 
 
