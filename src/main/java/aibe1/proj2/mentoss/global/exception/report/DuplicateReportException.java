@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.global.exception;
+package aibe1.proj2.mentoss.global.exception.report;
 
 public class DuplicateReportException extends RuntimeException{
     public DuplicateReportException() {

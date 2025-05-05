@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.global.exception;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
+import aibe1.proj2.mentoss.global.exception.report.DuplicateReportException;
 import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
@@ -107,6 +108,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseFormat<Void>> handleNotReviewOwner(NotOwnerException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * 중복 신고 예외 처리
+     */
+    @ExceptionHandler(DuplicateReportException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleDuplicateReport(DuplicateReportException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 }

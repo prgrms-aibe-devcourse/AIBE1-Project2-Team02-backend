@@ -41,20 +41,6 @@ public class ReportController {
                             )
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청(필수 필드 누락 등)",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = ApiResponseFormat.class,
-                                    example = """
-                    {
-                      "success": false,
-                      "message": "reporterId, targetType, targetId, reason, reasonType 모두 필요합니다.",
-                      "data": null
-                    }
-                    """
-                            )
-                    )
-            ),
             @ApiResponse(responseCode = "409", description = "중복 신고(같은 대상에 이미 신고한 경우)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(
@@ -63,20 +49,6 @@ public class ReportController {
                     {
                       "success": false,
                       "message": "이미 이 대상을 신고하셨습니다.",
-                      "data": null
-                    }
-                    """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "500", description = "서버 오류",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = ApiResponseFormat.class,
-                                    example = """
-                    {
-                      "success": false,
-                      "message": "신고 처리 중 오류가 발생했습니다.",
                       "data": null
                     }
                     """
