@@ -57,4 +57,10 @@ public interface AccountMapper {
             "deleted_at = #{deletedAt} " +
             "WHERE user_id = #{userId}")
     void softDeleteUser(AppUser appUser);
+
+    @Update("UPDATE app_user SET " +
+            "profile_image = #{profileImage}, " +
+            "updated_at = NOW() " +
+            "WHERE user_id = #{userId}")
+    void updateProfileImage(@Param("userId") Long userId, @Param("profileImage") String profileImage);
 }

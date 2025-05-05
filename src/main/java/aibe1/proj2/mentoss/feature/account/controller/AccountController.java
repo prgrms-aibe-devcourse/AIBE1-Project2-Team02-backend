@@ -8,9 +8,13 @@ import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Tag(name = "Account API", description = "회원 계정 관련 API")
 @RestController
@@ -57,5 +61,16 @@ public class AccountController {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.deleteAccount(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    @Operation(summary = "프로필 이미지 업로드", description = "사용자의 프로필 이미지를 업로드 합니다")
+    @PostMapping(value = "/profile/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseFormat<String>> uploadProfileImage(
+            Authentication authentication,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        String imageUrl = accountService.updateProfileImage(userId, file);
+        return ResponseEntity.ok(ApiResponseFormat.ok(imageUrl));
     }
 }
