@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.controller;
 
+import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import aibe1.proj2.mentoss.feature.account.service.AccountService;
@@ -82,5 +83,15 @@ public class AccountController {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         boolean isMentor = accountService.isMentor(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(isMentor));
+    }
+
+    @Operation(summary = "멘토 프로필 조회", description = "사용자의 멘토 프로필을 조회합니다")
+    @GetMapping("/mentor/profile")
+    public ResponseEntity<ApiResponseFormat<MentorProfileResponseDto>> getMentorProfile(
+            Authentication authentication
+    ) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        MentorProfileResponseDto mentorProfile = accountService.getMentorProfile(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(mentorProfile));
     }
 }

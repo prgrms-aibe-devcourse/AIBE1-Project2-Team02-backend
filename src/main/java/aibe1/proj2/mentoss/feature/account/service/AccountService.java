@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
+import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,4 +22,6 @@ public interface AccountService {
     String updateProfileImage(Long userId, MultipartFile file) throws IOException;
 
     boolean isMentor(Long userId);
+
+    MentorProfileResponseDto getMentorProfile(Long userId);
 }

@@ -1,11 +1,13 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
+import aibe1.proj2.mentoss.feature.account.model.dto.MentorProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileResponseDto;
 import aibe1.proj2.mentoss.feature.account.model.dto.ProfileUpdateRequestDto;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
 import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
 import aibe1.proj2.mentoss.feature.file.service.FileService;
 import aibe1.proj2.mentoss.global.entity.AppUser;
+import aibe1.proj2.mentoss.global.entity.MentorProfile;
 import aibe1.proj2.mentoss.global.entity.Region;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -136,5 +138,13 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean isMentor(Long userId) {
         return mentorMapper.existsByUserId(userId);
+    }
+
+    @Override
+    public MentorProfileResponseDto getMentorProfile(Long userId) {
+        MentorProfile mentorProfile = mentorMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", userId));
+
+        return MentorProfileResponseDto.fromEntity(mentorProfile);
     }
 }
