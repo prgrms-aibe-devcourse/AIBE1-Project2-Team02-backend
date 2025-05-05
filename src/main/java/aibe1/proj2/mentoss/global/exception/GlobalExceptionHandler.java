@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.global.exception;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import aibe1.proj2.mentoss.global.exception.report.DuplicateReportException;
+import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
 import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
@@ -118,6 +119,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseFormat<Void>> handleDuplicateReport(DuplicateReportException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * targetType 유효성 검사 실패 예외 처리
+     */
+    @ExceptionHandler(InvalidTargetTypeException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleInvalidTargetType(InvalidTargetTypeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 }

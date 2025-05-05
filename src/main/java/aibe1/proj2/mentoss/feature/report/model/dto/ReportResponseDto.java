@@ -1,4 +1,12 @@
 package aibe1.proj2.mentoss.feature.report.model.dto;
 
-public record ReportResponseDto() {
-}
+import java.time.LocalDateTime;
+
+public record ReportResponseDto(
+        Long reportId,
+        Long reporterId,
+        String targetType,
+        Long targetId,
+        String reason,
+        LocalDateTime processedAt
+) {}

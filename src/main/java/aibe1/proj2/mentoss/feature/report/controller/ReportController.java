@@ -41,6 +41,20 @@ public class ReportController {
                             )
                     )
             ),
+            @ApiResponse(responseCode = "400", description = "targetType에 올바른 값이 들어가는지에 대한 검증",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+                    {
+                      "success": false,
+                      "message": "targetType은 USER, LECTURE, REVIEW 중 하나여야 합니다.",
+                      "data": null
+                    }
+                    """
+                            )
+                    )
+            ),
             @ApiResponse(responseCode = "409", description = "중복 신고(같은 대상에 이미 신고한 경우)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(
