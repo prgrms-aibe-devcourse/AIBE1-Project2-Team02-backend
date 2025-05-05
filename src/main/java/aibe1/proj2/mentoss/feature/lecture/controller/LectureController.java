@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,21 @@ public class LectureController {
     public LectureController(LectureService lectureService, ObjectMapper objectMapper) {
         this.lectureService = lectureService;
         this.objectMapper = objectMapper;
+    }
+
+    // 개발 전용 강의 생성 메서드
+    @PostMapping("/dev")
+    @Profile("dev") // 개발 환경에서만 활성화
+    @Operation(summary = "강의 생성 (개발용)", description = "개발 환경에서 인증 없이 강의를 생성합니다.")
+    public ResponseEntity<ApiResponseFormat<Long>> createLectureForDev(
+            @RequestBody LectureCreateRequest request
+    ) throws JsonProcessingException {
+        // 개발용 하드코딩된 사용자 ID
+        Long userId = 1L;
+
+        // 강의 생성
+        Long lectureId = lectureService.createLecture(request, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
     }
 
     @PostMapping
