@@ -87,4 +87,22 @@ public interface ReviewMapper {
                       @Param("content")  String content,
                       @Param("rating")   Long rating);
 
+
+    @Select("""
+      SELECT COUNT(*) 
+        FROM lecture_mentee 
+       WHERE lecture_id = #{lectureId}
+         AND mentee_id  = #{userId}
+    """)
+    int countLectureMentee(@Param("lectureId") Long lectureId,
+                           @Param("userId")    Long userId);
+
+    default boolean hasAttendedLecture(Long lectureId, Long userId) {
+        return countLectureMentee(lectureId, userId) > 0;
+    }
+
+    /** (2) 후기 작성자(writerId) 조회 */
+    @Select("SELECT writer_id FROM review WHERE review_id = #{reviewId}")
+    Long findWriterIdByReviewId(Long reviewId);
+
 }
