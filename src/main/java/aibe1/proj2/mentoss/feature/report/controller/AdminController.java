@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.report.controller;
 
+import aibe1.proj2.mentoss.feature.report.model.dto.RecoverRequestDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.SoftDeleteRequestDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.StatusUpdateRequestDto;
@@ -23,14 +24,14 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponseFormat.ok(list));
     }
 
-    @GetMapping("/reports/notdone")
+    @GetMapping("/reports/not-done")
     public ResponseEntity<ApiResponseFormat<List<ReportResponseDto>>> getNotProcessedReports() {
         List<ReportResponseDto> list = adminService.getReportsByProcessed(false);
         return ResponseEntity.ok(ApiResponseFormat.ok(list));
     }
 
 
-    @PutMapping("/user/{userId}/status")
+    @PutMapping("/status")
     public ResponseEntity<ApiResponseFormat<Void>> updateStatus(
             @RequestBody StatusUpdateRequestDto req) {
         adminService.updateStatus(req);
@@ -38,10 +39,17 @@ public class AdminController {
     }
 
 
-    @PutMapping("/{entity}/{id}/soft-delete")
-    public ResponseEntity<ApiResponseFormat<Void>> toggleSoftDelete(
+    @PutMapping("/soft-delete")
+    public ResponseEntity<ApiResponseFormat<Void>> softDelete(
             @RequestBody SoftDeleteRequestDto req) {
-        adminService.toggleSoftDelete(req);
+        adminService.softDelete(req);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    @PutMapping("/recover")
+    public ResponseEntity<ApiResponseFormat<Void>> recover(
+            @RequestBody RecoverRequestDto req){
+        adminService.recover(req);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 

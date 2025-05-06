@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.report.service;
 
+import aibe1.proj2.mentoss.feature.report.model.dto.RecoverRequestDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.SoftDeleteRequestDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.StatusUpdateRequestDto;
@@ -11,7 +12,9 @@ public interface AdminService {
 
     void updateStatus(StatusUpdateRequestDto request);
 
-    void toggleSoftDelete(SoftDeleteRequestDto request);
+    void softDelete(SoftDeleteRequestDto request);
 
     void processReport(Long reportId);
+
+    void recover(RecoverRequestDto req);
 }
