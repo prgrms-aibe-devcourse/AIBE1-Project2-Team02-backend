@@ -34,4 +34,6 @@ public interface AccountService {
     List<RegionDto> getUserRegions(Long userId);
 
     void updateUserRegion(Long userId, UserRegionsUpdateRequestDto regionDto);
+
+    void deleteProfileImage(Long userId);
 }
