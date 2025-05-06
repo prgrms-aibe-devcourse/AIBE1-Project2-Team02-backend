@@ -285,4 +285,17 @@ public class AccountServiceImpl implements AccountService {
             }
         }
     }
+
+    @Override
+    public void deleteProfileImage(Long userId) {
+        AppUser appUser = accountMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+
+        if (appUser.getProfileImage() != null && !appUser.getProfileImage().isEmpty()) {
+            fileService.deleteFile(appUser.getProfileImage());
+        }
+
+        appUser.setProfileImage(null);
+        accountMapper.updateProfileImage(userId, null);
+    }
 }

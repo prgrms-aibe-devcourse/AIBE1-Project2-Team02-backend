@@ -168,8 +168,17 @@ public class AccountController {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
+    @Operation(summary = "프로필 이미지 삭제", description = "사용자의 프로필 이미지를 삭제하고 기본 이미지로 변경합니다")
+    @DeleteMapping("/profile/image")
+    public ResponseEntity<ApiResponseFormat<Void>> deleteProfileImage(
+            Authentication authentication) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        accountService.deleteProfileImage(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
     /**
-     * 어필 파일에 대한 유효성 검사를 수행합니다.
+     * 파일에 대한 유효성 검사를 수행합니다.
      */
     private String validateFile(
             MultipartFile file,
