@@ -4,6 +4,8 @@ import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
 import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
 import aibe1.proj2.mentoss.feature.file.service.FileService;
+import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
+import aibe1.proj2.mentoss.feature.message.model.mapper.MessageMapper;
 import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.MentorProfile;
@@ -30,6 +32,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final FileService fileService;
     private final MentorMapper mentorMapper;
+    private final LectureMapper lectureMapper;
+    private final MessageMapper messageMapper;
 
     @Override
     public ProfileResponseDto getProfile(Long userId) {
@@ -106,6 +110,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public void deleteAccount(Long userId) {
         AppUser appUser = accountMapper.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
@@ -114,8 +119,15 @@ public class AccountServiceImpl implements AccountService {
         appUser.setDeletedAt(LocalDateTime.now());
 
         accountMapper.softDeleteUser(appUser);
-
         accountMapper.deleteUserRegion(userId);
+
+        if (mentorMapper.existsByUserId(userId)) {
+            mentorMapper.softDeleteMentorProfile(userId);
+
+            lectureMapper.softDeleteLecturesByMentorId(userId);
+        }
+
+        messageMapper.softDeleteMessagesByUserId(userId);
     }
 
     @Override

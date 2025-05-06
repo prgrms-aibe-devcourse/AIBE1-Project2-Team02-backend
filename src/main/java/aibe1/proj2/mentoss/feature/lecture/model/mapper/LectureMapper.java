@@ -187,4 +187,13 @@ public interface LectureMapper {
     @Select("SELECT mentor_id FROM mentor_profile WHERE user_id = #{userId}")
     Long getMentorIdByUserId(@Param("userId") Long userId);
 
+    /**
+     *
+     * 회원 삭제 시 멘토의 모든 강의 소프트 삭제
+     */
+    @Update("UPDATE lecture l " +
+            "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
+            "SET l.is_deleted = TRUE, l.deleted_at = CURRENT_TIMESTAMP " +
+            "WHERE mp.user_id = #{userId}")
+    int softDeleteLecturesByMentorId(@Param("userId") Long userId);
 }
