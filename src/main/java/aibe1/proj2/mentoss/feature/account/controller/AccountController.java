@@ -136,5 +136,13 @@ public class AccountController {
         return ResponseEntity.ok(ApiResponseFormat.ok(regions));
     }
 
-
+    @Operation(summary = "사용자 지역 업데이트", description = "로그인한 사용자의 지역 정보를 업데이트합니다")
+    @PutMapping("/regions")
+    public ResponseEntity<ApiResponseFormat<Void>> updateUserRegions(
+            Authentication authentication,
+            @RequestBody UserRegionsUpdateRequestDto requestDto) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        accountService.updateUserRegion(userId, requestDto);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
 }

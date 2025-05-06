@@ -32,4 +32,6 @@ public interface AccountService {
     MentorStatusResponseDto getMentorStatus(Long userId);
 
     List<RegionDto> getUserRegions(Long userId);
+
+    void updateUserRegion(Long userId, UserRegionsUpdateRequestDto regionDto);
 }

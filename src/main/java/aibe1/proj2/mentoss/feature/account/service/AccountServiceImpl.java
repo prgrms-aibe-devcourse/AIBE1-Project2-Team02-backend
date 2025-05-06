@@ -247,4 +247,30 @@ public class AccountServiceImpl implements AccountService {
 
         return sb.toString();
     }
+
+
+    @Override
+    public void updateUserRegion(Long userId, UserRegionsUpdateRequestDto regionDto) {
+        AppUser appUser = accountMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+
+        accountMapper.deleteUserRegion(userId);
+
+        if (regionDto.regionCodes() == null || regionDto.regionCodes().isEmpty()) {
+            return;
+        }
+
+        String firstRegionCode = regionDto.regionCodes().get(0);
+        Optional<Region> region = accountMapper.findRegionByRegionCode(firstRegionCode);
+        if (region.isPresent()) {
+            appUser.setRegionCode(firstRegionCode);
+            accountMapper.updateProfile(appUser);
+        }
+
+        for(String regionCode : regionDto.regionCodes()) {
+            if (accountMapper.findRegionByRegionCode(regionCode).isPresent()) {
+                accountMapper.insertUserRegion(userId, regionCode);
+            }
+        }
+    }
 }
