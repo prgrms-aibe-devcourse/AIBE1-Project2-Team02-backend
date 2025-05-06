@@ -1,14 +1,23 @@
 const API = 'http://localhost:8081/api/admin';
 
-// -- 1. 신고 목록 로드 & 처리 --
+// 1. 신고 목록 로드 & 처리
 async function loadReports() {
-    // 미처리 신고
-    const notDone = await fetch(`${API}/reports/not-done`).then(r => r.json());
-    populateReports('tbl-notProcessed', notDone.data, true);
+    try {
+        // 미처리 신고
+        const resNot = await fetch(`${API}/reports/not-done`);
+        if (!resNot.ok) throw new Error(`HTTP ${resNot.status}`);
+        const jsonNot = await resNot.json();
+        populateReports('tbl-notProcessed', jsonNot.data, true);
 
-    // 처리 완료 신고
-    const done = await fetch(`${API}/reports/done`).then(r => r.json());
-    populateReports('tbl-processed', done.data, false);
+        // 처리 완료 신고
+        const resDone = await fetch(`${API}/reports/done`);
+        if (!resDone.ok) throw new Error(`HTTP ${resDone.status}`);
+        const jsonDone = await resDone.json();
+        populateReports('tbl-processed', jsonDone.data, false);
+    } catch (e) {
+        console.error('신고 목록 로드 실패', e);
+        alert('신고 목록을 불러오는 중 오류가 발생했습니다.');
+    }
 }
 
 function populateReports(tbodyId, reports, canProcess) {
@@ -29,8 +38,6 @@ function populateReports(tbodyId, reports, canProcess) {
             btn.textContent = '처리완료';
             btn.addEventListener('click', () => processReport(r.reportId));
             tdAction.appendChild(btn);
-        } else {
-            tdAction.textContent = r.processedAt || '-';
         }
         tr.appendChild(tdAction);
         tbody.appendChild(tr);
@@ -38,45 +45,63 @@ function populateReports(tbodyId, reports, canProcess) {
 }
 
 async function processReport(reportId) {
-    await fetch(`${API}/reports/${reportId}/process`, {
-        method: 'PUT'
-    });
-    loadReports();
+    try {
+        await fetch(`${API}/reports/${reportId}/process`, {
+            method: 'PUT'
+        });
+        loadReports();
+    } catch (e) {
+        console.error('신고 처리 실패', e);
+        alert('신고 처리 중 오류가 발생했습니다.');
+    }
 }
 
-// 이벤트 바인딩
-document.getElementById('btn-loadReports')
-    .addEventListener('click', loadReports);
-
-// -- 2. 상태 변경 --
+// 2. 상태 변경
 document.getElementById('form-status')
     .addEventListener('submit', async e => {
         e.preventDefault();
-        const type = document.getElementById('status-type').value;
-        const targetId = Number(document.getElementById('status-id').value);
-        const status = document.getElementById('status-value').value;
-
-        await fetch(`${API}/status`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ targetType: type, targetId, status })
-        });
-        alert('상태가 변경되었습니다.');
+        const req = {
+            targetType: document.getElementById('status-type').value,
+            targetId: Number(document.getElementById('status-id').value),
+            status: document.getElementById('status-value').value
+        };
+        try {
+            const res = await fetch(`${API}/status`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(req)
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            alert('상태가 변경되었습니다.');
+        } catch (e) {
+            console.error('상태 변경 실패', e);
+            alert('상태 변경 중 오류가 발생했습니다.');
+        }
     });
 
-// -- 3. Soft Delete & 복구 --
+// 3. Soft Delete & 복구
 document.getElementById('form-delete')
     .addEventListener('submit', async e => {
         e.preventDefault();
-        const type = document.getElementById('delete-type').value;
-        const targetId = Number(document.getElementById('delete-id').value);
         const action = document.getElementById('delete-action').value;
-
         const endpoint = action === 'soft-delete' ? 'soft-delete' : 'recover';
-        await fetch(`${API}/${endpoint}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ targetType: type, targetId })
-        });
-        alert(action === 'soft-delete' ? '삭제 처리되었습니다.' : '복구 처리되었습니다.');
+        const req = {
+            targetType: document.getElementById('delete-type').value,
+            targetId: Number(document.getElementById('delete-id').value)
+        };
+        try {
+            const res = await fetch(`${API}/${endpoint}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(req)
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            alert(action === 'soft-delete' ? '삭제 처리되었습니다.' : '복구 처리되었습니다.');
+        } catch (e) {
+            console.error('Soft Delete/복구 실패', e);
+            alert('처리 중 오류가 발생했습니다.');
+        }
     });
+
+// 초기 로드
+window.addEventListener('DOMContentLoaded', loadReports);

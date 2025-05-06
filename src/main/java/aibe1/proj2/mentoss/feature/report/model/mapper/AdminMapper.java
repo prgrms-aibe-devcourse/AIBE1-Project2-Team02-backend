@@ -20,7 +20,7 @@ public interface AdminMapper {
             target_type    AS targetType,
             target_id      AS targetId,
             reason,
-            updated_at     AS processedAt
+            reason_type    AS reasonType
         FROM report
         WHERE is_processed = #{processed}
     """

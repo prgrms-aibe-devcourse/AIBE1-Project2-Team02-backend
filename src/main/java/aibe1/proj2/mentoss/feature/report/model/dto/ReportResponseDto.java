@@ -8,5 +8,5 @@ public record ReportResponseDto(
         String targetType,
         Long targetId,
         String reason,
-        LocalDateTime processedAt
+        String reasonType
 ) {}
