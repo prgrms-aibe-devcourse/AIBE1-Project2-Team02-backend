@@ -4,7 +4,10 @@ package aibe1.proj2.mentoss.feature.report.service;
 import aibe1.proj2.mentoss.feature.report.model.dto.CreateReportRequestDto;
 import aibe1.proj2.mentoss.feature.report.model.mapper.ReportMapper;
 import aibe1.proj2.mentoss.global.entity.Report;
+import aibe1.proj2.mentoss.global.entity.enums.ReportReasonType;
+import aibe1.proj2.mentoss.global.entity.enums.TargetType;
 import aibe1.proj2.mentoss.global.exception.report.DuplicateReportException;
+import aibe1.proj2.mentoss.global.exception.report.InvalidReasonTypeException;
 import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +24,11 @@ public class ReportServiceImpl implements ReportService {
         int count = reportMapper.countByReporterAndTarget(
                 req.reporterId(), req.targetType(), req.targetId()
         );
-        if (!List.of("USER", "LECTURE", "REVIEW").contains(req.targetType())) {
+        if (!TargetType.contains(req.targetType())) {
             throw new InvalidTargetTypeException();
+        }
+        if (!ReportReasonType.contains(req.reasonType())) {
+            throw new InvalidReasonTypeException();
         }
         if (count > 0) {
             throw new DuplicateReportException();

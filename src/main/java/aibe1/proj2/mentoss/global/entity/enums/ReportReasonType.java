@@ -1,8 +1,11 @@
 package aibe1.proj2.mentoss.global.entity.enums;
 
 public enum ReportReasonType {
-    TEXT,
-    NICKNAME;
+    MESSAGE_CONTENT,
+    LECTURE_CONTENT,
+    REVIEW_CONTENT,
+    APPLICATION_CONTENT,
+    PROFILE;
 
     @Override
     public String toString() {
