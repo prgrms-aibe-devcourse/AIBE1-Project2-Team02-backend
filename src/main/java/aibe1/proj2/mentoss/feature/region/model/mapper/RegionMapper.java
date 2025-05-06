@@ -17,10 +17,13 @@ public interface RegionMapper {
     @Select("SELECT DISTINCT sigungu FROM region WHERE sido = #{sido} ORDER BY sigungu")
     List<String> findSigungusBySido(String sido);
 
-    @Select("SELECT region_code AS regionCode, sido, sigungu, dong " +
+    @Select("SELECT region_code AS regionCode, sido, sigungu, COALESCE(dong, '') AS dong, " +
+            "CONCAT(sido, ' ', sigungu, ' ', COALESCE(dong, '')) AS displayName " +
             "FROM region WHERE sido = #{sido} AND sigungu = #{sigungu} ORDER BY dong")
     List<RegionDto> findDongsBySidoAndSigungu(String sido, String sigungu);
 
-    @Select("SELECT region_code AS regionCode, sido, sigungu, dong FROM region")
+    @Select("SELECT region_code AS regionCode, sido, sigungu, COALESCE(dong, '') AS dong, " +
+            "CONCAT(sido, ' ', sigungu, ' ', COALESCE(dong, '')) AS displayName " +
+            "FROM region")
     List<RegionDto> findAllRegions();
 }
