@@ -1,29 +1,27 @@
 const API = 'http://localhost:8081/api/admin';
 
-// 1. 신고 목록 로드 & 처리
 async function loadReports() {
     try {
-        // 미처리 신고
         const resNot = await fetch(`${API}/reports/not-done`);
         if (!resNot.ok) throw new Error(`HTTP ${resNot.status}`);
-        const jsonNot = await resNot.json();
-        populateReports('tbl-notProcessed', jsonNot.data, true);
+        const { data: notList } = await resNot.json();
+        renderNotProcessed(notList);
 
-        // 처리 완료 신고
         const resDone = await fetch(`${API}/reports/done`);
         if (!resDone.ok) throw new Error(`HTTP ${resDone.status}`);
-        const jsonDone = await resDone.json();
-        populateReports('tbl-processed', jsonDone.data, false);
+        const { data: doneList } = await resDone.json();
+        renderProcessed(doneList);
+
     } catch (e) {
         console.error('신고 목록 로드 실패', e);
         alert('신고 목록을 불러오는 중 오류가 발생했습니다.');
     }
 }
 
-function populateReports(tbodyId, reports, canProcess) {
-    const tbody = document.getElementById(tbodyId);
+function renderNotProcessed(list) {
+    const tbody = document.getElementById('tbl-notProcessed');
     tbody.innerHTML = '';
-    reports.forEach(r => {
+    list.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
       <td>${r.reportId}</td>
@@ -32,14 +30,31 @@ function populateReports(tbodyId, reports, canProcess) {
       <td>${r.targetId}</td>
       <td>${r.reason}</td>
     `;
-        const tdAction = document.createElement('td');
-        if (canProcess) {
-            const btn = document.createElement('button');
-            btn.textContent = '처리완료';
-            btn.addEventListener('click', () => processReport(r.reportId));
-            tdAction.appendChild(btn);
-        }
-        tr.appendChild(tdAction);
+        const td = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.textContent = '처리완료';
+        btn.addEventListener('click', () => processReport(r.reportId));
+        td.appendChild(btn);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    });
+}
+
+function renderProcessed(list) {
+    const tbody = document.getElementById('tbl-processed');
+    tbody.innerHTML = '';
+    list.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+      <td>${r.reportId}</td>
+      <td>${r.reporterId}</td>
+      <td>${r.targetType}</td>
+      <td>${r.targetId}</td>
+      <td>${r.reason}</td>
+      <td>${r.reasonType}</td>
+      <td>${r.processedAt ? new Date(r.processedAt).toLocaleString() : '-'}</td>
+      <td>${r.processAdminId}</td>
+    `;
         tbody.appendChild(tr);
     });
 }

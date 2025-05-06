@@ -1,10 +1,9 @@
 package aibe1.proj2.mentoss.feature.report.service;
 
-import aibe1.proj2.mentoss.feature.report.model.dto.RecoverRequestDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.SoftDeleteRequestDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.StatusUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.*;
 import aibe1.proj2.mentoss.feature.report.model.mapper.AdminMapper;
+import aibe1.proj2.mentoss.global.entity.AdminAction;
+import aibe1.proj2.mentoss.global.entity.Report;
 import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,15 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public List<ReportResponseDto> getReportsByProcessed(boolean processed) {
+    public List<ReportResponseDto> getReportsNotProcessed() {
 
-        return adminMapper.findReportsByProcessed(processed);
+        return adminMapper.findReportsNotProcessed();
+    }
+
+    @Override
+    public List<ReportDoneResponseDto> getReportsProcessed() {
+
+        return adminMapper.findReportsProcessed();
     }
 
     @Override
@@ -86,5 +91,17 @@ public class AdminServiceImpl implements AdminService {
             default:
                 throw new InvalidTargetTypeException();
         }
+    }
+
+    @Override
+    public Long adminAction(ReportProcessRequestDto req) {
+        AdminAction adminAction = AdminAction.builder()
+                .build();
+        return 0L;
+    }
+
+    @Override
+    public void reportActionRelation(Long reportId, Long actionId) {
+
     }
 }

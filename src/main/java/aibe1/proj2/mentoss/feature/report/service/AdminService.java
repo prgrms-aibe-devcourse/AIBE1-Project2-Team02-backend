@@ -1,14 +1,13 @@
 package aibe1.proj2.mentoss.feature.report.service;
 
-import aibe1.proj2.mentoss.feature.report.model.dto.RecoverRequestDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.SoftDeleteRequestDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.StatusUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.*;
 
 import java.util.List;
 
 public interface AdminService {
-    List<ReportResponseDto> getReportsByProcessed(boolean processed);
+    List<ReportResponseDto> getReportsNotProcessed();
+
+    List<ReportDoneResponseDto> getReportsProcessed();
 
     void updateStatus(StatusUpdateRequestDto request);
 
@@ -17,4 +16,8 @@ public interface AdminService {
     void processReport(Long reportId);
 
     void recover(RecoverRequestDto req);
+
+    Long adminAction(ReportProcessRequestDto req);
+
+    void reportActionRelation(Long reportId, Long actionId);
 }

@@ -10,4 +10,13 @@ public enum TargetType {
     public String toString() {
         return name();
     }
+
+    public static boolean contains(String value) {
+        for (var t : values()) {
+            if (t.name().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

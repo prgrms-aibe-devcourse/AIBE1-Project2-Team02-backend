@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.report.model.mapper;
 
 
+import aibe1.proj2.mentoss.feature.report.model.dto.ReportDoneResponseDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,10 +23,27 @@ public interface AdminMapper {
             reason,
             reason_type    AS reasonType
         FROM report
-        WHERE is_processed = #{processed}
+        WHERE is_processed = FALSE
     """
     )
-    List<ReportResponseDto> findReportsByProcessed(@Param("processed") boolean processed);
+    List<ReportResponseDto> findReportsNotProcessed();
+
+    @Select("""
+        SELECT
+            r.report_id       AS reportId,
+            r.reporter_id     AS reporterId,
+            r.target_type     AS targetType,
+            r.target_id       AS targetId,
+            r.reason,
+            r.reason_type     AS reasonType,
+            ra.created_at     AS processedAt,
+            aa.admin_id       AS processAdminId
+        FROM report r
+        JOIN report_action ra ON ra.report_id = r.report_id
+        JOIN admin_action  aa ON aa.action_id  = ra.action_id
+        WHERE r.is_processed = TRUE
+    """)
+    List<ReportDoneResponseDto> findReportsProcessed();
 
 
     @Update("UPDATE app_user SET status = #{status} WHERE user_id = #{targetId}")
