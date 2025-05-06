@@ -71,25 +71,10 @@ public class AccountController {
             Authentication authentication,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일이 비어있습니다"));
+        String errorMsg = validateProfileImage(file);
+        if(errorMsg != null) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail(errorMsg));
         }
-
-        long maxSize = 5 * 1024 * 1024;
-        if(file.getSize() > maxSize){
-            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일 크기는 5MB를 초과할 수 없습니다"));
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        if (originalFilename != null && originalFilename.contains(".")) {
-            String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-            if (!Arrays.asList("jpg", "jpeg", "png", "gif").contains(extension)) {
-                return ResponseEntity.badRequest().body(ApiResponseFormat.fail("프로필 이미지는 jpg, jpeg, png, gif 파일만 업로드 가능합니다"));
-            }
-        } else {
-            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일 확장자가 없습니다"));
-        }
-
 
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         String imageUrl = accountService.updateProfileImage(userId, file);
@@ -122,23 +107,9 @@ public class AccountController {
             Authentication authentication,
             @ModelAttribute MentorProfileRequestDto requestDto
     ) throws IOException {
-        MultipartFile file = requestDto.appealFile();
-
-        if (file != null && !file.isEmpty()) {
-            long maxSize = 20 * 1024 * 1024;
-            if(file.getSize() > maxSize){
-                return ResponseEntity.badRequest().body(ApiResponseFormat.fail("어필 파일 크기는 20MB를 초과할 수 없습니다."));
-            }
-
-            String originalFilename = file.getOriginalFilename();
-            if (originalFilename != null && originalFilename.contains(".")) {
-                String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-                if (!Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx", "ppt", "pptx").contains(extension)) {
-                    return ResponseEntity.badRequest().body(ApiResponseFormat.fail("어필 파일은 pdf, jpg, jpeg, png, doc, docx, ppt, pptx 형식만 업로드 가능합니다"));
-                }
-            } else if (originalFilename != null) {
-                return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일 확장자가 없습니다"));
-            }
+        String errorMsg = validateAppealFile(requestDto.appealFile());
+        if (errorMsg != null) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail(errorMsg));
         }
 
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
@@ -152,6 +123,11 @@ public class AccountController {
             Authentication authentication,
             @ModelAttribute MentorProfileRequestDto requestDto
     ) throws IOException {
+        String errorMsg = validateAppealFile(requestDto.appealFile());
+        if (errorMsg != null) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail(errorMsg));
+        }
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.updateMentorProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
@@ -191,4 +167,59 @@ public class AccountController {
     public ResponseEntity<ApiResponseFormat<Void>> logout() {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
+
+    /**
+     * 어필 파일에 대한 유효성 검사를 수행합니다.
+     */
+    private String validateFile(
+            MultipartFile file,
+            int maxSizeMB,
+            List<String> allowedExtensions,
+            String fileTypeName,
+            boolean optional) {
+        if (file == null || file.isEmpty()) {
+            return optional ? null : "파일이 비어있습니다";
+        }
+
+        // 파일 크기 제한
+        long maxSize = maxSizeMB * 1024 * 1024;
+        if (file.getSize() > maxSize) {
+            return fileTypeName + " 크기는 " + maxSizeMB + "MB를 초과할 수 없습니다.";
+        }
+
+        // 파일 형식 검증
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+            if (!allowedExtensions.contains(extension)) {
+                return fileTypeName + "은(는) " + String.join(", ", allowedExtensions) + " 형식만 업로드 가능합니다";
+            }
+        } else if (originalFilename != null) {
+            return "파일 확장자가 없습니다";
+        }
+
+        return null;
+    }
+
+    private String validateAppealFile(MultipartFile file) {
+        return validateFile(
+                file,
+                20,
+                Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx", "ppt", "pptx"),
+                "어필 파일",
+                true
+        );
+    }
+
+    private String validateProfileImage(MultipartFile file) {
+        return validateFile(
+                file,
+                5,
+                Arrays.asList("jpg", "jpeg", "png", "gif"),
+                "프로필 이미지",
+                false
+        );
+    }
+
+
 }
