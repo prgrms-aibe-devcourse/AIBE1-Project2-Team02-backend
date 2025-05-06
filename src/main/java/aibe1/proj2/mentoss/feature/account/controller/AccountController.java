@@ -145,4 +145,10 @@ public class AccountController {
         accountService.updateUserRegion(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
+
+    @Operation(summary = "로그아웃", description = "사용자를 로그아웃합니다")
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponseFormat<Void>> logout() {
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
 }
