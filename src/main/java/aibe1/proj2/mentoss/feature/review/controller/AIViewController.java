@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AIViewController {
     @GetMapping("/prompt")
     public String promptTestPage() {
-        return "aiTest";
+        return "ai-test";
     }
 }
