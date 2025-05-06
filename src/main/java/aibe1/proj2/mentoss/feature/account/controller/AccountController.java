@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Tag(name = "Account API", description = "회원 계정 관련 API")
@@ -70,6 +71,26 @@ public class AccountController {
             Authentication authentication,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일이 비어있습니다"));
+        }
+
+        long maxSize = 5 * 1024 * 1024;
+        if(file.getSize() > maxSize){
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일 크기는 5MB를 초과할 수 없습니다"));
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+            if (!Arrays.asList("jpg", "jpeg", "png", "gif").contains(extension)) {
+                return ResponseEntity.badRequest().body(ApiResponseFormat.fail("프로필 이미지는 jpg, jpeg, png, gif 파일만 업로드 가능합니다"));
+            }
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일 확장자가 없습니다"));
+        }
+
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         String imageUrl = accountService.updateProfileImage(userId, file);
         return ResponseEntity.ok(ApiResponseFormat.ok(imageUrl));
@@ -101,6 +122,25 @@ public class AccountController {
             Authentication authentication,
             @ModelAttribute MentorProfileRequestDto requestDto
     ) throws IOException {
+        MultipartFile file = requestDto.appealFile();
+
+        if (file != null && !file.isEmpty()) {
+            long maxSize = 20 * 1024 * 1024;
+            if(file.getSize() > maxSize){
+                return ResponseEntity.badRequest().body(ApiResponseFormat.fail("어필 파일 크기는 20MB를 초과할 수 없습니다."));
+            }
+
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null && originalFilename.contains(".")) {
+                String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+                if (!Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx", "ppt", "pptx").contains(extension)) {
+                    return ResponseEntity.badRequest().body(ApiResponseFormat.fail("어필 파일은 pdf, jpg, jpeg, png, doc, docx, ppt, pptx 형식만 업로드 가능합니다"));
+                }
+            } else if (originalFilename != null) {
+                return ResponseEntity.badRequest().body(ApiResponseFormat.fail("파일 확장자가 없습니다"));
+            }
+        }
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.applyMentorProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
