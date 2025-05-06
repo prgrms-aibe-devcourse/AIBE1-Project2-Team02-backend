@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,11 +85,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private void processLogin(String provider, String providerId, HttpServletRequest req, HttpServletResponse res) throws IOException {
         Optional<AppUser> userOpt = appUserMapper.findByProviderAndProviderId(provider, providerId);
 
-        if(userOpt.isEmpty()) {
-            log.error("소셜 로그인 사용자 정보가 DB에 존재하지 않습니다. provider={}, providerId={}", provider, providerId);
-            throw new IllegalStateException("소셜 로그인 사용자 정보가 DB에 존재하지 않습니다");
-        }
-
         AppUser appUser = userOpt.get();
         String username = provider + "_" + providerId;
 
@@ -111,17 +107,30 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     userId
             );
 
-            // 개발 환경에서는 테스트 페이지로 리다이렉트
+
+            res.setContentType("text/html;charset=UTF-8");
+            PrintWriter writer = res.getWriter();
+
+            String frontendOrigin;
             if ("dev".equals(activeProfile)) {
-                String redirectUrl = "/test/login?token=" + token;
-                res.sendRedirect(redirectUrl);
+                frontendOrigin = "http://localhost:5173"; // 개발 환경
+            } else {
+                frontendOrigin = "https://mentoss.vercel.app"; // 배포 환경
             }
-            // 운영 환경에서는 JSON 응답
-            else {
-                res.setContentType("application/json;charset=UTF-8");
-                Map<String, String> result = Map.of("token", token);
-                res.getWriter().write(objectMapper.writeValueAsString(result));
-            }
+
+            String script = "<script>" +
+                    "console.log('토큰 전송 시도');" +
+                    "try {" +
+                    "  window.opener.postMessage({ token: '" + token + "' }, '" + frontendOrigin + "');" +
+                    "  console.log('토큰 전송 완료');" +
+                    "} catch (e) {" +
+                    "  console.error('토큰 전송 오류:', e);" +
+                    "}" +
+                    "window.close();" +
+                    "</script>";
+
+            writer.write(script);
+            writer.flush();
         } catch (Exception e) {
             log.error("토큰 생성 중 오류 발생", e);
             throw e;
