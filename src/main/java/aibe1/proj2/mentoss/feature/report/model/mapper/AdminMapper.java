@@ -3,10 +3,9 @@ package aibe1.proj2.mentoss.feature.report.model.mapper;
 
 import aibe1.proj2.mentoss.feature.report.model.dto.ReportDoneResponseDto;
 import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import aibe1.proj2.mentoss.feature.report.model.dto.ReportTargetDto;
+import aibe1.proj2.mentoss.global.entity.AdminAction;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -95,7 +94,31 @@ public interface AdminMapper {
     @Update("UPDATE report SET is_processed = TRUE WHERE report_id = #{reportId}")
     void markReportProcessed(@Param("reportId") Long reportId);
 
+    @Select("""
+        SELECT target_type AS targetType,
+               target_id   AS targetId
+          FROM report
+         WHERE report_id = #{reportId}
+    """
+    )
+    ReportTargetDto findReportTarget(@Param("reportId") Long reportId);
 
+    @Options(useGeneratedKeys = true, keyProperty = "actionId")
+    @Insert("""
+        INSERT INTO admin_action (
+            admin_id, target_type, target_id,
+            action_type, reason, suspension_period_days
+        ) VALUES (
+            #{adminId}, #{targetType}, #{targetId},
+            #{actionType}, #{reason}, #{suspensionPeriodDays}
+        )
+    """
+    )
+    void insertAdminAction(AdminAction adminAction);
+
+    @Insert("INSERT INTO report_action (report_id, action_id) VALUES (#{reportId}, #{actionId})")
+    void insertReportAction(@Param("reportId") Long reportId,
+                            @Param("actionId") Long actionId);
 
 
 }
