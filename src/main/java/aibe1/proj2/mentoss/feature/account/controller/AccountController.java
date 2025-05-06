@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.account.controller;
 
 import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.service.AccountService;
+import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Tag(name = "Account API", description = "회원 계정 관련 API")
 @RestController
@@ -124,4 +126,15 @@ public class AccountController {
         MentorStatusResponseDto mentorStatus = accountService.getMentorStatus(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(mentorStatus));
     }
+
+    @Operation(summary = "사용자 지역 목록 조회", description = "로그인한 사용자의 저장된 지역 목록을 조회합니다")
+    @GetMapping("/regions")
+    public ResponseEntity<ApiResponseFormat<List<RegionDto>>> getUserRegions(
+            Authentication authentication) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        List<RegionDto> regions = accountService.getUserRegions(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(regions));
+    }
+
+
 }

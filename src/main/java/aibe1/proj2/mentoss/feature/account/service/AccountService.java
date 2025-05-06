@@ -1,9 +1,11 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
 import aibe1.proj2.mentoss.feature.account.model.dto.*;
+import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface AccountService {
 
@@ -28,4 +30,6 @@ public interface AccountService {
     void updateMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException;
 
     MentorStatusResponseDto getMentorStatus(Long userId);
+
+    List<RegionDto> getUserRegions(Long userId);
 }

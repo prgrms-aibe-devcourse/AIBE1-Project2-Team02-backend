@@ -4,6 +4,7 @@ import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
 import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
 import aibe1.proj2.mentoss.feature.file.service.FileService;
+import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.MentorProfile;
 import aibe1.proj2.mentoss.global.entity.Region;
@@ -20,6 +21,7 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -209,5 +211,40 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return new MentorStatusResponseDto(isMentor, isCertified);
+    }
+
+    @Override
+    public List<RegionDto> getUserRegions(Long userId) {
+        AppUser appUser = accountMapper.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+        List<Region> regions = accountMapper.findRegionByUserId(userId);
+
+        return regions.stream()
+                .map(region -> new RegionDto(
+                        region.getRegionCode(),
+                        region.getSido(),
+                        region.getSigungu(),
+                        region.getDong(),
+                        formatRegionDisplayName(region)
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private String formatRegionDisplayName(Region region) {
+        StringBuilder sb = new StringBuilder();
+
+        if (region.getSido() != null) {
+            sb.append(region.getSido());
+        }
+
+        if (region.getSigungu() != null) {
+            sb.append(" ").append(region.getSigungu());
+        }
+
+        if (region.getDong() != null) {
+            sb.append(" ").append(region.getDong());
+        }
+
+        return sb.toString();
     }
 }
