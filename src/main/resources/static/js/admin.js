@@ -45,7 +45,7 @@ function renderProcessed(list) {
     tbody.innerHTML = '';
     list.forEach(r => {
         console.log(r.processedAt)
-        let time = `${r.processedAt[0]}-${r.processedAt[1]}-${r.processedAt[2]} ${r.processedAt[3]}:${r.processedAt[4]}:${r.processedAt[5]}`
+        let timeText = `${r.processedAt[0]}-${r.processedAt[1]}-${r.processedAt[2]} ${r.processedAt[3]}:${r.processedAt[4]}:${r.processedAt[5]}`
         const tr = document.createElement('tr');
         tr.innerHTML = `
       <td>${r.reportId}</td>
@@ -53,7 +53,7 @@ function renderProcessed(list) {
       <td>${r.targetType}</td>
       <td>${r.targetId}</td>
       <td>${r.reason}</td>
-      <td>${time}</td>
+      <td>${timeText}</td>
       <td>${r.processAdminId}</td>
     `;
         tbody.appendChild(tr);

@@ -12,54 +12,6 @@
 <body>
 <h1>관리자 대시보드</h1>
 
-<!-- 1. 신고 목록 -->
-<section>
-    <h2>신고 목록</h2>
-    <button id="btn-loadReports">신고 목록 새로고침</button>
-    <div style="display:flex; gap:2rem; margin-top:1rem;">
-        <div>
-            <h3>미처리 신고</h3>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>신고ID</th>
-                    <th>신고자ID</th>
-                    <th>타입</th>
-                    <th>대상ID</th>
-                    <th>사유</th>
-                    <th>액션</th>
-                </tr>
-                </thead>
-                <tbody id="tbl-notProcessed">
-
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <h3>처리 완료 신고</h3>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>신고ID</th>
-                    <th>신고자ID</th>
-                    <th>타입</th>
-                    <th>대상ID</th>
-                    <th>사유</th>
-                    <th>처리일시</th>
-                    <th>담당자</th>
-                </tr>
-                </thead>
-                <tbody id="tbl-processed">
-
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-
-<hr/>
-
-<!-- 2. 상태 변경 -->
 <section>
     <h2>상태 변경</h2>
     <form id="form-status">
@@ -113,5 +65,53 @@
         <button type="submit">적용</button>
     </form>
 </section>
+
+<hr/>
+
+<section>
+    <h2>신고 목록</h2>
+    <button id="btn-loadReports">신고 목록 새로고침</button>
+    <div style="display:flex; gap:2rem; margin-top:1rem;">
+        <div>
+            <h3>미처리 신고</h3>
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>신고ID</th>
+                    <th>신고자ID</th>
+                    <th>타입</th>
+                    <th>대상ID</th>
+                    <th>사유</th>
+                    <th>액션</th>
+                </tr>
+                </thead>
+                <tbody id="tbl-notProcessed">
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3>처리 완료 신고</h3>
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>신고ID</th>
+                    <th>신고자ID</th>
+                    <th>타입</th>
+                    <th>대상ID</th>
+                    <th>사유</th>
+                    <th>처리일시</th>
+                    <th>담당자</th>
+                </tr>
+                </thead>
+                <tbody id="tbl-processed">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
 </body>
 </html>
