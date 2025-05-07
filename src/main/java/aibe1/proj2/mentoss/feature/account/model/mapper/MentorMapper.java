@@ -34,4 +34,10 @@ public interface MentorMapper {
             "appeal_file_url = #{appealFileUrl} " +
             "WHERE user_id = #{userId}")
     int updateMentorProfile(MentorProfile mentorProfile);
+
+    @Update("UPDATE mentor_profile SET " +
+            "is_deleted = TRUE, " +
+            "deleted_at = CURRENT_TIMESTAMP " +
+            "WHERE user_id = #{userId}")
+    int softDeleteMentorProfile(Long userId);
 }

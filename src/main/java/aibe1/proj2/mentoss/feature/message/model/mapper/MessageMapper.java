@@ -57,4 +57,10 @@ public interface MessageMapper {
     @Options(useGeneratedKeys = true, keyProperty = "messageId")
     void insert(Message message);
 
+    @Update("""
+                UPDATE message
+                SET is_deleted = TRUE, deleted_at = CURRENT_TIMESTAMP
+                WHERE sender_id = #{userId} OR receiver_id = #{userId}
+            """)
+    void softDeleteMessagesByUserId(Long userId);
 }

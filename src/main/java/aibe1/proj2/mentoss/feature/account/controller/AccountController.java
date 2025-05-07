@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Tag(name = "Account API", description = "회원 계정 관련 API")
@@ -70,6 +71,11 @@ public class AccountController {
             Authentication authentication,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
+        String errorMsg = validateProfileImage(file);
+        if(errorMsg != null) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail(errorMsg));
+        }
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         String imageUrl = accountService.updateProfileImage(userId, file);
         return ResponseEntity.ok(ApiResponseFormat.ok(imageUrl));
@@ -101,6 +107,11 @@ public class AccountController {
             Authentication authentication,
             @ModelAttribute MentorProfileRequestDto requestDto
     ) throws IOException {
+        String errorMsg = validateAppealFile(requestDto.appealFile());
+        if (errorMsg != null) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail(errorMsg));
+        }
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.applyMentorProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
@@ -112,6 +123,11 @@ public class AccountController {
             Authentication authentication,
             @ModelAttribute MentorProfileRequestDto requestDto
     ) throws IOException {
+        String errorMsg = validateAppealFile(requestDto.appealFile());
+        if (errorMsg != null) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail(errorMsg));
+        }
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.updateMentorProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
@@ -145,4 +161,74 @@ public class AccountController {
         accountService.updateUserRegion(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
+
+    @Operation(summary = "로그아웃", description = "사용자를 로그아웃합니다")
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponseFormat<Void>> logout() {
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    @Operation(summary = "프로필 이미지 삭제", description = "사용자의 프로필 이미지를 삭제하고 기본 이미지로 변경합니다")
+    @DeleteMapping("/profile/image")
+    public ResponseEntity<ApiResponseFormat<Void>> deleteProfileImage(
+            Authentication authentication) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        accountService.deleteProfileImage(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    /**
+     * 파일에 대한 유효성 검사를 수행합니다.
+     */
+    private String validateFile(
+            MultipartFile file,
+            int maxSizeMB,
+            List<String> allowedExtensions,
+            String fileTypeName,
+            boolean optional) {
+        if (file == null || file.isEmpty()) {
+            return optional ? null : "파일이 비어있습니다";
+        }
+
+        // 파일 크기 제한
+        long maxSize = maxSizeMB * 1024 * 1024;
+        if (file.getSize() > maxSize) {
+            return fileTypeName + " 크기는 " + maxSizeMB + "MB를 초과할 수 없습니다.";
+        }
+
+        // 파일 형식 검증
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+            if (!allowedExtensions.contains(extension)) {
+                return fileTypeName + "은(는) " + String.join(", ", allowedExtensions) + " 형식만 업로드 가능합니다";
+            }
+        } else if (originalFilename != null) {
+            return "파일 확장자가 없습니다";
+        }
+
+        return null;
+    }
+
+    private String validateAppealFile(MultipartFile file) {
+        return validateFile(
+                file,
+                20,
+                Arrays.asList("pdf", "jpg", "jpeg", "png", "doc", "docx", "ppt", "pptx"),
+                "어필 파일",
+                true
+        );
+    }
+
+    private String validateProfileImage(MultipartFile file) {
+        return validateFile(
+                file,
+                5,
+                Arrays.asList("jpg", "jpeg", "png", "gif"),
+                "프로필 이미지",
+                false
+        );
+    }
+
+
 }
