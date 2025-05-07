@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface MessageService {
 
-    PageResponse<MessageResponseDto> getSentMessages(Long senderId, int page, int size);;
+    PageResponse<MessageResponseDto> getSentMessages(Long senderId, int page, int size, String filterBy , String keyword);;
 
-    PageResponse<MessageResponseDto> getReceivedMessages(Long receiverId, int page, int size);
+    PageResponse<MessageResponseDto> getReceivedMessages(Long receiverId, int page, int size, String filterBy ,String keyword);
 
     MessageResponseDto getMessage(Long messageId, Long viewerId);
 
