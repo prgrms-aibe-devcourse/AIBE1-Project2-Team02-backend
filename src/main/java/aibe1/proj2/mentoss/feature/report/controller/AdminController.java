@@ -58,6 +58,18 @@ public class AdminController {
                             """
                             )
                     )
+            ),
+            @ApiResponse(responseCode = "400", description = "신고 기록을 가져오는 중 오류 발생",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponseFormat.class, example = """
+                            {
+                              "success": false,
+                              "message": "targetType은 USER, LECTURE, REVIEW 중 하나여야 합니다.",
+                              "data": null
+                            }
+                            """
+                            )
+                    )
             )
     })
     @GetMapping("/reports/done")
@@ -89,7 +101,19 @@ public class AdminController {
                                 """
                                 )
                         )
-                )
+                ),
+            @ApiResponse(responseCode = "400", description = "TargetType이 지정된 값 이외의 것이 들어옴",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponseFormat.class, example = """
+                            {
+                              "success": false,
+                              "message": "targetType은 USER, LECTURE, REVIEW 중 하나여야 합니다.",
+                              "data": null
+                            }
+                            """
+                            )
+                    )
+            ),
         })
     @GetMapping("/reports/not-done")
     public ResponseEntity<ApiResponseFormat<List<ReportResponseDto>>> getNotProcessedReports() {

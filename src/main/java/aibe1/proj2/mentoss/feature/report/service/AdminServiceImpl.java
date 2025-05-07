@@ -8,6 +8,7 @@ import aibe1.proj2.mentoss.global.entity.AdminAction;
 import aibe1.proj2.mentoss.global.entity.Report;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
+import aibe1.proj2.mentoss.global.exception.report.ReportListException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +22,22 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<ReportResponseDto> getReportsNotProcessed() {
-
-        return adminMapper.findReportsNotProcessed();
+        try {
+            return adminMapper.findReportsNotProcessed();
+        }
+        catch(Exception e) {
+            throw new ReportListException(e);
+        }
     }
 
     @Override
     public List<ReportDoneResponseDto> getReportsProcessed() {
-
-        return adminMapper.findReportsProcessed();
+        try {
+            return adminMapper.findReportsProcessed();
+        }
+        catch(Exception e) {
+            throw new ReportListException(e);
+        }
     }
 
     @Override

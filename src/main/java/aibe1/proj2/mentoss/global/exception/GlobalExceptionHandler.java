@@ -3,6 +3,7 @@ package aibe1.proj2.mentoss.global.exception;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import aibe1.proj2.mentoss.global.exception.report.DuplicateReportException;
 import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
+import aibe1.proj2.mentoss.global.exception.report.ReportListException;
 import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
@@ -127,6 +128,16 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidTargetTypeException.class)
     public ResponseEntity<ApiResponseFormat<Void>> handleInvalidTargetType(InvalidTargetTypeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * report 리스트를 가져오는 과정에서 생기는 오류
+     */
+    @ExceptionHandler(ReportListException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleReportListException(ReportListException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
