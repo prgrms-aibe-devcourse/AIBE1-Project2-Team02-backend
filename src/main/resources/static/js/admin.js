@@ -1,4 +1,4 @@
-const API = 'http://localhost:8081/api/admin';
+const API = 'https://mentoss.onrender.com/api/admin';
 
 //신고 리스트
 async function loadReports() {
