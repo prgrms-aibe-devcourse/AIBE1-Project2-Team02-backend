@@ -8,6 +8,7 @@ import aibe1.proj2.mentoss.global.entity.Message;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,11 +18,11 @@ public class MessageServiceImpl implements MessageService{
     private final MessageMapper messageMapper;
 
     @Override
-    public PageResponse<MessageResponseDto> getSentMessages(Long senderId, int page, int size) {
-        int offset = (page - 1) * size;
-        List<Message> messages = messageMapper.findSentMessages(senderId, size, offset);
-        int totalCount = messageMapper.countSentMessages(senderId);
-
+    public PageResponse<MessageResponseDto> getSentMessages(Long senderId, int page, int size, String filterBy , String keyword) {
+        int offset = page * size;
+        List<Message> messages = messageMapper.findSentMessages(senderId, size, offset, filterBy, keyword);
+        int totalCount = messageMapper.countSentMessages(senderId, filterBy, keyword);
+        System.out.println(totalCount);
         List<MessageResponseDto> content = messages.stream()
                 .map(m -> MessageResponseDto.fromEntity(m, senderId))
                 .toList();
@@ -30,11 +31,11 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public PageResponse<MessageResponseDto> getReceivedMessages(Long receiverId, int page, int size) {
-        int offset = (page - 1) * size;
-        List<Message> messages = messageMapper.findReceivedMessages(receiverId, size, offset);
-        int totalCount = messageMapper.countSentMessages(receiverId);
-
+    public PageResponse<MessageResponseDto> getReceivedMessages(Long receiverId, int page, int size, String filterBy , String keyword) {
+        int offset = page * size;
+        List<Message> messages = messageMapper.findReceivedMessages(receiverId, size, offset, filterBy, keyword);
+        int totalCount = messageMapper.countReceivedMessages(receiverId, filterBy, keyword);
+        System.out.println(totalCount);
         List<MessageResponseDto> content = messages.stream()
                 .map(message -> MessageResponseDto.fromEntity(message, receiverId))
                 .toList();
@@ -63,7 +64,6 @@ public class MessageServiceImpl implements MessageService{
         if (dto.content() == null || dto.content().trim().isEmpty()) {
             throw new IllegalArgumentException("쪽지 내용을 입력해주세요.");
         }
-
         Message message = dto.toEntity(senderId);
         messageMapper.insert(message);
         return message.getMessageId();

@@ -15,9 +15,12 @@ public class Message {
     private Long messageId;
     private Long senderId;
     private Long receiverId;
+    private String nickname;
     private String content;
     private Boolean isRead = false;
     private Boolean isDeleted = false;
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
+
+
 }
