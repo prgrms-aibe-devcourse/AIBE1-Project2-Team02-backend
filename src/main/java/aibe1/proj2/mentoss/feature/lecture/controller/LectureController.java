@@ -126,6 +126,7 @@ public class LectureController {
 //        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
 //    }
 
+    // 강의 필터검색
     @GetMapping
     @Operation(summary = "강의 목록 조회", description = "강의 목록을 검색 조건에 따라 조회합니다.")
     @ApiResponses(value = {
@@ -142,8 +143,8 @@ public class LectureController {
             @Parameter(description = "카테고리 (대/중/소분류)")
             @RequestParam(required = false) String category,
 
-            @Parameter(description = "지역 검색")
-            @RequestParam(required = false) String region,
+            @Parameter(description = "지역 검색 (복수 지역 가능, 쉼표로 구분)")
+            @RequestParam(required = false) List<String> regions,
 
             @Parameter(description = "최소 가격")
             @RequestParam(required = false) Long minPrice,
@@ -171,7 +172,7 @@ public class LectureController {
 
         // 검색 조건 DTO 생성
         LectureSearchRequest searchRequest = new LectureSearchRequest(
-                keyword, category, region, minPrice, maxPrice,
+                keyword, category, regions, minPrice, maxPrice,
                 minRating, isCertified, isOpen);
 
         // 서비스 호출
