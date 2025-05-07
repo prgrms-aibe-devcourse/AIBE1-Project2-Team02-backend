@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8081", allowCredentials = "true")
 @Tag(name = "관리자 API", description = "관리자 페이지 및 기능 API")
 @RequiredArgsConstructor
 public class AdminController {
