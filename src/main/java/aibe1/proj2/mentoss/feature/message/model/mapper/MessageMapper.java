@@ -11,36 +11,26 @@ import java.util.List;
 public interface MessageMapper {
 
 
-    @Select("""
-                SELECT * FROM message
-                WHERE sender_id = #{userId} AND is_deleted = 0
-                ORDER BY message_id DESC
-                LIMIT #{limit} OFFSET #{offset}
-            """)
-    List<Message> findSentMessages(Long userId, int limit, int offset);
+    @SelectProvider(type = MessageSqlProvider.class, method = "findSentMessagesSql")
+    List<Message> findSentMessages(Long userId, int limit, int offset, String filterBy, String keyword);
 
-    @Select("""
-                SELECT * FROM message
-                WHERE receiver_id = #{userId} AND is_deleted = 0
-                ORDER BY message_id DESC
-                LIMIT #{limit} OFFSET #{offset}
-            """)
-    List<Message> findReceivedMessages(Long userId, int limit, int offset);
+    @SelectProvider(type = MessageSqlProvider.class, method = "findReceivedMessagesSql")
+    List<Message> findReceivedMessages(Long userId, int limit, int offset, String filterBy, String keyword);
+
+    @SelectProvider(type = MessageSqlProvider.class, method = "countSentMessagesSql")
+    int countSentMessages(Long userId, String filterBy, String keyword);
+
+    @SelectProvider(type = MessageSqlProvider.class, method = "countReceivedMessagesSql")
+    int countReceivedMessages(Long userId, String filterBy, String keyword);
+
 
     @Select("""
-                SELECT COUNT(*) FROM message
-                WHERE sender_id = #{userId} AND is_deleted = 0
+                SELECT m.*, u.nickname
+                FROM message m
+                JOIN app_user u ON m.receiver_id = u.user_id
+                WHERE m.message_id = #{id}
+                  AND m.is_deleted = 0
             """)
-    int countSentMessages(Long userId);
-
-    @Select("""
-                SELECT COUNT(*) FROM message
-                WHERE receiver_id = #{userId} AND is_deleted = 0
-            """)
-    int countReceivedMessages(Long userId);
-
-
-    @Select("SELECT * FROM message WHERE message_id = #{id} AND is_deleted = 0")
     Message findById(Long id);
 
     @Update("""
@@ -51,8 +41,8 @@ public interface MessageMapper {
     void markAsRead(Long id);
 
     @Insert("""
-                INSERT INTO message (sender_id, receiver_id, content)
-                VALUES (#{senderId}, #{receiverId}, #{content})
+                INSERT INTO message (sender_id, receiver_id, content, created_at)
+                VALUES (#{senderId}, #{receiverId}, #{content}, #{createdAt})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "messageId")
     void insert(Message message);

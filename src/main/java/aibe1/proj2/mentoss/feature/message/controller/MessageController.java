@@ -30,9 +30,11 @@ public class MessageController {
     @GetMapping("/sent")
     public ResponseEntity<ApiResponseFormat<PageResponse<MessageResponseDto>>> getSentMessages(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) String keyword
     ) {
-        PageResponse<MessageResponseDto> response = messageService.getSentMessages(userId, page, size);
+        PageResponse<MessageResponseDto> response = messageService.getSentMessages(userId, page, size, filterBy ,keyword);
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
@@ -41,9 +43,11 @@ public class MessageController {
     public ResponseEntity<ApiResponseFormat<PageResponse<MessageResponseDto>>> getReceivedMessages(
             Authentication authentication,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) String keyword
     ) {
-        PageResponse<MessageResponseDto> response = messageService.getReceivedMessages(userId, page, size);
+        PageResponse<MessageResponseDto> response = messageService.getReceivedMessages(userId, page, size, filterBy ,keyword);
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
