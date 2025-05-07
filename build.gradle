@@ -58,7 +58,7 @@ dependencies {
     // AWS SDK for Java v2 의존성 추가
     implementation 'software.amazon.awssdk:s3:2.25.6'
 
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
 }
 
 tasks.named('test') {
