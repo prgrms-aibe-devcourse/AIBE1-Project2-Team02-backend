@@ -3,6 +3,7 @@ package aibe1.proj2.mentoss.feature.report.controller;
 import aibe1.proj2.mentoss.feature.report.model.dto.*;
 import aibe1.proj2.mentoss.feature.report.service.AdminService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
+@Tag(name = "관리자 API", description = "관리자 페이지 및 기능 API")
 @RequiredArgsConstructor
 public class AdminController {
     private final AdminService adminService;

@@ -10,6 +10,9 @@ public record ReportDoneResponseDto(
         String reason,
         String reasonType,
         LocalDateTime processedAt,
-        Long processAdminId
+        Long processAdminId,
+        String actionType,
+        String actionReason,
+        Long suspendPeriod
 ) {
 }

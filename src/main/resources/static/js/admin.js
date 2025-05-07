@@ -1,5 +1,6 @@
 const API = 'http://localhost:8081/api/admin';
 
+//신고 리스트
 async function loadReports() {
     try {
         const resNot = await fetch(`${API}/reports/not-done`);
@@ -33,7 +34,7 @@ function renderNotProcessed(list) {
         const td = document.createElement('td');
         const btn = document.createElement('button');
         btn.textContent = '처리완료';
-        btn.addEventListener('click', () => processReport(r.reportId));
+        btn.addEventListener('click', () => showProcessModal(r.reportId));
         td.appendChild(btn);
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -44,7 +45,6 @@ function renderProcessed(list) {
     const tbody = document.getElementById('tbl-processed');
     tbody.innerHTML = '';
     list.forEach(r => {
-        console.log(r.processedAt)
         let timeText = `${r.processedAt[0]}-${r.processedAt[1]}-${r.processedAt[2]} ${r.processedAt[3]}:${r.processedAt[4]}:${r.processedAt[5]}`
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -55,24 +55,16 @@ function renderProcessed(list) {
       <td>${r.reason}</td>
       <td>${timeText}</td>
       <td>${r.processAdminId}</td>
+      <td>${r.actionType}</td>
+      <td>${r.actionReason}</td>
+      <td>${r.suspendPeriod}</td>
     `;
         tbody.appendChild(tr);
     });
 }
 
-async function processReport(reportId) {
-    try {
-        await fetch(`${API}/reports/${reportId}/process`, {
-            method: 'PUT'
-        });
-        loadReports();
-    } catch (e) {
-        console.error('신고 처리 실패', e);
-        alert('신고 처리 중 오류가 발생했습니다.');
-    }
-}
 
-// 2. 상태 변경
+//상태 변경
 document.getElementById('form-status')
     .addEventListener('submit', async e => {
         e.preventDefault();
@@ -95,7 +87,7 @@ document.getElementById('form-status')
         }
     });
 
-// 3. Soft Delete & 복구
+//삭제 복구
 document.getElementById('form-delete')
     .addEventListener('submit', async e => {
         e.preventDefault();
@@ -119,5 +111,53 @@ document.getElementById('form-delete')
         }
     });
 
-// 초기 로드
+//모달
+const modal = document.getElementById('process-modal');
+const backdrop = document.getElementById('modal-backdrop');
+let currentReportId = null;
+
+function showProcessModal(reportId) {
+    currentReportId = reportId;
+    document.getElementById('process-reportId').value = reportId;
+    modal.style.display = 'block';
+    backdrop.style.display = 'block';
+}
+
+function hideProcessModal() {
+    modal.style.display = 'none';
+    backdrop.style.display = 'none';
+    document.getElementById('form-process').reset();
+    currentReportId = null;
+}
+//확인 버튼
+document.getElementById('process-confirm')
+    .addEventListener('click', async () => {
+        const dto = {
+            reportId: currentReportId,
+            adminId: Number(document.getElementById('process-adminId').value),
+            actionType: document.getElementById('process-actionType').value,
+            reason: document.getElementById('process-reason').value,
+            suspendPeriod: Number(document.getElementById('process-suspendPeriod').value)
+        };
+
+        try {
+            const res = await fetch(`${API}/process`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(dto)
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            hideProcessModal();
+            loadReports();
+        } catch (e) {
+            console.error('신고 처리 실패', e);
+            alert('신고 처리 중 오류가 발생했습니다.');
+        }
+    });
+//취소 버튼
+document.getElementById('process-cancel')
+    .addEventListener('click', hideProcessModal);
+//모달 밖에 다른데 눌러도 닫히게 하는거
+backdrop.addEventListener('click', hideProcessModal);
+
 window.addEventListener('DOMContentLoaded', loadReports);

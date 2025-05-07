@@ -36,7 +36,10 @@ public interface AdminMapper {
             r.reason,
             r.reason_type     AS reasonType,
             ra.created_at     AS processedAt,
-            aa.admin_id       AS processAdminId
+            aa.admin_id       AS processAdminId,
+            aa.action_type     AS actionType,
+            aa.reason         AS actionReason,
+            aa.suspension_period_days AS suspendPeriod
         FROM report r
         JOIN report_action ra ON ra.report_id = r.report_id
         JOIN admin_action  aa ON aa.action_id  = ra.action_id
