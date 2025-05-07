@@ -40,12 +40,14 @@ public class SecurityConfig {
      * CORS 설정
      * - 프론트엔드 도메인에서 백엔드 API에 접근 가능하도록 허용
      * - localhost:5173 (개발), mentoss.vercel.app (배포) 허용
+     * - localhost:8081 (백엔드 개발) 에서도 API 접근 허용
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
+                "http://localhost:8081",
                 "https://mentoss.vercel.app"
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
