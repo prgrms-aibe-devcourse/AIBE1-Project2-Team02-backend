@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.file.service;
+package aibe1.proj2.mentoss.feature.account.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

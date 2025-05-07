@@ -1,7 +1,6 @@
-package aibe1.proj2.mentoss.feature.ping;
+package aibe1.proj2.mentoss.feature.testController.rest;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

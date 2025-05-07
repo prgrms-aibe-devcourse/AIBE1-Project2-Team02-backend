@@ -55,6 +55,28 @@ public class ReviewController {
             "data": null
             }
             """))),
+            @ApiResponse(responseCode = "403", description = "본인이 수강한 강의가 아닌 항목에 후기를 작성하려는 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "본인이 수강한 강의가 아닙니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "403", description = "본인이 작성한 후기가 아닌 항목을 수정/삭제하려는 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "본인이 작성한 항목이 아닙니다.",
+            "data": null
+            }
+            """))),
             @ApiResponse(responseCode = "404", description = "외래키 참조 오류(참조할 대상 ID가 없음)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(

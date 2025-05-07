@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/ai")
 @Tag(name = "AI API", description = "생성형 AI 활용 멘토 태그 생성 API")
 @RequiredArgsConstructor
-public class AIController {
+public class AiController {
     private final AIService aiService;
 
 

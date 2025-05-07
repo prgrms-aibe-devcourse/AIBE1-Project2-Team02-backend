@@ -3,7 +3,6 @@ package aibe1.proj2.mentoss.feature.account.service;
 import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
 import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
-import aibe1.proj2.mentoss.feature.file.service.FileService;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
 import aibe1.proj2.mentoss.feature.message.model.mapper.MessageMapper;
 import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
