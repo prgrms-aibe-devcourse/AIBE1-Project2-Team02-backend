@@ -42,7 +42,9 @@ public interface CategoryMapper {
     /**
      * 특정 대분류와 중분류에 속한 소분류 목록 조회
      */
-    @Select("SELECT category_id AS categoryId, subcategory FROM lecture_category " +
+    @Select("SELECT category_id AS categoryId, parent_category AS parentCategory, " +
+            "middle_category AS middleCategory, subcategory " +
+            "FROM lecture_category " +
             "WHERE parent_category = #{parentCategory} AND middle_category = #{middleCategory}")
     List<CategoryResponse> getSubcategories(String parentCategory, String middleCategory);
 }
