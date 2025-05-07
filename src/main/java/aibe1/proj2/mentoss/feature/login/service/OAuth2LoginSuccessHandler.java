@@ -89,26 +89,16 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     userId
             );
 
-            res.setContentType("text/html;charset=UTF-8");
-            PrintWriter writer = res.getWriter();
-
-            String frontendOrigin = "dev".equals(activeProfile)
+            // 리디렉션 URL 추출 (요청 파라미터에서)
+            String redirectUri = "dev".equals(activeProfile)
                     ? "http://localhost:5173"  // 개발 환경
-                    : "https://mentoss.vercel.app";  // 배포 환경
+                    : "https://mentoss.vercel.app";
 
-            String script = "<script>" +
-                    "console.log('토큰 전송 시도');" +
-                    "try {" +
-                    "  window.opener.postMessage({ token: '" + token + "' }, '" + frontendOrigin + "');" +
-                    "  console.log('토큰 전송 완료');" +
-                    "} catch (e) {" +
-                    "  console.error('토큰 전송 오류:', e);" +
-                    "}" +
-                    "window.close();" +
-                    "</script>";
+            // 리다이렉트 실행
+            log.info("현재 프로필: {}, 리다이렉트 URI: {}", activeProfile, redirectUri);
+            res.sendRedirect(redirectUri + "?token=" + token);
+            log.debug("리다이렉트 완료: {}", redirectUri + "?token=" + token.substring(0, 10) + "...");
 
-            writer.write(script);
-            writer.flush();
         } catch (Exception e) {
             log.error("토큰 생성 중 오류 발생", e);
             throw e;
