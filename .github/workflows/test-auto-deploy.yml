@@ -1,0 +1,16 @@
+name: Deploy Test to Render
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  trigger-render-deploy:
+    name: Trigger Render Deploy Hook
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Render Deploy Hook
+        run: |
+          curl -X POST "${{ secrets.RENDER_TEST_DEPLOY_HOOK_URL }}"
