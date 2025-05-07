@@ -1,15 +1,29 @@
-const API = 'https://mentoss.onrender.com/api/admin';
+//const API = 'https://mentoss.onrender.com/api/admin';
+const API = 'http://localhost:8081/api/admin';
 
 //신고 리스트
 async function loadReports() {
     try {
-        const resNot = await fetch(`${API}/reports/not-done`);
+        const resNot = await fetch(`${API}/reports/not-done`, {
+            credentials: 'include'
+        });
         if (!resNot.ok) throw new Error(`HTTP ${resNot.status}`);
+        const ct1 = resNot.headers.get('content-type') || '';
+        if (!ct1.includes('application/json')) {
+            throw new Error('JSON 응답이 아닙니다: ' + ct1);
+        }
+
         const { data: notList } = await resNot.json();
         renderNotProcessed(notList);
 
-        const resDone = await fetch(`${API}/reports/done`);
+        const resDone = await fetch(`${API}/reports/done`, {
+            credentials: 'include'
+        });
         if (!resDone.ok) throw new Error(`HTTP ${resDone.status}`);
+        const ct2 = resNot.headers.get('content-type') || '';
+        if (!ct2.includes('application/json')) {
+            throw new Error('JSON 응답이 아닙니다: ' + ct2);
+        }
         const { data: doneList } = await resDone.json();
         renderProcessed(doneList);
 

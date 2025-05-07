@@ -2,8 +2,11 @@ package aibe1.proj2.mentoss.feature.report.service;
 
 import aibe1.proj2.mentoss.feature.report.model.dto.*;
 import aibe1.proj2.mentoss.feature.report.model.mapper.AdminMapper;
+import aibe1.proj2.mentoss.feature.report.model.mapper.ReportMapper;
+import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
 import aibe1.proj2.mentoss.global.entity.AdminAction;
 import aibe1.proj2.mentoss.global.entity.Report;
+import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
     private final AdminMapper adminMapper;
-
+    private final ReportMapper reportMapper;
 
     @Override
     public List<ReportResponseDto> getReportsNotProcessed() {
@@ -29,18 +32,27 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void updateStatus(StatusUpdateRequestDto request) {
-        String type = request.targetType();
-        Long id = request.targetId();
-        String status = request.status();
+    public void updateStatus(StatusUpdateRequestDto req) {
+        String type = req.targetType();
+        Long id = req.targetId();
+        String status = req.status();
         switch (type) {
             case "USER":
+                if (reportMapper.countUserById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateUserStatus(id, status);
                 break;
             case "LECTURE":
+                if (reportMapper.countLectureById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateLectureStatus(id, status);
                 break;
             case "REVIEW":
+                if (reportMapper.countLectureById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateReviewStatus(id, status);
                 break;
             default:
@@ -50,17 +62,26 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void softDelete(SoftDeleteRequestDto request) {
-        String type = request.targetType();
-        Long id = request.targetId();
+    public void softDelete(SoftDeleteRequestDto req) {
+        String type = req.targetType();
+        Long id = req.targetId();
         switch (type) {
             case "USER":
+                if (reportMapper.countUserById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateUserSoftDelete(id, true);
                 break;
             case "LECTURE":
+                if (reportMapper.countLectureById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateLectureSoftDelete(id, true);
                 break;
             case "REVIEW":
+                if (reportMapper.countLectureById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateReviewSoftDelete(id, true);
                 break;
             default:
@@ -80,12 +101,21 @@ public class AdminServiceImpl implements AdminService {
         Long id = req.targetId();
         switch (type) {
             case "USER":
+                if (reportMapper.countUserById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateUserSoftDelete(id, false);
                 break;
             case "LECTURE":
+                if (reportMapper.countLectureById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateLectureSoftDelete(id, false);
                 break;
             case "REVIEW":
+                if (reportMapper.countReviewById(req.targetId()) == 0) {
+                    throw new ResourceNotFoundException(type, req.targetId());
+                }
                 adminMapper.updateReviewSoftDelete(id, false);
                 break;
             default:
@@ -94,11 +124,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Long adminAction(ReportProcessRequestDto req) {
+    public Long adminAction(ReportProcessRequestDto req, Long adminId) {
         ReportTargetDto target = adminMapper.findReportTarget(req.reportId());
 
         AdminAction action = AdminAction.builder()
-                .adminId(req.adminId())
+                .adminId(adminId)
                 .targetType(target.targetType())
                 .targetId(target.targetId())
                 .actionType(req.actionType())
