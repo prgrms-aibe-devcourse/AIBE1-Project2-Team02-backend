@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth/test")
-public class AuthTestController {
+public class LoginTestController {
 
     @GetMapping("/public")
     public ResponseEntity<String> publicEndpoint() {

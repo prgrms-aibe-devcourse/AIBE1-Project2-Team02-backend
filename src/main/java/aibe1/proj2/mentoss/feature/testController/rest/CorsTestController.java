@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.test;
+package aibe1.proj2.mentoss.feature.testController.rest;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
  * CORS 테스트용 공개 API
  */
 @RestController
-public class TestController {
+public class CorsTestController {
 
     @GetMapping("/api/test/hello")
     public ApiResponseFormat<String> helloTest() {

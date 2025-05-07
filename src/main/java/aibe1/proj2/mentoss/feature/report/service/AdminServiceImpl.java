@@ -95,13 +95,24 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Long adminAction(ReportProcessRequestDto req) {
-        AdminAction adminAction = AdminAction.builder()
+        ReportTargetDto target = adminMapper.findReportTarget(req.reportId());
+
+        AdminAction action = AdminAction.builder()
+                .adminId(req.adminId())
+                .targetType(target.targetType())
+                .targetId(target.targetId())
+                .actionType(req.actionType())
+                .reason(req.reason())
+                .suspensionPeriodDays(req.suspendPeriod())
                 .build();
-        return 0L;
+
+        adminMapper.insertAdminAction(action);
+
+        return action.getActionId();
     }
 
     @Override
     public void reportActionRelation(Long reportId, Long actionId) {
-
+        adminMapper.insertReportAction(reportId, actionId);
     }
 }

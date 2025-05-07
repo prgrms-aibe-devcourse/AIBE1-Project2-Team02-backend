@@ -40,7 +40,7 @@ out/
 application-dev.yml
 
 ### dotenv ###
-.env
+src/main/resources/templates/.env
 
 ### sql ###
 *.sql
@@ -50,3 +50,6 @@ application-dev.yml
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
+
+### .env ###
+.env

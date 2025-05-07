@@ -37,4 +37,12 @@ public interface ReportMapper {
                                  @Param("targetType")  String targetType,
                                  @Param("targetId")    Long targetId);
 
+    @Select("SELECT COUNT(*) FROM app_user WHERE user_id = #{userId}")
+    int countUserById(@Param("userId") Long userId);
+
+    @Select("SELECT COUNT(*) FROM lecture WHERE lecture_id = #{lectureId}")
+    int countLectureById(@Param("lectureId") Long lectureId);
+
+    @Select("SELECT COUNT(*) FROM review WHERE review_id = #{reviewId}")
+    int countReviewById(@Param("reviewId") Long reviewId);
 }

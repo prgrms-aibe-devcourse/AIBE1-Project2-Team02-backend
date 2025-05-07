@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/review")
+@Tag(name = "후기 API", description = "후기 CRUD API")
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -50,6 +52,28 @@ public class ReviewController {
             {
             "success": false,
             "message": "별점은 1에서 5 사이의 정수여야 합니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "403", description = "본인이 수강한 강의가 아닌 항목에 후기를 작성하려는 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "본인이 수강한 강의가 아닙니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "403", description = "본인이 작성한 후기가 아닌 항목을 수정/삭제하려는 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "본인이 작성한 항목이 아닙니다.",
             "data": null
             }
             """))),

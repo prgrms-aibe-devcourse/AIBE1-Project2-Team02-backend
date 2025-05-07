@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.test;
+package aibe1.proj2.mentoss.feature.testController.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

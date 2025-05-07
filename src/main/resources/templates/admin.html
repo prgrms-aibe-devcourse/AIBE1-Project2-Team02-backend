@@ -12,54 +12,6 @@
 <body>
 <h1>관리자 대시보드</h1>
 
-<!-- 1. 신고 목록 -->
-<section>
-    <h2>신고 목록</h2>
-    <button id="btn-loadReports">신고 목록 새로고침</button>
-    <div style="display:flex; gap:2rem; margin-top:1rem;">
-        <div>
-            <h3>미처리 신고</h3>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>신고ID</th>
-                    <th>신고자ID</th>
-                    <th>타입</th>
-                    <th>대상ID</th>
-                    <th>사유</th>
-                    <th>액션</th>
-                </tr>
-                </thead>
-                <tbody id="tbl-notProcessed">
-
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <h3>처리 완료 신고</h3>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>신고ID</th>
-                    <th>신고자ID</th>
-                    <th>타입</th>
-                    <th>대상ID</th>
-                    <th>사유</th>
-                    <th>처리일시</th>
-                    <th>담당자</th>
-                </tr>
-                </thead>
-                <tbody id="tbl-processed">
-
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-
-<hr/>
-
-<!-- 2. 상태 변경 -->
 <section>
     <h2>상태 변경</h2>
     <form id="form-status">
@@ -88,9 +40,8 @@
 
 <hr/>
 
-<!-- 3. Soft Delete & 복구 -->
 <section>
-    <h2>Soft Delete &amp; 복구</h2>
+    <h2>삭제 및 복구</h2>
     <form id="form-delete">
         <label>
             타입:
@@ -113,5 +64,87 @@
         <button type="submit">적용</button>
     </form>
 </section>
+
+<hr/>
+
+<section>
+    <h2>신고 목록</h2>
+    <button id="btn-loadReports">신고 목록 새로고침</button>
+    <div style="display:flex; gap:2rem; margin-top:1rem;">
+        <div>
+            <h3>미처리 신고</h3>
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>신고ID</th>
+                    <th>신고자ID</th>
+                    <th>타입</th>
+                    <th>대상ID</th>
+                    <th>사유</th>
+                    <th>완료</th>
+                </tr>
+                </thead>
+                <tbody id="tbl-notProcessed">
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3>처리 완료 신고</h3>
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>신고ID</th>
+                    <th>신고자ID</th>
+                    <th>타입</th>
+                    <th>대상ID</th>
+                    <th>신고 사유</th>
+                    <th>처리일시</th>
+                    <th>담당자</th>
+                    <th>조치 종류</th>
+                    <th>조치 사유</th>
+                    <th>제재 기간</th>
+                </tr>
+                </thead>
+                <tbody id="tbl-processed">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div id="modal-backdrop"></div>
+
+<div id="process-modal">
+    <form id="form-process" novalidate>
+        <h3>신고 처리 정보 입력</h3>
+        <input type="hidden" id="process-reportId" />
+        <label>
+            담당자 ID :
+            <input type="number" id="process-adminId" required/>
+        </label>
+        <label>
+            조치 종류 :
+            <select id="process-actionType">
+                <option value="FREE">FREE</option>
+                <option value="WARN">WARN</option>
+                <option value="SUSPEND">SUSPEND</option>
+                <option value="BAN">BAN</option>
+            </select>
+        </label>
+        <label>
+            조치 사유 :
+            <input type="text" id="process-reason" required/>
+        </label>
+        <label>
+            제제 기간 :
+            <input type="number" id="process-suspendPeriod" min="0" value="0"/>
+        </label>
+        <button id="process-confirm">확인</button>
+        <button id="process-cancel">취소</button>
+    </form>
+</div>
+
 </body>
 </html>

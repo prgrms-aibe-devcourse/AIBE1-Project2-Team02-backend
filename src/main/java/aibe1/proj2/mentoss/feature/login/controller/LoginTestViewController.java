@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/test")
-public class TestViewController {
+public class LoginTestViewController {
 
     @GetMapping("/login")
     public String loginTestPage() {
