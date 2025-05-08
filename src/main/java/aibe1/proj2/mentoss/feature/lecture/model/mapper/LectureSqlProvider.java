@@ -32,7 +32,8 @@ public class LectureSqlProvider {
         sql.JOIN("lecture_category lc ON l.category_id = lc.category_id");
         sql.LEFT_OUTER_JOIN("review r ON l.lecture_id = r.lecture_id AND r.is_deleted = FALSE AND r.status = 'AVAILABLE'");
 
-        if (searchRequest.region() != null) {
+        // 지역 관련 JOIN을 한 번만 추가
+        if (searchRequest.regions() != null && !searchRequest.regions().isEmpty()) {
             sql.JOIN("lecture_region lr ON l.lecture_id = lr.lecture_id");
             sql.JOIN("region reg ON lr.region_code = reg.region_code");
         }
@@ -60,10 +61,25 @@ public class LectureSqlProvider {
             sql.WHERE("l.price <= #{searchRequest.maxPrice}");
         }
 
-        if (searchRequest.region() != null) {
-            sql.WHERE("(reg.sido LIKE CONCAT('%', #{searchRequest.region}, '%') " +
-                    "OR reg.sigungu LIKE CONCAT('%', #{searchRequest.region}, '%') " +
-                    "OR reg.dong LIKE CONCAT('%', #{searchRequest.region}, '%'))");
+        // 지역 검색 조건만 한 번 추가
+        if (searchRequest.regions() != null && !searchRequest.regions().isEmpty()) {
+            StringBuilder regionsCondition = new StringBuilder();
+            regionsCondition.append("(");
+
+            for (int i = 0; i < searchRequest.regions().size(); i++) {
+                if (i > 0) {
+                    regionsCondition.append(" OR ");
+                }
+
+                regionsCondition.append("(reg.sido = #{searchRequest.regions[").append(i).append("]} ");
+                regionsCondition.append("OR reg.sigungu = #{searchRequest.regions[").append(i).append("]} ");
+                regionsCondition.append("OR reg.dong = #{searchRequest.regions[").append(i).append("]} ");
+                regionsCondition.append("OR CONCAT(reg.sido, ' ', reg.sigungu) = #{searchRequest.regions[").append(i).append("]} ");
+                regionsCondition.append("OR CONCAT(reg.sido, ' ', reg.sigungu, ' ', IFNULL(reg.dong, '')) = #{searchRequest.regions[").append(i).append("]})");
+            }
+
+            regionsCondition.append(")");
+            sql.WHERE(regionsCondition.toString());
         }
 
         if (searchRequest.isCertified() != null) {
@@ -91,14 +107,15 @@ public class LectureSqlProvider {
     public String countLectures(@Param("searchRequest") LectureSearchRequest searchRequest) {
         // 서브쿼리를 문자열로 직접 구성
         StringBuilder subQuery = new StringBuilder();
-        subQuery.append("SELECT l.lecture_id "); // 콤마 제거
+        subQuery.append("SELECT l.lecture_id ");
         subQuery.append("FROM lecture l ");
         subQuery.append("JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id ");
         subQuery.append("JOIN app_user u ON mp.user_id = u.user_id ");
         subQuery.append("JOIN lecture_category lc ON l.category_id = lc.category_id ");
         subQuery.append("LEFT JOIN review r ON l.lecture_id = r.lecture_id AND r.is_deleted = FALSE AND r.status = 'AVAILABLE' ");
 
-        if (searchRequest.region() != null) {
+        // 지역 관련 JOIN을 한 번만 추가
+        if (searchRequest.regions() != null && !searchRequest.regions().isEmpty()) {
             subQuery.append("JOIN lecture_region lr ON l.lecture_id = lr.lecture_id ");
             subQuery.append("JOIN region reg ON lr.region_code = reg.region_code ");
         }
@@ -125,10 +142,21 @@ public class LectureSqlProvider {
             subQuery.append("AND l.price <= #{searchRequest.maxPrice} ");
         }
 
-        if (searchRequest.region() != null) {
-            subQuery.append("AND (reg.sido LIKE CONCAT('%', #{searchRequest.region}, '%') ");
-            subQuery.append("OR reg.sigungu LIKE CONCAT('%', #{searchRequest.region}, '%') ");
-            subQuery.append("OR reg.dong LIKE CONCAT('%', #{searchRequest.region}, '%')) ");
+        // 지역 조건도 한 번만 추가
+        if (searchRequest.regions() != null && !searchRequest.regions().isEmpty()) {
+            subQuery.append("AND (");
+            for (int i = 0; i < searchRequest.regions().size(); i++) {
+                if (i > 0) {
+                    subQuery.append(" OR ");
+                }
+
+                subQuery.append("(reg.sido = #{searchRequest.regions[").append(i).append("]} ");
+                subQuery.append("OR reg.sigungu = #{searchRequest.regions[").append(i).append("]} ");
+                subQuery.append("OR reg.dong = #{searchRequest.regions[").append(i).append("]} ");
+                subQuery.append("OR CONCAT(reg.sido, ' ', reg.sigungu) = #{searchRequest.regions[").append(i).append("]} ");
+                subQuery.append("OR CONCAT(reg.sido, ' ', reg.sigungu, ' ', IFNULL(reg.dong, '')) = #{searchRequest.regions[").append(i).append("]})");
+            }
+            subQuery.append(") ");
         }
 
         if (searchRequest.isCertified() != null) {
