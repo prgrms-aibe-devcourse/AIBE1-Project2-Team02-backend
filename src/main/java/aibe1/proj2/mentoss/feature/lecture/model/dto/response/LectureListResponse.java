@@ -17,5 +17,6 @@ public record LectureListResponse(
         String parentCategory,
         String middleCategory,
         String subcategory,
+        String regions, // 지역 정보 필드 추가
         LocalDateTime createdAt
 ) {}

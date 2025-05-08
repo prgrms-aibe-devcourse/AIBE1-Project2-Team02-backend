@@ -45,86 +45,86 @@ public class LectureController {
         this.objectMapper = objectMapper;
     }
 
-    // 개발 전용 강의 생성 메서드
-    @PostMapping()
-    // 개발 환경에서만 활성화
-    @Operation(summary = "강의 생성 (개발용)", description = "개발 환경에서 인증 없이 강의를 생성합니다.")
-    public ResponseEntity<ApiResponseFormat<Long>> createLectureForDev(
-            @RequestBody LectureCreateRequest request
-    ) throws JsonProcessingException {
-        // 개발용 하드코딩된 사용자 ID
-        Long userId = 1L;
-
-        // 강의 생성
-        Long lectureId = lectureService.createLecture(request, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
-    }
-
-    // 배포 전용 강의 생성 메서드
-
-//    @PostMapping
-//    @Operation(summary = "강의 생성", description = "새로운 강의를 생성합니다.")
-//    @ApiResponses(value = {
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-//                    responseCode = "201",
-//                    description = "강의 생성 성공",
-//                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-//            ),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-//                    responseCode = "400",
-//                    description = "잘못된 요청",
-//                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-//            ),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-//                    responseCode = "403",
-//                    description = "권한 없음",
-//                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-//            )
-//    })
-//    public ResponseEntity<ApiResponseFormat<Long>> createLecture(
-//            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-//                    description = "강의 생성 요청 예시",
-//                    required = true,
-//                    content = @Content(
-//                            schema = @Schema(implementation = LectureCreateRequest.class),
-//                            examples = @ExampleObject(
-//                                    name = "강의 생성 예시",
-//                                    value = """
-//{
-//  "lectureTitle": "test강의",
-//  "description": "test내용",
-//  "categoryId": 2,
-//  "curriculum": "test커리큘럼",
-//  "price": 30000,
-//  "regions": [
-//    { "regionCode": "1111010400" }
-//  ],
-//  "timeSlots": [
-//    { "dayOfWeek": "월", "startTime": "13:00", "endTime": "15:00" },
-//    { "dayOfWeek": "월", "startTime": "18:00", "endTime": "20:00" },
-//    { "dayOfWeek": "화", "startTime": "10:00", "endTime": "12:00" }
-//  ]
-//}
-//"""
-//                            )
-//                    )
-//            )
-//            @RequestBody LectureCreateRequest request,
-//            Authentication authentication
+////     개발 전용 강의 생성 메서드
+//    @PostMapping()
+//    // 개발 환경에서만 활성화
+//    @Operation(summary = "강의 생성 (개발용)", description = "개발 환경에서 인증 없이 강의를 생성합니다.")
+//    public ResponseEntity<ApiResponseFormat<Long>> createLectureForDev(
+//            @RequestBody LectureCreateRequest request
 //    ) throws JsonProcessingException {
-//        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//        Long userId = userDetails.getUserId();
+//        // 개발용 하드코딩된 사용자 ID
+//        Long userId = 1L;
 //
-//        // 사용자 정보 조회 및 권한 확인
-//        AppUser currentUser = lectureService.getUserById(userId);
-//        if (!currentUser.getRole().equals("ADMIN") && !currentUser.getRole().equals("MENTOR")) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body(ApiResponseFormat.fail("강의 생성 권한이 없습니다."));
-//        }
-//
+//        // 강의 생성
 //        Long lectureId = lectureService.createLecture(request, userId);
 //        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
 //    }
+
+//     배포 전용 강의 생성 메서드
+
+    @PostMapping
+    @Operation(summary = "강의 생성", description = "새로운 강의를 생성합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "강의 생성 성공",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    public ResponseEntity<ApiResponseFormat<Long>> createLecture(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "강의 생성 요청 예시",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = LectureCreateRequest.class),
+                            examples = @ExampleObject(
+                                    name = "강의 생성 예시",
+                                    value = """
+{
+  "lectureTitle": "test강의",
+  "description": "test내용",
+  "categoryId": 2,
+  "curriculum": "test커리큘럼",
+  "price": 30000,
+  "regions": [
+    { "regionCode": "1111010400" }
+  ],
+  "timeSlots": [
+    { "dayOfWeek": "월", "startTime": "13:00", "endTime": "15:00" },
+    { "dayOfWeek": "월", "startTime": "18:00", "endTime": "20:00" },
+    { "dayOfWeek": "화", "startTime": "10:00", "endTime": "12:00" }
+  ]
+}
+"""
+                            )
+                    )
+            )
+            @RequestBody LectureCreateRequest request,
+            Authentication authentication
+    ) throws JsonProcessingException {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
+
+        // 사용자 정보 조회 및 권한 확인
+        AppUser currentUser = lectureService.getUserById(userId);
+        if (!currentUser.getRole().equals("ADMIN") && !currentUser.getRole().equals("MENTOR")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponseFormat.fail("강의 생성 권한이 없습니다."));
+        }
+
+        Long lectureId = lectureService.createLecture(request, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
+    }
 
     // 강의 필터검색
     @GetMapping
