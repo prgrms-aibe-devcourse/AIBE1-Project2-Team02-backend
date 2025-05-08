@@ -17,7 +17,7 @@ public interface AdminService {
 
     void recover(RecoverRequestDto req);
 
-    Long adminAction(ReportProcessRequestDto req);
+    Long adminAction(ReportProcessRequestDto req, Long adminId);
 
     void reportActionRelation(Long reportId, Long actionId);
 }
