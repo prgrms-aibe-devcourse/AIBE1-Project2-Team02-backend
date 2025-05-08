@@ -279,17 +279,38 @@ public class AdminController {
             ),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (ReportProcessRequestDto 검증 오류)",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseFormat.class)
+                            schema = @Schema(implementation = ApiResponseFormat.class, example = """
+                            {
+                              "success": false,
+                              "message": "Review (id=78) 가 존재하지 않습니다.",
+                              "data": null
+                            }
+                            """
+                            )
                     )
             ),
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseFormat.class)
+                            schema = @Schema(implementation = ApiResponseFormat.class, example = """
+                            {
+                              "success": false,
+                              "message": "Review (id=78) 가 존재하지 않습니다.",
+                              "data": null
+                            }
+                            """
+                            )
                     )
             ),
             @ApiResponse(responseCode = "404", description = "신고 또는 대상 엔티티를 찾을 수 없음",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponseFormat.class)
+                            schema = @Schema(implementation = ApiResponseFormat.class, example = """
+                            {
+                              "success": false,
+                              "message": "Review (id=78) 가 존재하지 않습니다.",
+                              "data": null
+                            }
+                            """
+                            )
                     )
             )
     })
