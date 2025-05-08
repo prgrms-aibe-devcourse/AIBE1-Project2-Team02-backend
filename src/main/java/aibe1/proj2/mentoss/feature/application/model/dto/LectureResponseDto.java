@@ -7,6 +7,8 @@ public record LectureResponseDto(
         double averageRating,
         String preferredRegions,
         String subcategory,
-        String profile_image
+        String nickname,
+        String profile_image,
+        Boolean isCertified
 ) {
 }
