@@ -6,12 +6,18 @@ import aibe1.proj2.mentoss.feature.report.model.mapper.ReportMapper;
 import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
 import aibe1.proj2.mentoss.global.entity.AdminAction;
 import aibe1.proj2.mentoss.global.entity.Report;
+import aibe1.proj2.mentoss.global.entity.enums.ActionType;
+import aibe1.proj2.mentoss.global.entity.enums.TargetType;
+import aibe1.proj2.mentoss.global.exception.DatabaseException;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
+import aibe1.proj2.mentoss.global.exception.report.InvalidActionTypeException;
+import aibe1.proj2.mentoss.global.exception.report.InvalidSuspendPeriodException;
 import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
 import aibe1.proj2.mentoss.global.exception.report.ReportListException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -101,7 +107,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void processReport(Long reportId) {
-        adminMapper.markReportProcessed(reportId);
+        try {
+            adminMapper.markReportProcessed(reportId);
+        }
+        catch(Exception e) {
+            throw new DatabaseException();
+        }
     }
 
     @Override
@@ -134,24 +145,41 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Long adminAction(ReportProcessRequestDto req, Long adminId) {
-        ReportTargetDto target = adminMapper.findReportTarget(req.reportId());
+        if (!ActionType.contains(req.actionType())) {
+            throw new InvalidActionTypeException();
+        }
+        if (req.actionType().equals("FREE") || req.actionType().equals("WARN")) {
+            if (req.suspendPeriod() > 0){
+                throw new InvalidSuspendPeriodException();
+            }
+        }
+        try {
+            ReportTargetDto target = adminMapper.findReportTarget(req.reportId());
+            AdminAction action = AdminAction.builder()
+                    .adminId(adminId)
+                    .targetType(target.targetType())
+                    .targetId(target.targetId())
+                    .actionType(req.actionType())
+                    .reason(req.reason())
+                    .suspensionPeriodDays(req.suspendPeriod())
+                    .build();
 
-        AdminAction action = AdminAction.builder()
-                .adminId(adminId)
-                .targetType(target.targetType())
-                .targetId(target.targetId())
-                .actionType(req.actionType())
-                .reason(req.reason())
-                .suspensionPeriodDays(req.suspendPeriod())
-                .build();
+            adminMapper.insertAdminAction(action);
 
-        adminMapper.insertAdminAction(action);
-
-        return action.getActionId();
+            return action.getActionId();
+        }
+        catch(Exception e) {
+            throw new DatabaseException();
+        }
     }
 
     @Override
     public void reportActionRelation(Long reportId, Long actionId) {
-        adminMapper.insertReportAction(reportId, actionId);
+        try {
+            adminMapper.insertReportAction(reportId, actionId);
+        }
+        catch(Exception e) {
+            throw new DatabaseException();
+        }
     }
 }

@@ -1,14 +1,13 @@
 package aibe1.proj2.mentoss.global.exception;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
-import aibe1.proj2.mentoss.global.exception.report.DuplicateReportException;
-import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
-import aibe1.proj2.mentoss.global.exception.report.ReportListException;
+import aibe1.proj2.mentoss.global.exception.report.*;
 import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
 import aibe1.proj2.mentoss.global.exception.review.TogetherApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sun.jdi.InvalidTypeException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -134,12 +133,42 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Admin actionType 유효성 검사 실패 예외 처리
+     */
+    @ExceptionHandler(InvalidActionTypeException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleInvalidActionType(InvalidActionTypeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
      * report 리스트를 가져오는 과정에서 생기는 오류
      */
     @ExceptionHandler(ReportListException.class)
     public ResponseEntity<ApiResponseFormat<Void>> handleReportListException(ReportListException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * AdminAction이 Free나 Warn일 경우 제재일은 0일이어야 함.
+     */
+    @ExceptionHandler(InvalidSuspendPeriodException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleSuspendPeriodException(InvalidSuspendPeriodException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     * DB나 SQL관련 문제 발생 시 예외 처리.
+     */
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleDatabaseException(DatabaseException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 }

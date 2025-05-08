@@ -277,36 +277,36 @@ public class AdminController {
                             )
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (ReportProcessRequestDto 검증 오류)",
+            @ApiResponse(responseCode = "400", description = "ActionType이 지정된 값 이외의 것이 들어옴",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseFormat.class, example = """
                             {
                               "success": false,
-                              "message": "Review (id=78) 가 존재하지 않습니다.",
+                              "message": "actionType은 FREE, WARN, SUSPEND, BAN 중 하나여야 합니다.",
                               "data": null
                             }
                             """
                             )
                     )
             ),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @ApiResponse(responseCode = "400", description = "제재일 측정 오류",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseFormat.class, example = """
                             {
                               "success": false,
-                              "message": "Review (id=78) 가 존재하지 않습니다.",
+                              "message": "Action이 FREE나 WARN일 경우 제재일은 0일이어야 합니다.",
                               "data": null
                             }
                             """
                             )
                     )
             ),
-            @ApiResponse(responseCode = "404", description = "신고 또는 대상 엔티티를 찾을 수 없음",
+            @ApiResponse(responseCode = "500", description = "DB / SQL 오류",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponseFormat.class, example = """
                             {
                               "success": false,
-                              "message": "Review (id=78) 가 존재하지 않습니다.",
+                              "message": "데이터베이스 처리 중 문제가 발생했습니다.",
                               "data": null
                             }
                             """
