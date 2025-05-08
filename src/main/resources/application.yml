@@ -1,8 +1,8 @@
 spring:
   application:
-    name: mentos
+    name: mentoss
   profiles:
-    active: dev
+    active: prod
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
