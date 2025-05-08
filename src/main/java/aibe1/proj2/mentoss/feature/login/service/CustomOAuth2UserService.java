@@ -49,11 +49,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (existingUser.isPresent()) {
             log.info("기존 사용자 로그인 : userId={}", existingUser.get().getUserId());
         } else {
+            String uniqueNickname = generateUniqueRandomNickname(nickname);
+
             AppUser newUser = AppUser.builder()
                     .provider(provider)
                     .providerId(providerId)
                     .email(email)
-                    .nickname(nickname)
+                    .nickname(uniqueNickname)
                     .profileImage(profileImage)
                     .role(UserRole.MENTEE.name())
                     .status(EntityStatus.AVAILABLE.name())
@@ -62,8 +64,31 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     .build();
 
             appUserMapper.save(newUser);
-            log.info("신규 사용자 등록 : userId={}", newUser.getUserId());
+            log.info("신규 사용자 등록 : userId={}, 닉네임={}", newUser.getUserId(), uniqueNickname);
         }
+    }
+
+    private String generateUniqueRandomNickname(String originalNickname) {
+        if (originalNickname == null || originalNickname.isEmpty()) {
+            originalNickname = "멘티";
+        }
+
+        String uniqueNickname;
+        int maxAttempts = 10;
+        int attempts = 0;
+
+        do {
+            int randomNum = (int) (Math.random() * 9000) + 1000;
+            uniqueNickname = originalNickname + randomNum;
+            attempts++;
+
+            if (attempts > maxAttempts) {
+                uniqueNickname = originalNickname + System.currentTimeMillis();
+                break;
+            }
+        } while (appUserMapper.nicknameExists(uniqueNickname));
+
+        return uniqueNickname;
     }
 
     private String getProviderId(OAuth2User oAuth2User, String provider) {
