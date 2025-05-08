@@ -20,6 +20,7 @@ public interface ApplicationMapper {
     @Select("""
                 SELECT
                     a.application_id,
+                    a.lecture_id,
                     a.status,
                     l.lecture_title,
                     l.price,
