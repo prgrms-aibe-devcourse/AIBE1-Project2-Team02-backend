@@ -60,6 +60,9 @@ public class LectureServiceImpl implements LectureService {
         lecture.setMentorId(mentorId); // 실제 멘토 ID 사용
         lecture.setStatus("AVAILABLE");
 
+
+
+
         // 엔티티 저장 로직
         lectureMapper.createLecture(lecture);
         Long lectureId = lectureMapper.getLastInsertId();

@@ -17,6 +17,7 @@ public class LectureSqlProvider {
         sql.SELECT("l.lecture_title AS lectureTitle");
         sql.SELECT("l.price");
         sql.SELECT("u.nickname AS mentorNickname");
+        sql.SELECT("u.user_id AS authorUserId");
         sql.SELECT("u.profile_image AS profileImage");
         sql.SELECT("COALESCE(AVG(r.rating), 0) AS averageRating");
         sql.SELECT("COUNT(DISTINCT r.review_id) AS reviewCount");
