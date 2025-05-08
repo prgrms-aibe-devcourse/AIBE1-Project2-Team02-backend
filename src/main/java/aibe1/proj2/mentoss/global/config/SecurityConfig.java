@@ -76,7 +76,8 @@ public class SecurityConfig {
                                 "/api/ping", "/api/categories/**", "/api/regions/**",
                                 "/api/lectures/**", "/default-ui.css", "/favicon.ico")
                         .permitAll()
-                        .requestMatchers("/api/admin/**", "/adminPage").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**"
+                                /*, "/adminPage"*/).hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {
