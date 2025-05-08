@@ -4,6 +4,7 @@ import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.model.mapper.AccountMapper;
 import aibe1.proj2.mentoss.feature.account.model.mapper.MentorMapper;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
+import aibe1.proj2.mentoss.feature.login.model.mapper.AppUserMapper;
 import aibe1.proj2.mentoss.feature.message.model.mapper.MessageMapper;
 import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import aibe1.proj2.mentoss.global.entity.AppUser;
@@ -33,6 +34,7 @@ public class AccountServiceImpl implements AccountService {
     private final MentorMapper mentorMapper;
     private final LectureMapper lectureMapper;
     private final MessageMapper messageMapper;
+    private final AppUserMapper appUserMapper;
 
     @Override
     public ProfileResponseDto getProfile(Long userId) {
@@ -49,6 +51,12 @@ public class AccountServiceImpl implements AccountService {
     public void updateProfile(Long userId, ProfileUpdateRequestDto requestDto) {
         AppUser appUser = accountMapper.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
+
+        if (!appUser.getNickname().equals(requestDto.nickname())
+                && appUserMapper.nicknameExists(requestDto.nickname())){
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해주세요.");
+
+        }
 
         Long age = calculateAge(requestDto.birthDate());
 

@@ -31,4 +31,7 @@ public interface AppUserMapper {
             "WHERE user_id = #{userId}")
     int update(AppUser appUser);
 
+    @Select("SELECT COUNT(*) > 0 FROM app_user " +
+            "WHERE nickname = #{nickname}")
+    boolean nicknameExists(String nickname);
 }
