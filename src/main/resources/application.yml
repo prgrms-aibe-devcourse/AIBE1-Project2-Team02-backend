@@ -1,6 +1,6 @@
 spring:
   application:
-    name: mentos
+    name: mentoss
   profiles:
     active: prod
   datasource:
