@@ -194,7 +194,7 @@ public class ReviewController {
                                     example = """
             {
             "success": false,
-            "message": "Review (id=10)에 접근할 수 없습니다.",
+            "message": "Review (id=10) 항목이 삭제되었거나 정지 상태입니다.",
             "data": null
             }
             """))),

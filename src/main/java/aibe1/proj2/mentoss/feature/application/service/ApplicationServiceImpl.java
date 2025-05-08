@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -40,8 +41,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional
     @Override
     public void approveApplication(Long applicationId, Long senderId) {
+        LocalDateTime time = LocalDateTime.now();
         ApplicationInfoDto info = validatePendingApplication(applicationId);
-        applicationMapper.acceptApplication(applicationId);
+        applicationMapper.acceptApplication(applicationId, time);
 
         String content = String.format("'%s' 과외 신청이 수락되었습니다.", info.lectureTitle());
         messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content), senderId);
@@ -50,8 +52,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional
     @Override
     public void rejectApplication(Long applicationId, String rejectReason, Long senderId) {
+        LocalDateTime time = LocalDateTime.now();
         ApplicationInfoDto info = validatePendingApplication(applicationId);
-        applicationMapper.rejectApplication(applicationId);
+        applicationMapper.rejectApplication(applicationId, time);
 
         String content = String.format("'%s' 과외 신청이 반려되었습니다.\n사유: %s", info.lectureTitle(), rejectReason);
         messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content), senderId);

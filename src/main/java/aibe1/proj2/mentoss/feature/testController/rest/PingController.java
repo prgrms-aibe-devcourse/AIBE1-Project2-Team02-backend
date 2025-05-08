@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.testController.rest;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
+@Tag(name = "TEST - Ping API", description = "서버 지속 활성화용 Ping API")
 public class PingController {
 
     @RequestMapping(value = "/api/ping", method = {RequestMethod.GET, RequestMethod.HEAD})
