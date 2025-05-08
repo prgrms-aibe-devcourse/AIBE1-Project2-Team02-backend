@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -66,10 +67,13 @@ public interface ApplicationMapper {
                     COALESCE(rv_avg.average_rating, 0) AS average_rating,
                     rg.preferred_regions,
                     lc.subcategory,
-                    u.profile_image
+                    u.nickname,
+                    u.profile_image,
+                    mp.is_certified
                 FROM lecture l
                 LEFT JOIN lecture_category lc ON l.category_id = lc.category_id
-                LEFT JOIN app_user u ON l.mentor_id = u.user_id
+                                LEFT JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
+                                LEFT JOIN app_user u ON mp.user_id = u.user_id
                 LEFT JOIN (
                     SELECT lecture_id, ROUND(AVG(rating), 1) AS average_rating
                     FROM review
@@ -116,18 +120,18 @@ public interface ApplicationMapper {
     // 수락 처리
     @Update("""
         UPDATE application
-        SET status = 'APPROVED', updated_at = CURRENT_TIMESTAMP
+        SET status = 'APPROVED', updated_at = #{LocalTime}
         WHERE application_id = #{applicationId}
     """)
-    void acceptApplication(Long applicationId);
+    void acceptApplication(Long applicationId, LocalDateTime LocalTime);
 
     // 반려 처리
     @Update("""
         UPDATE application
-        SET status = 'REJECTED', updated_at = CURRENT_TIMESTAMP
+        SET status = 'REJECTED', updated_at = #{LocalTime}
         WHERE application_id = #{applicationId}
     """)
-    void rejectApplication(Long applicationId);
+    void rejectApplication(Long applicationId, LocalDateTime LocalTime);
 
     @Select("""
                 SELECT 
