@@ -24,6 +24,9 @@ public class LectureSqlProvider {
         sql.SELECT("lc.parent_category AS parentCategory");
         sql.SELECT("lc.middle_category AS middleCategory");
         sql.SELECT("lc.subcategory AS subcategory");
+        sql.SELECT("(SELECT JSON_ARRAYAGG(CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))) " +
+                "FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
+                "WHERE lr.lecture_id = l.lecture_id) AS regions");
         sql.SELECT("l.created_at AS createdAt");
 
         sql.FROM("lecture l");
