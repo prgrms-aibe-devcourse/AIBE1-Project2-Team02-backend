@@ -74,7 +74,7 @@ public class SecurityConfig {
                                 "/api/test/**", "/api/auth/test/public",
                                 "/css/**", "/js/**", "/images/**",
                                 "/api/ping", "/api/categories/**", "/api/regions/**",
-                                "/api/lectures/**", "/default-ui.css", "/favicon.ico")
+                                "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error")
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("adminPage").permitAll()  // 로그인 토큰 백엔드에서 받아오는거 구현 전까지 일단 오픈
