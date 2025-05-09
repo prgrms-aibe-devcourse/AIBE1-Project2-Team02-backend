@@ -65,9 +65,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void processLogin(String provider, String providerId, HttpServletRequest req, HttpServletResponse res) throws IOException {
-        Optional<AppUser> userOpt = appUserMapper.findByProviderAndProviderId(provider, providerId);
 
-        AppUser appUser = userOpt.get();
+        AppUser appUser = appUserMapper.findByProviderAndProviderId(provider, providerId)
+                .orElseThrow(() -> new IllegalStateException("소셜 로그인 사용자 정보를 찾을 수 없습니다: provider=" + provider + ", providerId=" + providerId));
         String username = provider + "_" + providerId;
 
         log.debug("DB에서 조회한 사용자: userId={}, 타입={}",

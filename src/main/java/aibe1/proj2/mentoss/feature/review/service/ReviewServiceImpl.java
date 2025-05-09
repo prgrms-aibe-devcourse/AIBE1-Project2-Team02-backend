@@ -62,7 +62,7 @@ public class ReviewServiceImpl implements ReviewService{
             throw new ResourceAccessDeniedException("Review", reviewId);
         }
         if (rating == null || rating < 1 || rating > 5) {
-            throw new InvalidRatingException("별점은 1에서 5 사이의 정수여야 합니다.");
+            throw new InvalidRatingException("후기 등록 시 별점은 1에서 5 사이의 정수여야 합니다.");
         }
         Long writerId = reviewMapper.findWriterIdByReviewId(reviewId);
         if (!writerId.equals(currentUserId)) {
@@ -122,18 +122,28 @@ public class ReviewServiceImpl implements ReviewService{
         }
         Double avg = reviewMapper.findAverageRatingByLectureId(lectureId);
         double value = (avg != null) ? avg : 0.0;
-
-        return Math.round(value * 10) / 10.0;
+        double result = Math.round(value * 10) / 10.0;
+        if (result < 0.0 || result > 5.0) {
+            throw new InvalidRatingException("평균 별점은 0~5 사이의 소수여야 합니다.");
+        }
+        return result;
     }
 
     @Override
     public Double getAverageRatingByMentorId(Long mentorId) {
+        Long mentorUserId = reviewMapper.getUserByMentorId(mentorId);
         if (!reviewMapper.existsMentor(mentorId)) {
             throw new ResourceNotFoundException("Mentor", mentorId);
         }
+        if (!reviewMapper.isUserAccessible(mentorUserId)) {
+            throw new ResourceAccessDeniedException("User", mentorUserId);
+        }
         Double avg = reviewMapper.findAverageRatingByMentorId(mentorId);
         double value = (avg != null) ? avg : 0.0;
-
-        return Math.round(value * 10) / 10.0;
+        double result = Math.round(value * 10) / 10.0;
+        if (result < 0.0 || result > 5.0) {
+            throw new InvalidRatingException("평균 별점은 0~5 사이의 소수여야 합니다.");
+        }
+        return result;
     }
 }

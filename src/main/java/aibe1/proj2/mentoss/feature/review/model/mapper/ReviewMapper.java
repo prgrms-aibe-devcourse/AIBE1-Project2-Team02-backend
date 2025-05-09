@@ -52,6 +52,9 @@ public interface ReviewMapper {
         return countMentor(mentorId) > 0;
     }
 
+    @Select("SELECT user_id FROM mentore_profile WHERE mentor_id=#{mentorId}")
+    Long getUserByMentorId(Long mentorId);
+
     @Select("SELECT * FROM review WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
     @Results({
             @Result(property = "reviewId",  column = "review_id"),
