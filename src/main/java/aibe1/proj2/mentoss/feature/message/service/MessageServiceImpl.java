@@ -42,7 +42,7 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     public MessageResponseDto getMessage(Long messageId, Long userId) {
-        Message message = messageMapper.findById(messageId);
+        Message message = messageMapper.findById(messageId, userId);
 
         if (message.getReceiverId().equals(userId) && !message.getIsRead()) {
             messageMapper.markAsRead(messageId);
