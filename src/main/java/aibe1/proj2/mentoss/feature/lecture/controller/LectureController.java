@@ -197,6 +197,7 @@ public class LectureController {
         response.put("description", lecture.description());
         response.put("price", lecture.price());
         response.put("curriculum", lecture.curriculum());
+        response.put("mentorId", lecture.mentorId());
 
         // JSON 문자열을 객체로 파싱
         List<String> regionList = null;

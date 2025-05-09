@@ -69,7 +69,8 @@ public interface LectureMapper {
             "FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
             "WHERE lr.lecture_id = l.lecture_id) AS regions, " +
             "l.available_time_slots AS timeSlots, " +
-            "u.user_id AS authorUserId " +
+            "u.user_id AS authorUserId, " +
+            "l.mentor_id AS mentorId " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
             "JOIN app_user u ON mp.user_id = u.user_id " +

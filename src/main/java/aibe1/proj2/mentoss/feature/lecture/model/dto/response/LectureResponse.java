@@ -20,5 +20,6 @@ public record LectureResponse(
         String curriculum,
         String regions,
         String timeSlots,
-        Long authorUserId
+        Long authorUserId,
+        Long mentorId
 ) {}
