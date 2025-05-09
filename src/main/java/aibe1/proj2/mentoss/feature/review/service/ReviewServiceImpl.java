@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.review.service;
 
 
+import aibe1.proj2.mentoss.feature.review.model.dto.AverageRatingResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import aibe1.proj2.mentoss.global.entity.Review;
@@ -113,7 +114,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public Double getAverageRatingByLectureId(Long lectureId) {
+    public AverageRatingResponseDto getAverageRatingByLectureId(Long lectureId) {
         if (!reviewMapper.existsLecture(lectureId)) {
             throw new ResourceNotFoundException("Lecture", lectureId);
         }
@@ -126,17 +127,13 @@ public class ReviewServiceImpl implements ReviewService{
         if (result < 0.0 || result > 5.0) {
             throw new InvalidRatingException("평균 별점은 0~5 사이의 소수여야 합니다.");
         }
-        return result;
+        return new AverageRatingResponseDto(result, getCountByLecureId(lectureId));
     }
 
     @Override
-    public Double getAverageRatingByMentorId(Long mentorId) {
-        Long mentorUserId = reviewMapper.getUserByMentorId(mentorId);
+    public AverageRatingResponseDto getAverageRatingByMentorId(Long mentorId) {
         if (!reviewMapper.existsMentor(mentorId)) {
             throw new ResourceNotFoundException("Mentor", mentorId);
-        }
-        if (!reviewMapper.isUserAccessible(mentorUserId)) {
-            throw new ResourceAccessDeniedException("User", mentorUserId);
         }
         Double avg = reviewMapper.findAverageRatingByMentorId(mentorId);
         double value = (avg != null) ? avg : 0.0;
@@ -144,6 +141,14 @@ public class ReviewServiceImpl implements ReviewService{
         if (result < 0.0 || result > 5.0) {
             throw new InvalidRatingException("평균 별점은 0~5 사이의 소수여야 합니다.");
         }
-        return result;
+        return new AverageRatingResponseDto(result, getCountByMentorId(mentorId));
+    }
+
+    private Long getCountByLecureId(Long lectureId){
+        return reviewMapper.countReviewsByLectureId(lectureId);
+    }
+
+    private Long getCountByMentorId(Long mentorId){
+        return reviewMapper.countReviewsByMentorId(mentorId);
     }
 }

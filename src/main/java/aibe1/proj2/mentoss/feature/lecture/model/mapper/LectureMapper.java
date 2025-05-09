@@ -56,6 +56,9 @@ public interface LectureMapper {
     @SelectProvider(type = LectureSqlProvider.class, method = "countLectures")
     long countLectures(@Param("searchRequest") LectureSearchRequest searchRequest);
 
+    /**
+     * 강의 기본 정보 조회
+     */
     @Select("SELECT l.lecture_id AS lectureId, l.lecture_title AS lectureTitle, " +
             "u.nickname AS mentorNickname, l.created_at AS createdAt, " +
             "l.updated_at AS updatedAt, lc.parent_category AS parentCategory, " +
@@ -76,6 +79,7 @@ public interface LectureMapper {
             "mp.content AS content, " +
             "mp.appeal_file_url AS appealFileUrl, " +
             "mp.tag AS tag " +
+            "l.mentor_id AS mentorId " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
             "JOIN app_user u ON mp.user_id = u.user_id " +
