@@ -101,8 +101,25 @@ public interface ReviewMapper {
         return countLectureMentee(lectureId, userId) > 0;
     }
 
-    /** (2) 후기 작성자(writerId) 조회 */
     @Select("SELECT writer_id FROM review WHERE review_id = #{reviewId}")
     Long findWriterIdByReviewId(Long reviewId);
+
+    @Select("""
+      SELECT AVG(rating)
+        FROM review
+       WHERE lecture_id = #{lectureId}
+         AND status = 'AVAILABLE'
+         AND is_deleted = FALSE
+    """)
+    Double findAverageRatingByLectureId(Long lectureId);
+
+    @Select("""
+      SELECT AVG(rating)
+        FROM review
+       WHERE mentor_id = #{mentorId}
+         AND status = 'AVAILABLE'
+         AND is_deleted = FALSE
+    """)
+    Double findAverageRatingByMentorId(Long mentorId);
 
 }

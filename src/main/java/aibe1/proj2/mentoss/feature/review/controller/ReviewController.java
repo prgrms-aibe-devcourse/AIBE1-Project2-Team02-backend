@@ -266,6 +266,22 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
+    @GetMapping("/lecture/{lectureId}/average-rating")
+    @Operation(summary = "강의별 평균 평점", description = "특정 강의에 대한 후기 평점의 평균을 반환합니다.")
+    public ResponseEntity<ApiResponseFormat<Double>> getAverageRatingByLecture(
+            @PathVariable Long lectureId) {
+        Double avg = reviewService.getAverageRatingByLectureId(lectureId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(avg));
+    }
+
+    @GetMapping("/mentor/{mentorId}/average-rating")
+    @Operation(summary = "멘토별 평균 평점", description = "특정 멘토의 모든 강의 후기 평점 평균을 반환합니다.")
+    public ResponseEntity<ApiResponseFormat<Double>> getAverageRatingByMentor(
+            @PathVariable Long mentorId) {
+        Double avg = reviewService.getAverageRatingByMentorId(mentorId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(avg));
+    }
+
 
 
 }

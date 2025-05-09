@@ -112,4 +112,28 @@ public class ReviewServiceImpl implements ReviewService{
         );
     }
 
+    @Override
+    public Double getAverageRatingByLectureId(Long lectureId) {
+        if (!reviewMapper.existsLecture(lectureId)) {
+            throw new ResourceNotFoundException("Lecture", lectureId);
+        }
+        if (!reviewMapper.isLectureAccessible(lectureId)) {
+            throw new ResourceAccessDeniedException("Lecture", lectureId);
+        }
+        Double avg = reviewMapper.findAverageRatingByLectureId(lectureId);
+        double value = (avg != null) ? avg : 0.0;
+
+        return Math.round(value * 10) / 10.0;
+    }
+
+    @Override
+    public Double getAverageRatingByMentorId(Long mentorId) {
+        if (!reviewMapper.existsMentor(mentorId)) {
+            throw new ResourceNotFoundException("Mentor", mentorId);
+        }
+        Double avg = reviewMapper.findAverageRatingByMentorId(mentorId);
+        double value = (avg != null) ? avg : 0.0;
+
+        return Math.round(value * 10) / 10.0;
+    }
 }
