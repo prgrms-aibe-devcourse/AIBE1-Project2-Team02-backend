@@ -1,9 +1,7 @@
 package aibe1.proj2.mentoss.feature.review.controller;
 
 
-import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
-import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
-import aibe1.proj2.mentoss.feature.review.model.dto.UpdateReviewRequestDto;
+import aibe1.proj2.mentoss.feature.review.model.dto.*;
 import aibe1.proj2.mentoss.feature.review.service.ReviewService;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
@@ -266,20 +264,22 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
-    @GetMapping("/lecture/{lectureId}/average-rating")
+    @PostMapping("/lecture/average-rating")
     @Operation(summary = "강의별 평균 평점", description = "특정 강의에 대한 후기 평점의 평균을 반환합니다.")
-    public ResponseEntity<ApiResponseFormat<Double>> getAverageRatingByLecture(
-            @PathVariable Long lectureId) {
-        Double avg = reviewService.getAverageRatingByLectureId(lectureId);
-        return ResponseEntity.ok(ApiResponseFormat.ok(avg));
+    public ResponseEntity<ApiResponseFormat<AverageRatingResponseDto>> getAverageRatingByLecture(
+            @RequestBody AverageRatingRequestDto dto) {
+        Double avg = reviewService.getAverageRatingByLectureId(dto.id());
+        AverageRatingResponseDto response = new AverageRatingResponseDto(avg);
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
-    @GetMapping("/mentor/{mentorId}/average-rating")
+    @PostMapping("/mentor/average-rating")
     @Operation(summary = "멘토별 평균 평점", description = "특정 멘토의 모든 강의 후기 평점 평균을 반환합니다.")
-    public ResponseEntity<ApiResponseFormat<Double>> getAverageRatingByMentor(
-            @PathVariable Long mentorId) {
-        Double avg = reviewService.getAverageRatingByMentorId(mentorId);
-        return ResponseEntity.ok(ApiResponseFormat.ok(avg));
+    public ResponseEntity<ApiResponseFormat<AverageRatingResponseDto>> getAverageRatingByMentor(
+            @RequestBody AverageRatingRequestDto dto) {
+        Double avg = reviewService.getAverageRatingByMentorId(dto.id());
+        AverageRatingResponseDto response = new AverageRatingResponseDto(avg);
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
 
