@@ -31,5 +31,6 @@ public record LectureResponse(
         Boolean isCertified,
         String content,
         String appealFileUrl,
-        String tag
+        String tag,
+        Long mentorId
 ) {}

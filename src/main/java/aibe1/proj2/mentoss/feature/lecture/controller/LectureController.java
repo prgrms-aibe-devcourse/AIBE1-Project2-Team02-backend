@@ -196,6 +196,7 @@ public class LectureController {
         response.put("description", lecture.description());
         response.put("price", lecture.price());
         response.put("curriculum", lecture.curriculum());
+        response.put("mentorId", lecture.mentorId());
 
         // 멘토 정보 추가
         Map<String, Object> mentorInfo = new HashMap<>();
