@@ -315,8 +315,7 @@ public class ReviewController {
     @PostMapping("/lecture/average-rating")
     public ResponseEntity<ApiResponseFormat<AverageRatingResponseDto>> getAverageRatingByLecture(
             @RequestBody AverageRatingRequestDto dto) {
-        Double avg = reviewService.getAverageRatingByLectureId(dto.id());
-        AverageRatingResponseDto response = new AverageRatingResponseDto(avg);
+        AverageRatingResponseDto response = reviewService.getAverageRatingByLectureId(dto.id());
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
@@ -344,17 +343,6 @@ public class ReviewController {
             "data": null
             }
             """))),
-            @ApiResponse(responseCode = "403", description = "멘토 유저 접근 불가(해당 유저가 삭제되었거나 정지 상태)",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = ApiResponseFormat.class,
-                                    example = """
-            {
-            "success": false,
-            "message": "User (id=10)에 접근할 수 없습니다.",
-            "data": null
-            }
-            """))),
             @ApiResponse(responseCode = "404", description = "외래키 참조 오류(참조할 대상 ID가 없음)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(
@@ -370,8 +358,7 @@ public class ReviewController {
     @PostMapping("/mentor/average-rating")
     public ResponseEntity<ApiResponseFormat<AverageRatingResponseDto>> getAverageRatingByMentor(
             @RequestBody AverageRatingRequestDto dto) {
-        Double avg = reviewService.getAverageRatingByMentorId(dto.id());
-        AverageRatingResponseDto response = new AverageRatingResponseDto(avg);
+        AverageRatingResponseDto response = reviewService.getAverageRatingByMentorId(dto.id());
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
