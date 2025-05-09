@@ -124,12 +124,12 @@ public class AccountServiceImpl implements AccountService {
 
         appUser.setIsDeleted(true);
         appUser.setDeletedAt(LocalDateTime.now());
-
         accountMapper.softDeleteUser(appUser);
+
         accountMapper.deleteUserRegion(userId);
 
-        if (mentorMapper.existsByUserId(userId)) {
-            mentorMapper.softDeleteMentorProfile(userId);
+        if (mentorMapper.existsByUserIdWithoutDeleteCheck(userId)) {
+            Long mentorId = mentorMapper.findMentorIdByUserId(userId);
 
             lectureMapper.softDeleteLecturesByMentorId(userId);
         }

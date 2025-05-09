@@ -10,12 +10,16 @@ import java.util.Optional;
 @Repository
 public interface MentorMapper {
 
-    @Select("SELECT * FROM mentor_profile " +
-            "WHERE user_id = #{userId}")
+    @Select("SELECT mp.* FROM mentor_profile mp " +
+            "JOIN app_user u ON mp.user_id = u.user_id " +
+            "WHERE mp.user_id = #{userId} " +
+            "AND u.is_deleted = FALSE")
     Optional<MentorProfile> findByUserId(Long userId);
 
-    @Select("SELECT COUNT(*) > 0 FROM mentor_profile " +
-            "WHERE user_id = #{userId}")
+    @Select("SELECT COUNT(*) > 0 FROM mentor_profile mp " +
+            "JOIN app_user u ON mp.user_id = u.user_id " +
+            "WHERE mp.user_id = #{userId} " +
+            "AND u.is_deleted = FALSE")
     boolean existsByUserId(Long userId);
 
     @Insert("INSERT INTO mentor_profile " +
@@ -35,9 +39,16 @@ public interface MentorMapper {
             "WHERE user_id = #{userId}")
     int updateMentorProfile(MentorProfile mentorProfile);
 
+    @Select("SELECT COUNT(*) > 0 FROM mentor_profile " +
+            "WHERE user_id = #{userId}")
+    boolean existsByUserIdWithoutDeleteCheck(Long userId);
+
+    @Select("SELECT mentor_id FROM mentor_profile " +
+            "WHERE user_id = #{userId}")
+    Long findMentorIdByUserId(Long userId);
+
     @Update("UPDATE mentor_profile SET " +
-            "is_deleted = TRUE, " +
-            "deleted_at = CURRENT_TIMESTAMP " +
+            "is_certified = is_certified " + // 자기 자신을 할당 (변화 없음)
             "WHERE user_id = #{userId}")
     int softDeleteMentorProfile(Long userId);
 }
