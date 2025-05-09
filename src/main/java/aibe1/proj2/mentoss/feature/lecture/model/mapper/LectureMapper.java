@@ -70,6 +70,15 @@ public interface LectureMapper {
             "WHERE lr.lecture_id = l.lecture_id) AS regions, " +
             "l.available_time_slots AS timeSlots, " +
             "u.user_id AS authorUserId, " +
+            "u.profile_image AS profileImage, " +
+            "u.sex AS sex, " +
+            "u.mbti AS mbti, " +
+            "mp.education AS education, " +
+            "mp.major AS major, " +
+            "mp.is_certified AS isCertified, " +
+            "mp.content AS content, " +
+            "mp.appeal_file_url AS appealFileUrl, " +
+            "mp.tag AS tag " +
             "l.mentor_id AS mentorId " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +

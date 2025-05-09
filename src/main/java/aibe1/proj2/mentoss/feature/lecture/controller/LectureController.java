@@ -199,6 +199,20 @@ public class LectureController {
         response.put("curriculum", lecture.curriculum());
         response.put("mentorId", lecture.mentorId());
 
+        // 멘토 정보 추가
+        Map<String, Object> mentorInfo = new HashMap<>();
+        mentorInfo.put("profileImage", lecture.profileImage());
+        mentorInfo.put("sex", lecture.sex());
+        mentorInfo.put("mbti", lecture.mbti());
+        mentorInfo.put("education", lecture.education());
+        mentorInfo.put("major", lecture.major());
+        mentorInfo.put("isCertified", lecture.isCertified());
+        mentorInfo.put("content", lecture.content());
+        mentorInfo.put("appealFileUrl", lecture.appealFileUrl());
+        mentorInfo.put("tag", lecture.tag());
+
+        response.put("mentorInfo", mentorInfo);
+
         // JSON 문자열을 객체로 파싱
         List<String> regionList = null;
         if (lecture.regions() != null && !lecture.regions().isEmpty()) {

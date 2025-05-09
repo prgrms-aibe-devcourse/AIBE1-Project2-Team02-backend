@@ -21,5 +21,16 @@ public record LectureResponse(
         String regions,
         String timeSlots,
         Long authorUserId,
+
+        // 멘토 정보 (새로 추가)
+        String profileImage,
+        String sex,
+        String mbti,
+        String education,
+        String major,
+        Boolean isCertified,
+        String content,
+        String appealFileUrl,
+        String tag,
         Long mentorId
 ) {}
