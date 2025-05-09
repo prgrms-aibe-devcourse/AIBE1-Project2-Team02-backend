@@ -109,8 +109,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("요청 시간대를 처리하는 중 오류 발생: " + e.getMessage());
         }
-
-        applicationMapper.insertApplication(dto.lectureId(), menteeId, timeSlotsJson);
+        LocalDateTime time = LocalDateTime.now();
+        applicationMapper.insertApplication(dto.lectureId(), menteeId, timeSlotsJson, time);
 
         // 3. 쪽지 전송
         LectureSimpleInfoDto info = applicationMapper.findLectureSimpleInfo(dto.lectureId());
@@ -119,8 +119,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         String content = dto.message() == null || dto.message().trim().isEmpty()
-                ? String.format("'%s' 과외 신청을 보냈습니다.", info.lectureTitle())
-                : String.format("'%s' 과외 신청을 보냈습니다.\n%s", info.lectureTitle(), dto.message());
+                ? String.format("'%s' 과외에 새로운 신청이 있습니다.", info.lectureTitle())
+                : String.format("'%s' 과외에 새로운 신청이 있습니다.\n%s", info.lectureTitle(), dto.message());
 
         messageService.sendMessage(
                 new MessageSendRequestDto(info.mentorId(), content),

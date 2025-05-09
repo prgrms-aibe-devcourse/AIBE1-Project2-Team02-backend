@@ -20,6 +20,7 @@ public interface ApplicationMapper {
     @Select("""
                 SELECT
                     a.application_id,
+                    a.lecture_id,
                     a.status,
                     l.lecture_title,
                     l.price,
@@ -90,7 +91,7 @@ public interface ApplicationMapper {
                     GROUP BY lr.lecture_id
                 ) rg ON rg.lecture_id = l.lecture_id
                 WHERE 
-                    l.mentor_id = #{mentorId}
+                    u.user_id = #{mentorId}
                     AND l.is_deleted = 0
                 ORDER BY 
                     l.created_at DESC
@@ -99,38 +100,38 @@ public interface ApplicationMapper {
 
     // 특정 강의에 대한 신청 리스트
     @Select("""
-        SELECT
-            a.application_id,
-            u.nickname,
-            l.lecture_title,
-            DATE(a.created_at) AS created_at,
-            u.profile_image
-        FROM application a
-        JOIN app_user u ON a.mentee_id = u.user_id
-        JOIN lecture l ON a.lecture_id = l.lecture_id
-        WHERE
-            l.lecture_id = #{lectureId}
-            AND a.status = 'PENDING'
-            AND a.is_deleted = 0
-        ORDER BY
-            a.created_at DESC
-    """)
+                SELECT
+                    a.application_id,
+                    u.nickname,
+                    l.lecture_title,
+                    DATE(a.created_at) AS created_at,
+                    u.profile_image
+                FROM application a
+                JOIN app_user u ON a.mentee_id = u.user_id
+                JOIN lecture l ON a.lecture_id = l.lecture_id
+                WHERE
+                    l.lecture_id = #{lectureId}
+                    AND a.status = 'PENDING'
+                    AND a.is_deleted = 0
+                ORDER BY
+                    a.created_at DESC
+            """)
     List<LectureApplicantDto> findApplicantsByLectureId(Long lectureId);
 
     // 수락 처리
     @Update("""
-        UPDATE application
-        SET status = 'APPROVED', updated_at = #{LocalTime}
-        WHERE application_id = #{applicationId}
-    """)
+                UPDATE application
+                SET status = 'APPROVED', updated_at = #{LocalTime}
+                WHERE application_id = #{applicationId}
+            """)
     void acceptApplication(Long applicationId, LocalDateTime LocalTime);
 
     // 반려 처리
     @Update("""
-        UPDATE application
-        SET status = 'REJECTED', updated_at = #{LocalTime}
-        WHERE application_id = #{applicationId}
-    """)
+                UPDATE application
+                SET status = 'REJECTED', updated_at = #{LocalTime}
+                WHERE application_id = #{applicationId}
+            """)
     void rejectApplication(Long applicationId, LocalDateTime LocalTime);
 
     @Select("""
@@ -182,14 +183,15 @@ public interface ApplicationMapper {
 
     @Insert("""
                 INSERT INTO application (lecture_id, mentee_id, requested_time_slots, status, is_deleted, created_at, updated_at) 
-                VALUES (#{lectureId}, #{menteeId}, #{requestedTimeSlots},'PENDING',0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                VALUES (#{lectureId}, #{menteeId}, #{requestedTimeSlots},'PENDING',0, #{localTime}, #{localTime})
             """)
-    void insertApplication(Long lectureId, Long menteeId, String requestedTimeSlots);
+    void insertApplication(Long lectureId, Long menteeId, String requestedTimeSlots, LocalDateTime localTime);
 
     @Select("""
-                SELECT lecture_title, mentor_id
-                FROM lecture
-                WHERE lecture_id = #{lectureId}
+                SELECT l.lecture_title, mp.user_id
+                FROM lecture l
+                LEFT JOIN mentor_profile mp on l.mentor_id = mp.mentor_id
+                WHERE l.lecture_id = #{lectureId}
             """)
     LectureSimpleInfoDto findLectureSimpleInfo(Long lectureId);
 }

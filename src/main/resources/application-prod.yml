@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 logging:
   level:
     aibe1.proj2.mentoss.feature.initTest.model.mapper: ERROR
@@ -25,7 +25,7 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: email, profile
-            redirect-uri: "http://localhost:8081/login/oauth2/code/google"
+            redirect-uri: "https://mentoss.onrender.com/login/oauth2/code/google"
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}
