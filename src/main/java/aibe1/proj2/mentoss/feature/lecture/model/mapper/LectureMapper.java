@@ -78,7 +78,7 @@ public interface LectureMapper {
             "mp.is_certified AS isCertified, " +
             "mp.content AS content, " +
             "mp.appeal_file_url AS appealFileUrl, " +
-            "mp.tag AS tag " +
+            "mp.tag AS tag, " +
             "l.mentor_id AS mentorId " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
