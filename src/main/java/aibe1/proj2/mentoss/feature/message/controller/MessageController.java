@@ -25,8 +25,6 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    // JWT 토큰을 기반으로 현재 user id를 받을 예정
-
     @Operation(summary = "보낸 편지함 조회", description = "현재 로그인한 사용자가 보낸 메시지를 조회합니다.")
     @GetMapping("/sent")
     public ResponseEntity<ApiResponseFormat<PageResponse<MessageResponseDto>>> getSentMessages(
