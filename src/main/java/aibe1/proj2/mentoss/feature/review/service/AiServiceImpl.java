@@ -65,7 +65,7 @@ public class AiServiceImpl implements AiService {
 
 
     @Override
-    public TagResponseDto answer(String prompt) throws Exception {
+    public TagResponseDto answer(String prompt){
         int attempts = apiKeys.size();
         for (int i = 0; i < attempts; i++) {
             String currentKey = nextApiKey();
