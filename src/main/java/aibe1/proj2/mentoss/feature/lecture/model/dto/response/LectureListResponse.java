@@ -10,6 +10,7 @@ public record LectureListResponse(
         String lectureTitle,
         Long price,
         String mentorNickname,
+        Long authorUserId,
         String profileImage,
         Double averageRating,
         Long reviewCount,

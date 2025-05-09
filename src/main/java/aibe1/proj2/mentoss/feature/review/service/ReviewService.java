@@ -14,4 +14,8 @@ public interface ReviewService{
     void deleteReview(Long reviewId, Long currentUserId);
 
     List<ReviewResponseDto> getReviewsByLectureId(Long lectureId);
+
+    Double getAverageRatingByLectureId(Long lectureId);
+
+    Double getAverageRatingByMentorId(Long mentorId);
 }
