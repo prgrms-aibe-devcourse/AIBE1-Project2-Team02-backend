@@ -22,7 +22,6 @@ public class MessageServiceImpl implements MessageService{
         int offset = page * size;
         List<Message> messages = messageMapper.findSentMessages(senderId, size, offset, filterBy, keyword);
         int totalCount = messageMapper.countSentMessages(senderId, filterBy, keyword);
-        System.out.println(totalCount);
         List<MessageResponseDto> content = messages.stream()
                 .map(m -> MessageResponseDto.fromEntity(m, senderId))
                 .toList();
@@ -35,7 +34,6 @@ public class MessageServiceImpl implements MessageService{
         int offset = page * size;
         List<Message> messages = messageMapper.findReceivedMessages(receiverId, size, offset, filterBy, keyword);
         int totalCount = messageMapper.countReceivedMessages(receiverId, filterBy, keyword);
-        System.out.println(totalCount);
         List<MessageResponseDto> content = messages.stream()
                 .map(message -> MessageResponseDto.fromEntity(message, receiverId))
                 .toList();
@@ -44,7 +42,7 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     public MessageResponseDto getMessage(Long messageId, Long userId) {
-        Message message = messageMapper.findById(messageId);
+        Message message = messageMapper.findById(messageId, userId);
 
         if (message.getReceiverId().equals(userId) && !message.getIsRead()) {
             messageMapper.markAsRead(messageId);

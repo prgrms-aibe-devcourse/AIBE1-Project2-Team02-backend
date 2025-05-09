@@ -17,6 +17,7 @@ public class LectureSqlProvider {
         sql.SELECT("l.lecture_title AS lectureTitle");
         sql.SELECT("l.price");
         sql.SELECT("u.nickname AS mentorNickname");
+        sql.SELECT("u.user_id AS authorUserId");
         sql.SELECT("u.profile_image AS profileImage");
         sql.SELECT("COALESCE(AVG(r.rating), 0) AS averageRating");
         sql.SELECT("COUNT(DISTINCT r.review_id) AS reviewCount");
@@ -24,6 +25,9 @@ public class LectureSqlProvider {
         sql.SELECT("lc.parent_category AS parentCategory");
         sql.SELECT("lc.middle_category AS middleCategory");
         sql.SELECT("lc.subcategory AS subcategory");
+        sql.SELECT("(SELECT JSON_ARRAYAGG(CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))) " +
+                "FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
+                "WHERE lr.lecture_id = l.lecture_id) AS regions");
         sql.SELECT("l.created_at AS createdAt");
 
         sql.FROM("lecture l");

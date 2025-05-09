@@ -57,6 +57,28 @@ public class ReportController {
                             )
                     )
             ),
+            @ApiResponse(responseCode = "403", description = "신고 대상 접근 불가(해당 대상이 이미 삭제되었거나 정지 상태)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "Review (id=10) 항목이 삭제되었거나 정지 상태입니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "404", description = "신고할 대상이 없음",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "Review (id=1234) 가 존재하지 않습니다.",
+            "data": null
+            }
+            """))),
             @ApiResponse(responseCode = "409", description = "중복 신고(같은 대상에 이미 신고한 경우)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(

@@ -56,9 +56,6 @@ public interface LectureMapper {
     @SelectProvider(type = LectureSqlProvider.class, method = "countLectures")
     long countLectures(@Param("searchRequest") LectureSearchRequest searchRequest);
 
-    /**
-     * 강의 기본 정보 조회
-     */
     @Select("SELECT l.lecture_id AS lectureId, l.lecture_title AS lectureTitle, " +
             "u.nickname AS mentorNickname, l.created_at AS createdAt, " +
             "l.updated_at AS updatedAt, lc.parent_category AS parentCategory, " +
@@ -68,7 +65,17 @@ public interface LectureMapper {
             "(SELECT JSON_ARRAYAGG(CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))) " +
             "FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
             "WHERE lr.lecture_id = l.lecture_id) AS regions, " +
-            "l.available_time_slots AS timeSlots " +
+            "l.available_time_slots AS timeSlots, " +
+            "u.user_id AS authorUserId, " +
+            "u.profile_image AS profileImage, " +
+            "u.sex AS sex, " +
+            "u.mbti AS mbti, " +
+            "mp.education AS education, " +
+            "mp.major AS major, " +
+            "mp.is_certified AS isCertified, " +
+            "mp.content AS content, " +
+            "mp.appeal_file_url AS appealFileUrl, " +
+            "mp.tag AS tag " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
             "JOIN app_user u ON mp.user_id = u.user_id " +

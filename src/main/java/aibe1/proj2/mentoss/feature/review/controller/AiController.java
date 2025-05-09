@@ -3,7 +3,7 @@ package aibe1.proj2.mentoss.feature.review.controller;
 
 import aibe1.proj2.mentoss.feature.review.model.dto.CreateTagRequestDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.TagResponseDto;
-import aibe1.proj2.mentoss.feature.review.service.AIService;
+import aibe1.proj2.mentoss.feature.review.service.AiService;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "AI API", description = "생성형 AI 활용 멘토 태그 생성 API")
 @RequiredArgsConstructor
 public class AiController {
-    private final AIService aiService;
+    private final AiService aiService;
 
 
 

@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "R2 테스트 API", description = "Cloudflare R2 연동 확인용 API입니다.")
+@Tag(name = "TEST - R2 Storage API", description = "Cloudflare R2 연동 확인용 TEST API")
 @RestController
 @RequestMapping("/api/test/r2")
 @RequiredArgsConstructor
