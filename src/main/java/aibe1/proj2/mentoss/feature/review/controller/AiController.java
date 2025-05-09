@@ -73,7 +73,7 @@ public class AiController {
     })
     @PostMapping("/tag")
     public ResponseEntity<ApiResponseFormat<TagResponseDto>> generateMentorTag(
-            @RequestBody CreateTagRequestDto dto) throws Exception {
+            @RequestBody CreateTagRequestDto dto){
 
         String prompt = aiService.createPrompt(dto.mentorId());
 
