@@ -34,8 +34,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<LectureApplicantDto> getApplicantsByLectureId(Long lectureId) {
-        return applicationMapper.findApplicantsByLectureId(lectureId);
+    public List<LectureApplicantDto> getApplicantsByLecture(Long userId) {
+        return applicationMapper.findApplicantsByLecture(userId);
     }
 
     @Transactional
@@ -43,7 +43,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     public void approveApplication(Long applicationId, Long senderId) {
         LocalDateTime time = LocalDateTime.now();
         ApplicationInfoDto info = validatePendingApplication(applicationId);
-        applicationMapper.acceptApplication(applicationId, time);
+
+        int updatedRows = applicationMapper.acceptApplication(applicationId, time);
+
+        if (updatedRows == 0) {
+            throw new IllegalStateException("과외 수락 실패: 이미 수락되었거나 잘못된 요청입니다.");
+        }
+
+        applicationMapper.insertLectureMentee(applicationId, time);
 
         String content = String.format("'%s' 과외 신청이 수락되었습니다.", info.lectureTitle());
         messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content), senderId);

@@ -10,7 +10,7 @@ public interface ApplicationService {
 
     List<LectureResponseDto> getLecturesByMentor(Long mentorId);
 
-    List<LectureApplicantDto> getApplicantsByLectureId(Long lectureId);
+    List<LectureApplicantDto> getApplicantsByLecture(Long userId);
 
     void approveApplication(Long applicationId, Long senderId);
 

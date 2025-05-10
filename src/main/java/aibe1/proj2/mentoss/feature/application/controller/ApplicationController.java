@@ -45,11 +45,12 @@ public class ApplicationController {
             summary = "신청한 멘티 리스트 조회",
             description = "특정 과외에 대해 신청한 멘티들의 목록을 조회합니다."
     )
-    @GetMapping("/{lectureId}/applicants")
+    @GetMapping("/applicants")
     public ResponseEntity<ApiResponseFormat<List<LectureApplicantDto>>> getLectureApplicants(
-            @PathVariable Long lectureId
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<LectureApplicantDto> applicants = applicationService.getApplicantsByLectureId(lectureId);
+        Long userId = userDetails.getUserId();
+        List<LectureApplicantDto> applicants = applicationService.getApplicantsByLecture(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(applicants));
     }
 

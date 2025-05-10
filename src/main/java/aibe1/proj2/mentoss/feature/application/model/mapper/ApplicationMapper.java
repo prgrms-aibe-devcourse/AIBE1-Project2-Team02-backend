@@ -109,14 +109,15 @@ public interface ApplicationMapper {
                 FROM application a
                 JOIN app_user u ON a.mentee_id = u.user_id
                 JOIN lecture l ON a.lecture_id = l.lecture_id
+                JOIN mentor_profile mp on l.mentor_id = mp.mentor_id
                 WHERE
-                    l.lecture_id = #{lectureId}
+                    mp.user_id = #{userId}
                     AND a.status = 'PENDING'
                     AND a.is_deleted = 0
                 ORDER BY
                     a.created_at DESC
             """)
-    List<LectureApplicantDto> findApplicantsByLectureId(Long lectureId);
+    List<LectureApplicantDto> findApplicantsByLecture(Long userId);
 
     // 수락 처리
     @Update("""
@@ -124,7 +125,17 @@ public interface ApplicationMapper {
                 SET status = 'APPROVED', updated_at = #{LocalTime}
                 WHERE application_id = #{applicationId}
             """)
-    void acceptApplication(Long applicationId, LocalDateTime LocalTime);
+    int acceptApplication(Long applicationId, LocalDateTime LocalTime);
+
+    @Insert("""
+            INSERT INTO lecture_mentee(lecture_id, mentee_id, matched_price, matched_time_slots, joined_at)
+            SELECT a.lecture_id, a.mentee_id, l.price, a.requested_time_slots, #{LocalTime}
+            FROM application a
+            JOIN lecture l on a.lecture_id = l.lecture_id
+            WHERE a.application_id = #{applicationId}
+            """)
+    void insertLectureMentee(Long applicationId, LocalDateTime LocalTime);
+
 
     // 반려 처리
     @Update("""
@@ -194,4 +205,6 @@ public interface ApplicationMapper {
                 WHERE l.lecture_id = #{lectureId}
             """)
     LectureSimpleInfoDto findLectureSimpleInfo(Long lectureId);
+
+
 }
