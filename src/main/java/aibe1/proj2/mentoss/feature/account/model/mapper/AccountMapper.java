@@ -64,6 +64,24 @@ public interface AccountMapper {
             "WHERE user_id = #{userId}")
     void updateProfileImage(@Param("userId") Long userId, @Param("profileImage") String profileImage);
 
+    /**
+     * 탈퇴 회원 익명화 처리
+     */
+    @Update("UPDATE app_user SET " +
+            "is_deleted = #{isDeleted}, " +
+            "deleted_at = #{deletedAt}, " +
+            "nickname = #{nickname}, " +
+            "email = #{email}, " +
+            "provider_id = #{providerId}, " +
+            "birth_date = #{birthDate}, " +
+            "age = #{age}, " +
+            "sex = #{sex}, " +
+            "profile_image = #{profileImage}, " +
+            "mbti = #{mbti}, " +
+            "updated_at = NOW() " +
+            "WHERE user_id = #{userId}")
+    int anonymizeDeletedUser(AppUser appUser);
+
     @Select("""
         SELECT lecture_id
           FROM lecture_mentee

@@ -207,4 +207,16 @@ public interface LectureMapper {
             "SET l.is_deleted = TRUE, l.deleted_at = CURRENT_TIMESTAMP " +
             "WHERE mp.user_id = #{userId}")
     int softDeleteLecturesByMentorId(@Param("userId") Long userId);
+
+
+    /**
+     * 특정 멘토의 모집 중인 모든 강의 마감 처리
+     */
+    @Update("UPDATE lecture SET " +
+            "is_closed = TRUE, " +
+            "updated_at = CURRENT_TIMESTAMP " +
+            "WHERE mentor_id = #{mentorId} " +
+            "AND is_closed = FALSE " +
+            "AND is_deleted = FALSE")
+    int closeAllOpenLecturesByMentorId(Long mentorId);
 }
