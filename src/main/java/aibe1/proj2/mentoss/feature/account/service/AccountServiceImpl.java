@@ -12,6 +12,7 @@ import aibe1.proj2.mentoss.global.entity.MentorProfile;
 import aibe1.proj2.mentoss.global.entity.Region;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
@@ -122,10 +124,25 @@ public class AccountServiceImpl implements AccountService {
         AppUser appUser = accountMapper.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
 
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String randomSuffix = timestamp.substring(Math.max(0, timestamp.length() - 6));
+
+        if (appUser.getProfileImage() != null && !appUser.getProfileImage().isEmpty()) {
+            fileService.deleteFile(appUser.getProfileImage());
+        }
+
         appUser.setIsDeleted(true);
         appUser.setDeletedAt(LocalDateTime.now());
-        accountMapper.softDeleteUser(appUser);
+        appUser.setNickname("deletedUser" + randomSuffix);
+        appUser.setEmail("deleted-" + userId + "-" + randomSuffix + "@anonymous.mentoss.com");
+        appUser.setBirthDate(null);
+        appUser.setAge(null);
+        appUser.setSex(null);
+        appUser.setProfileImage(null);
+        appUser.setMbti(null);
+        appUser.setRegionCode(null);
 
+        accountMapper.anonymizeDeletedUser(appUser);
         accountMapper.deleteUserRegion(userId);
 
         if (mentorMapper.existsByUserIdWithoutDeleteCheck(userId)) {
@@ -136,6 +153,9 @@ public class AccountServiceImpl implements AccountService {
         }
 
         messageMapper.softDeleteMessagesByUserId(userId);
+
+        log.info("회원 탈퇴 및 익명화 처리 완료: userId={}, anonymousNickname={}",
+                userId, appUser.getNickname());
     }
 
     @Override
