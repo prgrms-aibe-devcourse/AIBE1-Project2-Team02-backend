@@ -8,6 +8,7 @@ import aibe1.proj2.mentoss.global.auth.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,6 +23,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -35,6 +38,9 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
     /**
      * CORS 설정
@@ -97,7 +103,19 @@ public class SecurityConfig {
                                 .baseUri("/login/oauth2/code/*"))
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
-                        .successHandler(oAuth2LoginSuccessHandler))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            // 현재 프로필(개발/운영)에 따라 리다이렉트 URL 설정
+                            String redirectUrl = "dev".equals(activeProfile)
+                                    ? "http://localhost:5173"
+                                    : "https://mentoss.vercel.app";
+
+                            // 에러 메시지 인코딩
+                            String errorMessage = URLEncoder.encode("소셜 로그인 실패: " + exception.getMessage(), StandardCharsets.UTF_8);
+
+                            // 프론트엔드로 리다이렉트
+                            response.sendRedirect(redirectUrl + "?error=" + errorMessage);
+                        }))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // @formatter:on
 

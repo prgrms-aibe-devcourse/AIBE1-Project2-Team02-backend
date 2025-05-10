@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,43 +67,43 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void processLogin(String provider, String providerId, HttpServletRequest req, HttpServletResponse res) throws IOException {
-
-        AppUser appUser = appUserMapper.findByProviderAndProviderId(provider, providerId)
-                .orElseThrow(() -> new IllegalStateException("소셜 로그인 사용자 정보를 찾을 수 없습니다: provider=" + provider + ", providerId=" + providerId));
-        String username = provider + "_" + providerId;
-
-        log.debug("DB에서 조회한 사용자: userId={}, 타입={}",
-                appUser.getUserId(),
-                appUser.getUserId() != null ? appUser.getUserId().getClass().getName() : "null");
-
-        Long userId = appUser.getUserId();
-        if (userId == null) {
-            log.error("사용자 ID가 null입니다");
-            throw new IllegalStateException("유효하지 않은 사용자 ID입니다");
-        }
-
-        log.info("로그인 성공 : userId={}, provider={}, providerId={}", appUser.getUserId(), provider, providerId);
-
+        // 리디렉션 URL 추출 (메인 홈페이지)
+        String redirectUri = "dev".equals(activeProfile)
+                ? "http://localhost:5173"  // 개발 환경
+                : "https://mentoss.vercel.app";
         try {
+            AppUser appUser = appUserMapper.findByProviderAndProviderId(provider, providerId)
+                    .orElseThrow(() -> new IllegalStateException("소셜 로그인 사용자 정보를 찾을 수 없습니다: provider=" + provider + ", providerId=" + providerId));
+            String username = provider + "_" + providerId;
+
+            log.info("DB에서 조회한 사용자: userId={}, 타입={}",
+                    appUser.getUserId(),
+                    appUser.getUserId() != null ? appUser.getUserId().getClass().getName() : "null");
+
+            Long userId = appUser.getUserId();
+            if (userId == null) {
+                log.info("사용자 ID가 null입니다");
+                throw new IllegalStateException("유효하지 않은 사용자 ID입니다");
+            }
+
+            log.info("로그인 성공 : userId={}, provider={}, providerId={}", appUser.getUserId(), provider, providerId);
+
             String token = jwtTokenProvider.generateToken(
                     new UsernamePasswordAuthenticationToken(username, ""),
                     List.of("USER"),
                     userId
             );
 
-            // 리디렉션 URL 추출 (요청 파라미터에서)
-            String redirectUri = "dev".equals(activeProfile)
-                    ? "http://localhost:5173"  // 개발 환경
-                    : "https://mentoss.vercel.app";
-
             // 리다이렉트 실행
             log.info("현재 프로필: {}, 리다이렉트 URI: {}", activeProfile, redirectUri);
             res.sendRedirect(redirectUri + "?token=" + token);
-            log.debug("리다이렉트 완료: {}", redirectUri + "?token=" + token.substring(0, 10) + "...");
+            log.info("리다이렉트 완료: {}", redirectUri + "?token=" + token.substring(0, 10) + "...");
+        } catch (RuntimeException e) {
+            log.info("로그인 처리 중 오류: {}", e.getMessage(), e);
 
-        } catch (Exception e) {
-            log.error("토큰 생성 중 오류 발생", e);
-            throw e;
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+
+            res.sendRedirect(redirectUri + "?error=" + errorMessage);
         }
     }
 }
