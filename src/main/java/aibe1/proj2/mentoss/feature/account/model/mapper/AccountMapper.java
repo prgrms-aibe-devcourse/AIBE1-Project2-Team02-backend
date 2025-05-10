@@ -81,4 +81,11 @@ public interface AccountMapper {
             "updated_at = NOW() " +
             "WHERE user_id = #{userId}")
     int anonymizeDeletedUser(AppUser appUser);
+
+    @Select("""
+        SELECT lecture_id
+          FROM lecture_mentee
+         WHERE mentee_id = #{userId}
+        """)
+    List<Long> findLectureByUserId(@Param("userId") Long userId);
 }
