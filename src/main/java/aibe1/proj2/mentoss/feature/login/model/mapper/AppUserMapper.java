@@ -10,10 +10,14 @@ import java.util.Optional;
 @Repository
 public interface AppUserMapper {
 
-    @Select("SELECT * FROM app_user WHERE provider = #{provider} AND provider_id = #{providerId}")
+    @Select("SELECT * FROM app_user " +
+            "WHERE provider = #{provider} " +
+            "AND provider_id = #{providerId}")
     Optional<AppUser> findByProviderAndProviderId(String provider, String providerId);
 
-    @Select("SELECT * FROM app_user WHERE email = #{email}")
+    @Select("SELECT * FROM app_user " +
+            "WHERE email = #{email} " +
+            "AND is_deleted = FALSE")
     Optional<AppUser> findByEmail(String email);
 
     @Insert("INSERT INTO app_user (region_code, provider, provider_id, email, nickname, profile_image, role, status, report_count, is_deleted, created_at, updated_at) " +
