@@ -239,4 +239,12 @@ public class AccountController {
         boolean isDuplicate = appUserMapper.nicknameExists(nickname);
         return ResponseEntity.ok(ApiResponseFormat.ok(!isDuplicate));
     }
+
+    @Operation(summary = "강의 목록 조회", description = "로그인한 사용자가 수강 중인 강의 목록을 조회합니다")
+    @GetMapping("/mylecture")
+    public ResponseEntity<ApiResponseFormat<MyLectureResponseDto>> getMyLecture(Authentication authentication) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        MyLectureResponseDto lectureDto = accountService.getMyLecture(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(lectureDto));
+    }
 }

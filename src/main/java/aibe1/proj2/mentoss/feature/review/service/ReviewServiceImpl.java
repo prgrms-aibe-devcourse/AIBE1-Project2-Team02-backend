@@ -25,8 +25,8 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void createReview(CreateReviewRequestDto req, Long currentUserId) {
-        if (!reviewMapper.existsUser(req.writerId())) {
-            throw new ResourceNotFoundException("User", req.writerId());
+        if (!reviewMapper.existsUser(currentUserId)) {
+            throw new ResourceNotFoundException("User", currentUserId);
         }
         if (!reviewMapper.existsLecture(req.lectureId())) {
             throw new ResourceNotFoundException("Lecture", req.lectureId());
