@@ -52,6 +52,9 @@ public interface ReviewMapper {
         return countMentor(mentorId) > 0;
     }
 
+    @Select("SELECT user_id FROM mentor_profile WHERE mentor_id=#{mentorId}")
+    Long getUserByMentorId(Long mentorId);
+
     @Select("SELECT * FROM review WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
     @Results({
             @Result(property = "reviewId",  column = "review_id"),
@@ -121,5 +124,21 @@ public interface ReviewMapper {
          AND is_deleted = FALSE
     """)
     Double findAverageRatingByMentorId(Long mentorId);
+
+    @Select("""
+        SELECT COUNT(*) 
+          FROM review r
+         INNER JOIN lecture l
+            ON r.lecture_id = l.lecture_id
+         WHERE l.mentor_id = #{mentorId}
+        """)
+    Long countReviewsByMentorId(@Param("mentorId") Long mentorId);
+
+    @Select("""
+        SELECT COUNT(*) 
+          FROM review
+         WHERE lecture_id = #{lectureId}
+        """)
+    Long countReviewsByLectureId(@Param("lectureId") Long lectureId);
 
 }
