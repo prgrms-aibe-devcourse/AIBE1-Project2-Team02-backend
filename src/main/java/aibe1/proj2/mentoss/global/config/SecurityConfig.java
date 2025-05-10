@@ -105,16 +105,12 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler((request, response, exception) -> {
-                            // 현재 프로필(개발/운영)에 따라 리다이렉트 URL 설정
                             String redirectUrl = "dev".equals(activeProfile)
                                     ? "http://localhost:5173"
                                     : "https://mentoss.vercel.app";
-
-                            // 에러 메시지 인코딩
+                            String socialType = request.getRequestURI().contains("google") ? "google" : "kakao";
                             String errorMessage = URLEncoder.encode("소셜 로그인 실패: " + exception.getMessage(), StandardCharsets.UTF_8);
-
-                            // 프론트엔드로 리다이렉트
-                            response.sendRedirect(redirectUrl + "?error=" + errorMessage);
+                            response.sendRedirect(redirectUrl + "?error=" + errorMessage + "&socialType=" + socialType);
                         }))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // @formatter:on

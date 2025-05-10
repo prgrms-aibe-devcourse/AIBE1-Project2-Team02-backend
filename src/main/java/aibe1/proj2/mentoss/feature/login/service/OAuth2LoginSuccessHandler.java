@@ -103,7 +103,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
 
-            res.sendRedirect(redirectUri + "?error=" + errorMessage);
+            res.sendRedirect(redirectUri + "?error=" + errorMessage + "&socialType=" + provider);
         }
     }
 }
