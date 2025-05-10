@@ -65,8 +65,15 @@ public interface LectureMapper {
             "lc.middle_category AS middleCategory, lc.subcategory AS subcategory, " +
             "l.is_closed AS isClosed, l.status AS status, l.description AS description, " +
             "l.price AS price, l.curriculum AS curriculum, " +
-            "(SELECT JSON_ARRAYAGG(CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))) " +
-            "FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
+            "(SELECT JSON_ARRAYAGG(" +
+            "   JSON_OBJECT(" +
+            "     'displayName', CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))," +
+            "     'regionCode', r.region_code," +
+            "     'sido', r.sido," +
+            "     'sigungu', r.sigungu," +
+            "     'dong', r.dong" +
+            "   )" +
+            ") FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
             "WHERE lr.lecture_id = l.lecture_id) AS regions, " +
             "l.available_time_slots AS timeSlots, " +
             "u.user_id AS authorUserId, " +

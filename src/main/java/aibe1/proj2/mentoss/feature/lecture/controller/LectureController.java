@@ -213,10 +213,8 @@ public class LectureController {
         response.put("mentorInfo", mentorInfo);
 
         // JSON 문자열을 객체로 파싱
-        List<String> regionList = null;
-        if (lecture.regions() != null && !lecture.regions().isEmpty()) {
-            regionList = objectMapper.readValue(lecture.regions(), new TypeReference<List<String>>() {});
-        }
+        Object regionList = lecture.regions();
+
         response.put("regions", regionList);
 
         List<TimeSlotResponse> timeSlotList = null;
