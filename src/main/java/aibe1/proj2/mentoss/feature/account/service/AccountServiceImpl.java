@@ -131,6 +131,7 @@ public class AccountServiceImpl implements AccountService {
         if (mentorMapper.existsByUserIdWithoutDeleteCheck(userId)) {
             Long mentorId = mentorMapper.findMentorIdByUserId(userId);
 
+            lectureMapper.closeAllOpenLecturesByMentorId(mentorId);
             lectureMapper.softDeleteLecturesByMentorId(userId);
         }
 
