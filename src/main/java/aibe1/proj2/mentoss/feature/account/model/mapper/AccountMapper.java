@@ -72,6 +72,7 @@ public interface AccountMapper {
             "deleted_at = #{deletedAt}, " +
             "nickname = #{nickname}, " +
             "email = #{email}, " +
+            "provider_id = #{providerId}, " +
             "birth_date = #{birthDate}, " +
             "age = #{age}, " +
             "sex = #{sex}, " +

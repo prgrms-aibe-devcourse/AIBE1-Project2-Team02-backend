@@ -135,6 +135,11 @@ public class AccountServiceImpl implements AccountService {
         appUser.setDeletedAt(LocalDateTime.now());
         appUser.setNickname("deletedUser" + randomSuffix);
         appUser.setEmail("deleted-" + userId + "-" + randomSuffix + "@anonymous.mentoss.com");
+
+        if (appUser.getProviderId() != null && !appUser.getProviderId().isEmpty()) {
+            appUser.setProviderId("deleted-" + appUser.getProviderId() + "-" + randomSuffix);
+        }
+
         appUser.setBirthDate(null);
         appUser.setAge(null);
         appUser.setSex(null);
