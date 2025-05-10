@@ -63,4 +63,11 @@ public interface AccountMapper {
             "updated_at = NOW() " +
             "WHERE user_id = #{userId}")
     void updateProfileImage(@Param("userId") Long userId, @Param("profileImage") String profileImage);
+
+    @Select("""
+        SELECT lecture_id
+          FROM lecture_mentee
+         WHERE mentee_id = #{userId}
+        """)
+    List<Long> findLectureByUserId(@Param("userId") Long userId);
 }

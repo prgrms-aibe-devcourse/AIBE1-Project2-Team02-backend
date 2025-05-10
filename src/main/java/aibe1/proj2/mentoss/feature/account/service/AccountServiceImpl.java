@@ -305,4 +305,10 @@ public class AccountServiceImpl implements AccountService {
         appUser.setProfileImage(null);
         accountMapper.updateProfileImage(userId, null);
     }
+
+    @Override
+    public MyLectureResponseDto getMyLecture(Long userId) {
+        List<Long> lectureList = accountMapper.findLectureByUserId(userId);
+        return new MyLectureResponseDto(lectureList);
+    }
 }
