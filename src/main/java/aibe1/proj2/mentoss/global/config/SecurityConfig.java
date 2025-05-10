@@ -111,7 +111,7 @@ public class SecurityConfig {
                                     ? "http://localhost:5173"
                                     : "https://mentoss.vercel.app";
                             String socialType = request.getRequestURI().contains("google") ? "google" : "kakao";
-                            String errorMessage = URLEncoder.encode("소셜 로그인 실패: " + exception.getMessage(), StandardCharsets.UTF_8);
+                            String errorMessage = URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
                             response.sendRedirect(redirectUrl + "?error=" + errorMessage + "&socialType=" + socialType);
                         }))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
