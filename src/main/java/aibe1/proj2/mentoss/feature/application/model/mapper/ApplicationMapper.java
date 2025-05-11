@@ -55,7 +55,7 @@ public interface ApplicationMapper {
                     AND a.is_deleted = 0
                     AND l.is_deleted = 0
                 ORDER BY
-                    a.created_at DESC
+                    a.application_id DESC
             """)
     List<AppliedLectureResponseDto> findMyAppliedLectures(Long menteeId);
 
@@ -70,7 +70,8 @@ public interface ApplicationMapper {
                     lc.subcategory,
                     u.nickname,
                     u.profile_image,
-                    mp.is_certified
+                    mp.is_certified,
+                    l.is_closed
                 FROM lecture l
                 LEFT JOIN lecture_category lc ON l.category_id = lc.category_id
                                 LEFT JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
@@ -93,8 +94,9 @@ public interface ApplicationMapper {
                 WHERE 
                     u.user_id = #{mentorId}
                     AND l.is_deleted = 0
+                    AND l.status = 'AVAILABLE'
                 ORDER BY 
-                    l.created_at DESC
+                    l.lecture_id DESC
             """)
     List<LectureResponseDto> findLecturesByMentorId(Long mentorId);
 
@@ -115,7 +117,7 @@ public interface ApplicationMapper {
                     AND a.status = 'PENDING'
                     AND a.is_deleted = 0
                 ORDER BY
-                    a.created_at DESC
+                    a.application_id
             """)
     List<LectureApplicantDto> findApplicantsByLecture(Long userId);
 
@@ -163,6 +165,29 @@ public interface ApplicationMapper {
             """)
     String findStatusByApplicationId(Long applicationId);
 
+
+    @Select("""
+            SELECT l.lecture_id, mp.user_id , l.is_closed, l.status
+            FROM lecture l
+            JOIN mentor_profile mp on l.mentor_id = mp.mentor_id
+            WHERE l.lecture_id = #{lectureId}
+    """)
+    LectureStatusDto findLectureStatusById(Long lectureId);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM application
+            WHERE lecture_id = #{lectureId}
+              AND status = 'PENDING'
+              AND is_deleted = 0
+    """)
+    int countPendingApplicationsByLectureId(Long lectureId);
+    @Update("""
+            UPDATE lecture
+            SET is_closed = #{isClosed}
+            WHERE lecture_id = #{lectureId}
+    """)
+    void updateLectureStatus(Long lectureId, boolean isClosed);
 
     @Select("""
                 SELECT

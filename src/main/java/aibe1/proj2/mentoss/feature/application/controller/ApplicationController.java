@@ -76,6 +76,19 @@ public class ApplicationController {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
+
+    @Operation(summary = "강의 상태 변경", description = "강의 마감 여부 상태를 변경합니다.")
+    @PatchMapping("/lecture/status/{lectureId}")
+    public ResponseEntity<ApiResponseFormat<String>> updateLectureStatus(
+            @PathVariable Long lectureId,
+            @RequestBody LectureStatusUpdateRequestDto request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        applicationService.updateLectureStatus(lectureId, request.isClosed(), userDetails.getUserId());
+        return ResponseEntity.ok(ApiResponseFormat.ok("강의 상태가 변경되었습니다."));
+    }
+
+
     @Operation(summary = "과외 신청 폼 데이터 조회", description = "과외 ID를 통해 신청 폼에 필요한 정보를 조회합니다.")
     @GetMapping("/{lectureId}/form/list")
     public ResponseEntity<ApiResponseFormat<LectureApplyFormDto>> getLectureApplyForm(

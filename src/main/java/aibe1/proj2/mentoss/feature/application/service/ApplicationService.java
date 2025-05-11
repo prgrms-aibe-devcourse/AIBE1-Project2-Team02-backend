@@ -16,6 +16,8 @@ public interface ApplicationService {
 
     void rejectApplication(Long applicationId, String rejectReason , Long senderId);
 
+    void updateLectureStatus(Long lectureId, boolean isClosed, Long userId);
+
     LectureApplyFormDto getLectureApplyForm(Long lectureId);
 
     void applyForLecture(LectureApplyRequestDto dto, Long menteeId);

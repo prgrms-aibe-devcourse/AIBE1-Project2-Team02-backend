@@ -5,6 +5,7 @@ import aibe1.proj2.mentoss.feature.application.model.mapper.ApplicationMapper;
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageSendRequestDto;
 import aibe1.proj2.mentoss.feature.message.service.MessageService;
 import aibe1.proj2.mentoss.global.entity.enums.ApplicationStatus;
+import aibe1.proj2.mentoss.global.entity.enums.EntityStatus;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,6 +79,36 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new IllegalStateException("이미 처리된 과외 신청입니다.");
         }
         return info;
+    }
+
+    @Transactional
+    @Override
+    public void updateLectureStatus(Long lectureId, boolean isClosed, Long userId) {
+        LectureStatusDto lecture = applicationMapper.findLectureStatusById(lectureId);
+
+        if (lecture == null) {
+            throw new ResourceNotFoundException("Lecture", lectureId);
+        }
+
+        // 강의가 BANNED/SUSPENDED 상태라면 변경 불가
+        if (!EntityStatus.AVAILABLE.name().equals(lecture.status())) {
+            throw new IllegalStateException("해당 강의는 정지 되었습니다.");
+        }
+
+        // 요청한 사용자가 강의 소유자가 아닌 경우
+        if (!lecture.userId().equals(userId)) {
+            throw new IllegalStateException("해당 강의에 대한 권한이 없습니다.");
+        }
+
+        // 강의 마감시 신청자 존재 여부 체크
+        if (isClosed) {
+            int pendingCount = applicationMapper.countPendingApplicationsByLectureId(lectureId);
+            if (pendingCount > 0) {
+                throw new IllegalStateException("해당 강의에 대한 신청자가 존재합니다.");
+            }
+        }
+
+        applicationMapper.updateLectureStatus(lectureId, isClosed);
     }
 
     @Override
