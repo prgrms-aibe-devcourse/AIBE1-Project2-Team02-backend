@@ -66,21 +66,17 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private void saveOrUpdateUser(String provider, String providerId, String email, String nickname, String profileImage) {
-        // 1. 먼저 provider와 providerId로 사용자 찾기
         Optional<AppUser> existingUser = appUserMapper.findByProviderAndProviderId(provider, providerId);
 
         if (existingUser.isPresent()) {
-            // 기존 사용자 로그인 - 정보 업데이트 (필요한 경우)
             log.info("기존 사용자 로그인: userId={}", existingUser.get().getUserId());
             return;
         }
 
-        // 2. 이메일로 사용자 찾기 (이미 다른 소셜 계정으로 가입된 경우 체크)
         if (email != null && !email.isEmpty()) {
             Optional<AppUser> userByEmail = appUserMapper.findByEmail(email);
 
             if (userByEmail.isPresent()) {
-                // 이미 다른 소셜 계정으로 같은 이메일이 등록되어 있는 경우
                 AppUser existingEmailUser = userByEmail.get();
                 log.warn("이미 다른 소셜 계정({}:{}으로 가입된 이메일입니다: {}",
                         existingEmailUser.getProvider(),
@@ -93,7 +89,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             }
         }
 
-        // 3. 신규 사용자 등록 (정상 처리)
         String uniqueNickname = generateUniqueRandomNickname(nickname);
 
         AppUser newUser = AppUser.builder()
@@ -113,15 +108,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             log.info("신규 사용자 등록: userId={}, 닉네임={}, 이메일={}",
                     newUser.getUserId(), uniqueNickname, email);
         } catch (Exception e) {
-            // 이메일 유니크 제약조건 위반 등으로 저장 실패 시
             log.info("사용자 저장 중 오류 발생: {}", e.getMessage());
 
-            // 이메일 중복 오류인 경우 사용자 친화적인 메시지 제공
             if (e.getMessage() != null && e.getMessage().contains("Duplicate entry") &&
                     (e.getMessage().contains("for key 'email'") || e.getMessage().contains("for key 'app_user.email'"))) {
                 throw new RuntimeException("이미 사용 중인 이메일입니다. 다른 소셜 계정으로 로그인해주세요.");
             } else {
-                // 다른 유형의 오류
                 throw new RuntimeException("사용자 등록 중 오류가 발생했습니다.", e);
             }
         }
