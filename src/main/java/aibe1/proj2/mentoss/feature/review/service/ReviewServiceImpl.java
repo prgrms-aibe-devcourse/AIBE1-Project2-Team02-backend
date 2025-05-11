@@ -95,22 +95,7 @@ public class ReviewServiceImpl implements ReviewService{
         if (!reviewMapper.isLectureAccessible(lectureId)) {
             throw new ResourceAccessDeniedException("Lecture", lectureId);
         }
-        return reviewMapper.findByLectureId(lectureId)
-                .stream()
-                .map(this::reviewToResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    private ReviewResponseDto reviewToResponseDto(Review r) {
-        return new ReviewResponseDto(
-                r.getReviewId(),
-                r.getLectureId(),
-                r.getMentorId(),
-                r.getWriterId(),
-                r.getContent(),
-                r.getRating(),
-                r.getCreatedAt()
-        );
+        return reviewMapper.findByLectureId(lectureId);
     }
 
     @Override

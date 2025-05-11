@@ -1,9 +1,11 @@
 package aibe1.proj2.mentoss.feature.review.model.mapper;
 
+import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import aibe1.proj2.mentoss.global.entity.Review;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -55,15 +57,35 @@ public interface ReviewMapper {
     @Select("SELECT user_id FROM mentor_profile WHERE mentor_id=#{mentorId}")
     Long getUserByMentorId(Long mentorId);
 
-    @Select("SELECT * FROM review WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
-    @Results({
-            @Result(property = "reviewId",  column = "review_id"),
-            @Result(property = "lectureId", column = "lecture_id"),
-            @Result(property = "mentorId",  column = "mentor_id"),
-            @Result(property = "writerId",  column = "writer_id"),
-            @Result(property = "createdAt", column = "created_at")
+    @Select("""
+    SELECT
+      r.review_id       AS reviewId,
+      r.lecture_id      AS lectureId,
+      r.mentor_id       AS mentorId,
+      r.writer_id       AS writerId,
+      u.nickname        AS writerNickname,
+      u.profile_image   AS writerProfileImage,
+      r.content,
+      r.rating,
+      r.created_at      AS createdAt
+    FROM review r
+    JOIN app_user u ON u.user_id = r.writer_id
+    WHERE r.lecture_id = #{lectureId}
+      AND r.is_deleted = FALSE
+    ORDER BY r.created_at DESC
+  """)
+    @ConstructorArgs({
+            @Arg(column="reviewId",            javaType=Long.class,            id=true),
+            @Arg(column="lectureId",           javaType=Long.class),
+            @Arg(column="mentorId",            javaType=Long.class),
+            @Arg(column="writerId",            javaType=Long.class),
+            @Arg(column="writerNickname",      javaType=String.class),
+            @Arg(column="writerProfileImage",  javaType=String.class),
+            @Arg(column="content",             javaType=String.class),
+            @Arg(column="rating",              javaType=Long.class),
+            @Arg(column="createdAt",           javaType= LocalDateTime.class)
     })
-    List<Review> findByLectureId(Long lectureId);
+    List<ReviewResponseDto> findByLectureId(Long lectureId);
 
     @Insert("""
     INSERT INTO review (lecture_id, mentor_id, writer_id, content, rating,
