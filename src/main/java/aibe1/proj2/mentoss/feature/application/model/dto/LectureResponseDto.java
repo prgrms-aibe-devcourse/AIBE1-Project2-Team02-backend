@@ -9,6 +9,7 @@ public record LectureResponseDto(
         String subcategory,
         String nickname,
         String profile_image,
-        Boolean isCertified
+        Boolean isCertified,
+        Boolean isClosed
 ) {
 }
