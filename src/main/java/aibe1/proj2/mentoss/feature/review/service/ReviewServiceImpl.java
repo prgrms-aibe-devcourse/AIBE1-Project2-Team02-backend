@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.review.service;
 
 
+import aibe1.proj2.mentoss.feature.review.model.dto.AverageRatingResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import aibe1.proj2.mentoss.global.entity.Review;
@@ -24,8 +25,8 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void createReview(CreateReviewRequestDto req, Long currentUserId) {
-        if (!reviewMapper.existsUser(req.writerId())) {
-            throw new ResourceNotFoundException("User", req.writerId());
+        if (!reviewMapper.existsUser(currentUserId)) {
+            throw new ResourceNotFoundException("User", currentUserId);
         }
         if (!reviewMapper.existsLecture(req.lectureId())) {
             throw new ResourceNotFoundException("Lecture", req.lectureId());
@@ -62,7 +63,7 @@ public class ReviewServiceImpl implements ReviewService{
             throw new ResourceAccessDeniedException("Review", reviewId);
         }
         if (rating == null || rating < 1 || rating > 5) {
-            throw new InvalidRatingException("별점은 1에서 5 사이의 정수여야 합니다.");
+            throw new InvalidRatingException("후기 등록 시 별점은 1에서 5 사이의 정수여야 합니다.");
         }
         Long writerId = reviewMapper.findWriterIdByReviewId(reviewId);
         if (!writerId.equals(currentUserId)) {
@@ -112,4 +113,42 @@ public class ReviewServiceImpl implements ReviewService{
         );
     }
 
+    @Override
+    public AverageRatingResponseDto getAverageRatingByLectureId(Long lectureId) {
+        if (!reviewMapper.existsLecture(lectureId)) {
+            throw new ResourceNotFoundException("Lecture", lectureId);
+        }
+        if (!reviewMapper.isLectureAccessible(lectureId)) {
+            throw new ResourceAccessDeniedException("Lecture", lectureId);
+        }
+        Double avg = reviewMapper.findAverageRatingByLectureId(lectureId);
+        double value = (avg != null) ? avg : 0.0;
+        double result = Math.round(value * 10) / 10.0;
+        if (result < 0.0 || result > 5.0) {
+            throw new InvalidRatingException("평균 별점은 0~5 사이의 소수여야 합니다.");
+        }
+        return new AverageRatingResponseDto(result, getCountByLecureId(lectureId));
+    }
+
+    @Override
+    public AverageRatingResponseDto getAverageRatingByMentorId(Long mentorId) {
+        if (!reviewMapper.existsMentor(mentorId)) {
+            throw new ResourceNotFoundException("Mentor", mentorId);
+        }
+        Double avg = reviewMapper.findAverageRatingByMentorId(mentorId);
+        double value = (avg != null) ? avg : 0.0;
+        double result = Math.round(value * 10) / 10.0;
+        if (result < 0.0 || result > 5.0) {
+            throw new InvalidRatingException("평균 별점은 0~5 사이의 소수여야 합니다.");
+        }
+        return new AverageRatingResponseDto(result, getCountByMentorId(mentorId));
+    }
+
+    private Long getCountByLecureId(Long lectureId){
+        return reviewMapper.countReviewsByLectureId(lectureId);
+    }
+
+    private Long getCountByMentorId(Long mentorId){
+        return reviewMapper.countReviewsByMentorId(mentorId);
+    }
 }

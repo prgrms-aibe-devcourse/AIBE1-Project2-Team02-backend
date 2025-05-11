@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.review.service;
 
+import aibe1.proj2.mentoss.feature.review.model.dto.AverageRatingResponseDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 
@@ -14,4 +15,8 @@ public interface ReviewService{
     void deleteReview(Long reviewId, Long currentUserId);
 
     List<ReviewResponseDto> getReviewsByLectureId(Long lectureId);
+
+    AverageRatingResponseDto getAverageRatingByLectureId(Long lectureId);
+
+    AverageRatingResponseDto getAverageRatingByMentorId(Long mentorId);
 }

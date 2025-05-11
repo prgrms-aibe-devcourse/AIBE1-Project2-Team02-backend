@@ -48,9 +48,12 @@ jwt:
   secret: ${JWT_SECRET_KEY}
   expiration-ms: 3600000  # 토큰 유효 시간 (1시간)
 together:
-  api-key: ${TOGETHER_API_KEY}
+  api-key1: ${TOGETHER_API_KEY1}
+  api-key2: ${TOGETHER_API_KEY2}
+  api-key3: ${TOGETHER_API_KEY3}
   model: ${TOGETHER_MODEL}
   prompt: ${TOGETHER_PROMPT}
+
 
 cloudflare:
   r2:

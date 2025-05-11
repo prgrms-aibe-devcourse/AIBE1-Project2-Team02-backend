@@ -8,6 +8,7 @@ import aibe1.proj2.mentoss.global.auth.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,6 +23,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -35,6 +38,9 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
     /**
      * CORS 설정
@@ -50,7 +56,7 @@ public class SecurityConfig {
                 "http://localhost:8081",
                 "https://mentoss.vercel.app"
         ));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
 
@@ -74,7 +80,9 @@ public class SecurityConfig {
                                 "/api/test/**", "/api/auth/test/public",
                                 "/css/**", "/js/**", "/images/**",
                                 "/api/ping", "/api/categories/**", "/api/regions/**",
-                                "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error")
+                                "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error"
+                                //, "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
+                                 )
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("adminPage").permitAll()  // 로그인 토큰 백엔드에서 받아오는거 구현 전까지 일단 오픈
@@ -97,7 +105,15 @@ public class SecurityConfig {
                                 .baseUri("/login/oauth2/code/*"))
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
-                        .successHandler(oAuth2LoginSuccessHandler))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            String redirectUrl = "dev".equals(activeProfile)
+                                    ? "http://localhost:5173"
+                                    : "https://mentoss.vercel.app";
+                            String socialType = request.getRequestURI().contains("google") ? "google" : "kakao";
+                            String errorMessage = URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
+                            response.sendRedirect(redirectUrl + "?error=" + errorMessage + "&socialType=" + socialType);
+                        }))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // @formatter:on
 

@@ -1,9 +1,7 @@
 package aibe1.proj2.mentoss.feature.review.controller;
 
 
-import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
-import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
-import aibe1.proj2.mentoss.feature.review.model.dto.UpdateReviewRequestDto;
+import aibe1.proj2.mentoss.feature.review.model.dto.*;
 import aibe1.proj2.mentoss.feature.review.service.ReviewService;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
@@ -264,6 +262,104 @@ public class ReviewController {
             @PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId, user.getUserId());
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+
+    @Operation(summary = "강의별 평균 평점", description = "특정 강의에 대한 후기 평점의 평균을 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": true,
+            "message": "요청이 성공적으로 처리되었습니다.",
+            "data": 3.7
+            }
+            """))),
+            @ApiResponse(responseCode = "400", description = "평균 별점 값 오류(0~5 사이의 소수가 아님)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "평균 별점은 0~5 사이의 소수여야 합니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "403", description = "강의 접근 불가(해당 강의가 삭제되었거나 정지 상태)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "Lecture (id=10)에 접근할 수 없습니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "404", description = "외래키 참조 오류(참조할 대상 ID가 없음)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "Lecture (id=1234) 가 존재하지 않습니다.",
+            "data": null
+            }
+            """)))
+    })
+    @PostMapping("/lecture/average-rating")
+    public ResponseEntity<ApiResponseFormat<AverageRatingResponseDto>> getAverageRatingByLecture(
+            @RequestBody AverageRatingRequestDto dto) {
+        AverageRatingResponseDto response = reviewService.getAverageRatingByLectureId(dto.id());
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
+    }
+
+    @Operation(summary = "멘토별 평균 평점", description = "특정 멘토의 모든 강의 후기 평점 평균을 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": true,
+            "message": "요청이 성공적으로 처리되었습니다.",
+            "data": 3.7
+            }
+            """))),
+            @ApiResponse(responseCode = "400", description = "평균 별점 값 오류(0~5 사이의 소수가 아님)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "평균 별점은 0~5 사이의 소수여야 합니다.",
+            "data": null
+            }
+            """))),
+            @ApiResponse(responseCode = "404", description = "외래키 참조 오류(참조할 대상 ID가 없음)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "Mentor (id=1234) 가 존재하지 않습니다.",
+            "data": null
+            }
+            """)))
+    })
+    @PostMapping("/mentor/average-rating")
+    public ResponseEntity<ApiResponseFormat<AverageRatingResponseDto>> getAverageRatingByMentor(
+            @RequestBody AverageRatingRequestDto dto) {
+        AverageRatingResponseDto response = reviewService.getAverageRatingByMentorId(dto.id());
+        return ResponseEntity.ok(ApiResponseFormat.ok(response));
     }
 
 

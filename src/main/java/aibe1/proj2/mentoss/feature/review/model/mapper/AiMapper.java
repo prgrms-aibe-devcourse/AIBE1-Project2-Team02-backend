@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.review.model.mapper;
 
 
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
+import aibe1.proj2.mentoss.global.entity.MentorProfile;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Repository
 @Mapper
-public interface AIMapper {
+public interface AiMapper {
     @Select("""
     SELECT
       review_id        AS reviewId,
@@ -38,4 +39,10 @@ public interface AIMapper {
     """)
     void updateMentorTag(@Param("mentorId") Long mentorId,
                    @Param("tag") String tag);
+
+    @Select("""
+        SELECT *
+        FROM mentor_profile
+    """)
+    List<MentorProfile> findAllMentor();
 }

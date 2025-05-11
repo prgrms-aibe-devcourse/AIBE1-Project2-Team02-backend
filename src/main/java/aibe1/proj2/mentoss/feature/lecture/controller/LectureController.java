@@ -45,23 +45,6 @@ public class LectureController {
         this.objectMapper = objectMapper;
     }
 
-////     개발 전용 강의 생성 메서드
-//    @PostMapping()
-//    // 개발 환경에서만 활성화
-//    @Operation(summary = "강의 생성 (개발용)", description = "개발 환경에서 인증 없이 강의를 생성합니다.")
-//    public ResponseEntity<ApiResponseFormat<Long>> createLectureForDev(
-//            @RequestBody LectureCreateRequest request
-//    ) throws JsonProcessingException {
-//        // 개발용 하드코딩된 사용자 ID
-//        Long userId = 1L;
-//
-//        // 강의 생성
-//        Long lectureId = lectureService.createLecture(request, userId);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(lectureId));
-//    }
-
-//     배포 전용 강의 생성 메서드
-
     @PostMapping
     @Operation(summary = "강의 생성", description = "새로운 강의를 생성합니다.")
     @ApiResponses(value = {
@@ -203,6 +186,7 @@ public class LectureController {
         response.put("lectureId", lecture.lectureId());
         response.put("lectureTitle", lecture.lectureTitle());
         response.put("mentorNickname", lecture.mentorNickname());
+        response.put("authorUserId", lecture.authorUserId());
         response.put("createdAt", lecture.createdAt());
         response.put("updatedAt", lecture.updatedAt());
         response.put("parentCategory", lecture.parentCategory());
@@ -213,6 +197,21 @@ public class LectureController {
         response.put("description", lecture.description());
         response.put("price", lecture.price());
         response.put("curriculum", lecture.curriculum());
+        response.put("mentorId", lecture.mentorId());
+
+        // 멘토 정보 추가
+        Map<String, Object> mentorInfo = new HashMap<>();
+        mentorInfo.put("profileImage", lecture.profileImage());
+        mentorInfo.put("sex", lecture.sex());
+        mentorInfo.put("mbti", lecture.mbti());
+        mentorInfo.put("education", lecture.education());
+        mentorInfo.put("major", lecture.major());
+        mentorInfo.put("isCertified", lecture.isCertified());
+        mentorInfo.put("content", lecture.content());
+        mentorInfo.put("appealFileUrl", lecture.appealFileUrl());
+        mentorInfo.put("tag", lecture.tag());
+
+        response.put("mentorInfo", mentorInfo);
 
         // JSON 문자열을 객체로 파싱
         List<String> regionList = null;
@@ -294,7 +293,8 @@ public class LectureController {
 
         // 권한 확인: ADMIN 또는 작성자만 수정 가능
         boolean isAdmin = currentUser.getRole().equals("ADMIN");
-        boolean isOwner = lectureService.isLectureOwner(lectureId, userId);
+        Long authorId = lecture.authorUserId();
+        boolean isOwner = authorId != null && authorId.equals(userId);
 
         if (!isAdmin && !isOwner) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)

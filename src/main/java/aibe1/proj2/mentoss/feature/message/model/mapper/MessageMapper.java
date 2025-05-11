@@ -25,13 +25,17 @@ public interface MessageMapper {
 
 
     @Select("""
-                SELECT m.*, u.nickname
-                FROM message m
-                JOIN app_user u ON m.receiver_id = u.user_id
-                WHERE m.message_id = #{id}
-                  AND m.is_deleted = 0
+            SELECT m.*, u.nickname
+            FROM message m
+            JOIN app_user u
+              ON u.user_id = CASE
+                               WHEN m.sender_id = #{userId} THEN m.receiver_id
+                               ELSE m.sender_id
+                             END
+            WHERE m.message_id = #{id}
+              AND m.is_deleted = 0
             """)
-    Message findById(Long id);
+    Message findById(Long id, Long userId);
 
     @Update("""
                 UPDATE message

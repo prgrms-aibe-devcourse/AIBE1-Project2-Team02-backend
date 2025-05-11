@@ -52,6 +52,9 @@ public interface ReviewMapper {
         return countMentor(mentorId) > 0;
     }
 
+    @Select("SELECT user_id FROM mentor_profile WHERE mentor_id=#{mentorId}")
+    Long getUserByMentorId(Long mentorId);
+
     @Select("SELECT * FROM review WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
     @Results({
             @Result(property = "reviewId",  column = "review_id"),
@@ -101,8 +104,41 @@ public interface ReviewMapper {
         return countLectureMentee(lectureId, userId) > 0;
     }
 
-    /** (2) 후기 작성자(writerId) 조회 */
     @Select("SELECT writer_id FROM review WHERE review_id = #{reviewId}")
     Long findWriterIdByReviewId(Long reviewId);
+
+    @Select("""
+      SELECT AVG(rating)
+        FROM review
+       WHERE lecture_id = #{lectureId}
+         AND status = 'AVAILABLE'
+         AND is_deleted = FALSE
+    """)
+    Double findAverageRatingByLectureId(Long lectureId);
+
+    @Select("""
+      SELECT AVG(rating)
+        FROM review
+       WHERE mentor_id = #{mentorId}
+         AND status = 'AVAILABLE'
+         AND is_deleted = FALSE
+    """)
+    Double findAverageRatingByMentorId(Long mentorId);
+
+    @Select("""
+        SELECT COUNT(*) 
+          FROM review r
+         INNER JOIN lecture l
+            ON r.lecture_id = l.lecture_id
+         WHERE l.mentor_id = #{mentorId}
+        """)
+    Long countReviewsByMentorId(@Param("mentorId") Long mentorId);
+
+    @Select("""
+        SELECT COUNT(*) 
+          FROM review
+         WHERE lecture_id = #{lectureId}
+        """)
+    Long countReviewsByLectureId(@Param("lectureId") Long lectureId);
 
 }

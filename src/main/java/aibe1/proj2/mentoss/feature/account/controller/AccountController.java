@@ -2,6 +2,7 @@ package aibe1.proj2.mentoss.feature.account.controller;
 
 import aibe1.proj2.mentoss.feature.account.model.dto.*;
 import aibe1.proj2.mentoss.feature.account.service.AccountService;
+import aibe1.proj2.mentoss.feature.login.model.mapper.AppUserMapper;
 import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
@@ -25,6 +26,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final AppUserMapper appUserMapper;
 
     @Operation(summary = "프로필 조회", description = "로그인한 사용자의 프로필 정보를 조회합니다")
     @GetMapping("/profile")
@@ -230,5 +232,19 @@ public class AccountController {
         );
     }
 
+    @Operation(summary = "닉네임 중복 확인", description = "입력한 닉네임이 이미 사용 중인지 확인합니다.")
+    @GetMapping("/check-nickname")
+    public ResponseEntity<ApiResponseFormat<Boolean>> checkNicknameDuplicate(
+            @RequestParam String nickname) {
+        boolean isDuplicate = appUserMapper.nicknameExists(nickname);
+        return ResponseEntity.ok(ApiResponseFormat.ok(!isDuplicate));
+    }
 
+    @Operation(summary = "강의 목록 조회", description = "로그인한 사용자가 수강 중인 강의 목록을 조회합니다")
+    @GetMapping("/mylecture")
+    public ResponseEntity<ApiResponseFormat<MyLectureResponseDto>> getMyLecture(Authentication authentication) {
+        Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+        MyLectureResponseDto lectureDto = accountService.getMyLecture(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(lectureDto));
+    }
 }

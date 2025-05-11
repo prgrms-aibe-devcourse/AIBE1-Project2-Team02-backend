@@ -68,7 +68,18 @@ public interface LectureMapper {
             "(SELECT JSON_ARRAYAGG(CONCAT(r.sido, ' ', r.sigungu, ' ', IFNULL(r.dong, ''))) " +
             "FROM lecture_region lr JOIN region r ON lr.region_code = r.region_code " +
             "WHERE lr.lecture_id = l.lecture_id) AS regions, " +
-            "l.available_time_slots AS timeSlots " +
+            "l.available_time_slots AS timeSlots, " +
+            "u.user_id AS authorUserId, " +
+            "u.profile_image AS profileImage, " +
+            "u.sex AS sex, " +
+            "u.mbti AS mbti, " +
+            "mp.education AS education, " +
+            "mp.major AS major, " +
+            "mp.is_certified AS isCertified, " +
+            "mp.content AS content, " +
+            "mp.appeal_file_url AS appealFileUrl, " +
+            "mp.tag AS tag, " +
+            "l.mentor_id AS mentorId " +
             "FROM lecture l " +
             "JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id " +
             "JOIN app_user u ON mp.user_id = u.user_id " +
@@ -196,4 +207,16 @@ public interface LectureMapper {
             "SET l.is_deleted = TRUE, l.deleted_at = CURRENT_TIMESTAMP " +
             "WHERE mp.user_id = #{userId}")
     int softDeleteLecturesByMentorId(@Param("userId") Long userId);
+
+
+    /**
+     * 특정 멘토의 모집 중인 모든 강의 마감 처리
+     */
+    @Update("UPDATE lecture SET " +
+            "is_closed = TRUE, " +
+            "updated_at = CURRENT_TIMESTAMP " +
+            "WHERE mentor_id = #{mentorId} " +
+            "AND is_closed = FALSE " +
+            "AND is_deleted = FALSE")
+    int closeAllOpenLecturesByMentorId(Long mentorId);
 }

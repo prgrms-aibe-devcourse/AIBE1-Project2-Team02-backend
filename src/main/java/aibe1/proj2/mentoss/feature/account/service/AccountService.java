@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.feature.account.service;
 
 import aibe1.proj2.mentoss.feature.account.model.dto.*;
+import aibe1.proj2.mentoss.feature.application.model.dto.LectureResponseDto;
 import aibe1.proj2.mentoss.feature.region.model.dto.RegionDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,4 +37,6 @@ public interface AccountService {
     void updateUserRegion(Long userId, UserRegionsUpdateRequestDto regionDto);
 
     void deleteProfileImage(Long userId);
+
+    MyLectureResponseDto getMyLecture(Long userId);
 }
