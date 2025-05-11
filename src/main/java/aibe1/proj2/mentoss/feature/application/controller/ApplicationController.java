@@ -70,7 +70,7 @@ public class ApplicationController {
     public ResponseEntity<ApiResponseFormat<Void>> rejectApplication(
             @RequestBody RejectApplicationRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails userDetails
-            ) {
+    ) {
         Long userId = userDetails.getUserId();
         applicationService.rejectApplication(dto.applicationId(), dto.reason(), userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
@@ -108,5 +108,17 @@ public class ApplicationController {
         Long userId = userDetails.getUserId();
         applicationService.applyForLecture(dto, userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
+
+    @Operation(
+            summary = "매칭된 수강생 목록 조회",
+            description = "현재 로그인한 멘토의 매칭 완료된 수강생 목록을 조회합니다."
+    )
+    @GetMapping("/mentees")
+    public ResponseEntity<ApiResponseFormat<List<MenteeResponseDto>>> getMatchedMentees(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUserId();
+        List<MenteeResponseDto> result = applicationService.getMatchedMenteesByMentor(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(result));
     }
 }

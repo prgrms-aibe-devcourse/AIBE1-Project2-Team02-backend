@@ -86,7 +86,18 @@ public class ReviewServiceImpl implements ReviewService{
         if (!writerId.equals(currentUserId)) {
             throw new NotOwnerException();
         }
-        reviewMapper.updateReview(reviewId, content, rating);
+
+        // XSS 방지를 위한 입력값 정화
+        String sanitizedContent = XssSanitizer.sanitize(content);
+
+        // AI 유해 콘텐츠 필터링 - 수정된 내용 검사
+        ModerationResult moderationResult = contentModerationService.moderateContent(sanitizedContent);
+        if (moderationResult.isBlocked()) {
+            throw new InappropriateContentException(moderationResult.getReason());
+        }
+
+        reviewMapper.updateReview(reviewId, sanitizedContent, rating);
+
     }
 
     @Override
