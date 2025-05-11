@@ -70,7 +70,7 @@ public class ApplicationController {
     public ResponseEntity<ApiResponseFormat<Void>> rejectApplication(
             @RequestBody RejectApplicationRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails userDetails
-            ) {
+    ) {
         Long userId = userDetails.getUserId();
         applicationService.rejectApplication(dto.applicationId(), dto.reason(), userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
