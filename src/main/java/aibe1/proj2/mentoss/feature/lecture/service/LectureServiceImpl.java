@@ -9,6 +9,10 @@ import aibe1.proj2.mentoss.global.entity.AppUser;
 import aibe1.proj2.mentoss.global.entity.Lecture;
 import aibe1.proj2.mentoss.feature.lecture.model.mapper.LectureMapper;
 import aibe1.proj2.mentoss.global.entity.Lecture;
+import aibe1.proj2.mentoss.global.exception.InappropriateContentException;
+import aibe1.proj2.mentoss.global.moderation.model.ModerationResult;
+import aibe1.proj2.mentoss.global.moderation.service.ContentModerationService;
+import aibe1.proj2.mentoss.global.util.XssSanitizer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,10 +33,12 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureMapper lectureMapper;
     private final ObjectMapper objectMapper;
+    private final ContentModerationService contentModerationService;
 
-    public LectureServiceImpl(LectureMapper lectureMapper, ObjectMapper objectMapper) {
+    public LectureServiceImpl(LectureMapper lectureMapper, ObjectMapper objectMapper, ContentModerationService contentModerationService) {
         this.lectureMapper = lectureMapper;
         this.objectMapper = objectMapper;
+        this.contentModerationService = contentModerationService;
     }
 
     /**
@@ -47,21 +53,47 @@ public class LectureServiceImpl implements LectureService {
             throw new IllegalStateException("멘토 프로필이 등록되어 있지 않습니다.");
         }
 
+        // XSS 방지를 위한 입력값 정화
+        String sanitizedTitle = XssSanitizer.sanitize(request.lectureTitle());
+        String sanitizedDescription = XssSanitizer.sanitize(request.description());
+        String sanitizedCurriculum = XssSanitizer.sanitize(request.curriculum());
+
+        // AI 유해 콘텐츠 필터링 - 제목 검사
+        // 부적절한 콘텐츠(욕설, 성적 표현, 혐오 발언, 폭력적 내용, 보안 민감 정보 등)가 포함되어 있는지 확인합니다.
+        ModerationResult titleResult = contentModerationService.moderateContent(sanitizedTitle);
+        if (titleResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(titleResult.getReason());
+        }
+
+        // AI 유해 콘텐츠 필터링 - 설명 검사
+        // 강의 설명에 부적절한 콘텐츠가 포함되어 있는지 확인합니다.
+        ModerationResult descriptionResult = contentModerationService.moderateContent(sanitizedDescription);
+        if (descriptionResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(descriptionResult.getReason());
+        }
+
+        // AI 유해 콘텐츠 필터링 - 커리큘럼 검사
+        // 강의 커리큘럼에 부적절한 콘텐츠가 포함되어 있는지 확인합니다.
+        ModerationResult curriculumResult = contentModerationService.moderateContent(sanitizedCurriculum);
+        if (curriculumResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(curriculumResult.getReason());
+        }
+
         // DTO → 엔티티 변환
         Lecture lecture = new Lecture();
-        lecture.setLectureTitle(request.lectureTitle());
-        lecture.setDescription(request.description());
+        lecture.setLectureTitle(sanitizedTitle);
+        lecture.setDescription(sanitizedDescription);
         lecture.setCategoryId(request.categoryId());
-        lecture.setCurriculum(request.curriculum());
+        lecture.setCurriculum(sanitizedCurriculum);
         lecture.setPrice(request.price());
 
         // 사용자의 멘토 ID 가져오기
         Long mentorId = lectureMapper.getMentorIdByUserId(userId);
         lecture.setMentorId(mentorId); // 실제 멘토 ID 사용
         lecture.setStatus("AVAILABLE");
-
-
-
 
         // 엔티티 저장 로직
         lectureMapper.createLecture(lecture);
@@ -124,13 +156,42 @@ public class LectureServiceImpl implements LectureService {
             throw new jakarta.persistence.EntityNotFoundException("해당 강의를 찾을 수 없습니다. (ID: " + lectureId + ")");
         }
 
+        // XSS 방지를 위한 입력값 정화
+        String sanitizedTitle = XssSanitizer.sanitize(request.lectureTitle());
+        String sanitizedDescription = XssSanitizer.sanitize(request.description());
+        String sanitizedCurriculum = XssSanitizer.sanitize(request.curriculum());
+
+        // AI 유해 콘텐츠 필터링 - 제목 검사
+        // 부적절한 콘텐츠(욕설, 성적 표현, 혐오 발언, 폭력적 내용, 보안 민감 정보 등)가 포함되어 있는지 확인합니다.
+        ModerationResult titleResult = contentModerationService.moderateContent(sanitizedTitle);
+        if (titleResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(titleResult.getReason());
+        }
+
+        // AI 유해 콘텐츠 필터링 - 설명 검사
+        // 강의 설명에 부적절한 콘텐츠가 포함되어 있는지 확인합니다.
+        ModerationResult descriptionResult = contentModerationService.moderateContent(sanitizedDescription);
+        if (descriptionResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(descriptionResult.getReason());
+        }
+
+        // AI 유해 콘텐츠 필터링 - 커리큘럼 검사
+        // 강의 커리큘럼에 부적절한 콘텐츠가 포함되어 있는지 확인합니다.
+        ModerationResult curriculumResult = contentModerationService.moderateContent(sanitizedCurriculum);
+        if (curriculumResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(curriculumResult.getReason());
+        }
+
         // DTO → 엔티티 변환
         Lecture lecture = new Lecture();
         lecture.setLectureId(lectureId);
-        lecture.setLectureTitle(request.lectureTitle());
-        lecture.setDescription(request.description());
+        lecture.setLectureTitle(sanitizedTitle);
+        lecture.setDescription(sanitizedDescription);
         lecture.setCategoryId(request.categoryId());
-        lecture.setCurriculum(request.curriculum());
+        lecture.setCurriculum(sanitizedCurriculum);
         lecture.setPrice(request.price());
 
         // 기본 정보 업데이트

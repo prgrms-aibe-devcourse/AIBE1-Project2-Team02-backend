@@ -6,11 +6,15 @@ import aibe1.proj2.mentoss.feature.review.model.dto.CreateReviewRequestDto;
 import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import aibe1.proj2.mentoss.global.entity.Review;
 import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
+import aibe1.proj2.mentoss.global.exception.InappropriateContentException;
 import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
 import aibe1.proj2.mentoss.global.exception.ResourceAccessDeniedException;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
+import aibe1.proj2.mentoss.global.moderation.model.ModerationResult;
+import aibe1.proj2.mentoss.global.moderation.service.ContentModerationService;
+import aibe1.proj2.mentoss.global.util.XssSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService{
     private final ReviewMapper reviewMapper;
+    private final ContentModerationService contentModerationService;
 
     @Override
     public void createReview(CreateReviewRequestDto req, Long currentUserId) {
@@ -40,11 +45,23 @@ public class ReviewServiceImpl implements ReviewService{
         if (!reviewMapper.hasAttendedLecture(req.lectureId(), currentUserId)) {
             throw new NotAttendedLectureException();
         }
+
+        // XSS 방지를 위한 입력값 정화
+        String sanitizedContent = XssSanitizer.sanitize(req.content());
+
+        // AI 유해 콘텐츠 필터링 - 리뷰 내용 검사
+        // 부적절한 콘텐츠(욕설, 성적 표현, 혐오 발언, 폭력적 내용, 보안 민감 정보 등)가 포함되어 있는지 확인합니다.
+        ModerationResult contentResult = contentModerationService.moderateContent(sanitizedContent);
+        if (contentResult.isBlocked()) {
+            // 부적절한 콘텐츠가 감지되면 해당 이유와 함께 예외를 발생시킵니다.
+            throw new InappropriateContentException(contentResult.getReason());
+        }
+
         Review review = Review.builder()
                 .lectureId(req.lectureId())
                 .mentorId(req.mentorId())
                 .writerId(currentUserId)
-                .content(req.content())
+                .content(sanitizedContent)
                 .rating(req.rating())
                 .status("AVAILABLE")
                 .reportCount(0L)
