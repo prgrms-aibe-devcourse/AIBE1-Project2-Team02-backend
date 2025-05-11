@@ -165,4 +165,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                 menteeId
         );
     }
+
+    @Override
+    public List<MenteeResponseDto> getMatchedMenteesByMentor(Long mentorId) {
+        return applicationMapper.findMatchedMenteesByMentorId(mentorId);
+    }
 }
