@@ -6,26 +6,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-/**
- * Gemini API를 이용하여 콘텐츠 유해성 여부를 판별하는 서비스 구현체
- */
-
-// TODO: 토큰 초과 시 글 등록은 허용하되, 관리자에게 알림?
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContentModerationServiceImpl implements ContentModerationService {
 
+    // Gemini API에 보낼 최대 텍스트 길이 제한 (초과 시 자름)
     private static final int MAX_GEMINI_CONTENT_LENGTH = 8000;
+
+    // Gemini가 허용하는 정확한 응답 목록
+    private static final Set<String> VALID_RESPONSES = Set.of(
+            "ALLOWED",
+            "BLOCKED: Profanity",
+            "BLOCKED: Sexual",
+            "BLOCKED: Hate",
+            "BLOCKED: Violence",
+            "BLOCKED: Sensitive"
+    );
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -40,10 +43,9 @@ public class ContentModerationServiceImpl implements ContentModerationService {
     private String moderationPrompt;
 
     /**
-     * 주어진 텍스트에 대해 유해한 콘텐츠가 포함되어 있는지를 판별합니다.
-     *
-     * @param content 검사할 텍스트
-     * @return 유해 여부 및 차단 사유를 포함한 ModerationResult 객체
+     * 콘텐츠 필터링을 수행하는 핵심 메서드
+     * @param content 유저가 입력한 텍스트
+     * @return 유해 여부를 담은 ModerationResult 객체
      */
     @Override
     public ModerationResult moderateContent(String content) {
@@ -51,34 +53,43 @@ public class ContentModerationServiceImpl implements ContentModerationService {
             return ModerationResult.allowed();
         }
 
-        // 길이 제한 적용
+        // 텍스트 길이 초과 방지 (Gemini 입력 제한)
         String truncated = content.length() > MAX_GEMINI_CONTENT_LENGTH
                 ? content.substring(0, MAX_GEMINI_CONTENT_LENGTH)
                 : content;
 
         try {
-            // HTTP 요청 헤더 설정
+            // HTTP 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // Gemini API 요청 본문 구성
+            // Gemini API에 보낼 JSON 구조 구성
+            Map<String, Object> textPart = Map.of("text", moderationPrompt + truncated);
+            Map<String, Object> contentPart = Map.of("parts", List.of(textPart));
+
+            // 생성 옵션: temperature 낮춤 + 줄바꿈 금지 등
+            Map<String, Object> generationConfig = Map.of(
+                    "temperature", 0.0,
+                    "topP", 1.0,
+                    "topK", 1,
+                    "maxOutputTokens", 20,
+                    "stopSequences", List.of("\n") // 줄바꿈 나오면 자름
+            );
+
             Map<String, Object> requestBody = new HashMap<>();
-            Map<String, Object> contents = new HashMap<>();
-            Map<String, Object> parts = new HashMap<>();
-            
-            parts.put("text", moderationPrompt + truncated);
-            contents.put("parts", new Object[]{parts});
-            requestBody.put("contents", new Object[]{contents});
-            
+            requestBody.put("contents", List.of(contentPart));
+            requestBody.put("generationConfig", generationConfig);
+
+            // HTTP 요청 객체 생성
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-            // Gemini API 호출
+            // API 호출
             String url = geminiApiEndpoint + "?key=" + geminiApiKey;
             String response = restTemplate.postForObject(url, request, String.class);
 
-            // 응답 결과 파싱
-            JsonNode responseJson = objectMapper.readTree(response);
-            String generatedText = responseJson
+            // 응답 파싱: Gemini의 응답 텍스트 추출
+            JsonNode root = objectMapper.readTree(response);
+            String rawOutput = root
                     .path("candidates")
                     .path(0)
                     .path("content")
@@ -87,17 +98,38 @@ public class ContentModerationServiceImpl implements ContentModerationService {
                     .path("text")
                     .asText();
 
-            // 유해 여부 판별
-            if (generatedText.startsWith("BLOCKED:")) {
-                String reason = generatedText.substring("BLOCKED:".length()).trim();
-                return ModerationResult.blocked(reason);
-            } else {
-                return ModerationResult.allowed();
+            // 후처리 및 유효한 결과인지 판별
+            String cleaned = sanitizeGeminiResponse(rawOutput);
+            if (cleaned.startsWith("BLOCKED:")) {
+                return ModerationResult.blocked(cleaned.substring("BLOCKED:".length()).trim());
             }
+            return ModerationResult.allowed();
+
         } catch (Exception e) {
-            log.error("Error during content moderation", e);
-            // 일단 지금은 오류 발생 시, 콘텐츠 차단을 방지하고 통과 처리
+            log.error("Gemini moderation error", e);
+            // 예외 발생 시 콘텐츠는 허용
             return ModerationResult.allowed();
         }
+    }
+
+    /**
+     * Gemini 응답을 정리하고 유효한 응답인지 검증
+     * @param raw Gemini에서 받은 응답 원문
+     * @return 유효한 응답 문자열
+     */
+    private String sanitizeGeminiResponse(String raw) {
+        String normalized = raw.trim()
+                .replaceAll("\\r|\\n", "")        // 줄바꿈 제거
+                .replaceAll("\\s{2,}", " ")       // 이중 공백 제거
+                .toUpperCase();                   // 대소문자 무시 위해 전부 대문자로
+
+        for (String valid : VALID_RESPONSES) {
+            if (normalized.contains(valid.toUpperCase())) {
+                return valid;
+            }
+        }
+
+        // 이상한 값이 들어오면 허용
+        return "ALLOWED";
     }
 }
