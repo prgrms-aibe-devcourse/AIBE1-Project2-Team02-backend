@@ -62,3 +62,9 @@ cloudflare:
     secret-key: ${CLOUDFLARE_R2_SECRET_KEY}
     bucket: ${CLOUDFLARE_R2_BUCKET}
     public-url: ${CLOUDFLARE_R2_PUBLIC_URL}
+
+gemini:
+  api:
+    endpoint: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent
+    key: ${GEMINI_API_KEY}
+  prompt: ${GEMINI_PROMPT_MODERATION}
