@@ -51,10 +51,33 @@ public class LectureSqlProvider {
                     "OR u.nickname LIKE CONCAT('%', #{searchRequest.keyword}, '%'))");
         }
 
-        if (searchRequest.category() != null) {
-            sql.WHERE("(lc.parent_category = #{searchRequest.category} " +
-                    "OR lc.middle_category = #{searchRequest.category} " +
-                    "OR lc.subcategory = #{searchRequest.category})");
+        if (searchRequest.categories() != null && !searchRequest.categories().isEmpty()) {
+            StringBuilder categoryConditions = new StringBuilder();
+            categoryConditions.append("(");
+
+            for (int i = 0; i < searchRequest.categories().size(); i++) {
+                String category = searchRequest.categories().get(i);
+                if (i > 0) {
+                    categoryConditions.append(" OR ");
+                }
+
+                // 각 카테고리에 대해 대/중/소분류 검색 조건 추가
+                categoryConditions.append("(");
+                categoryConditions.append("lc.parent_category = #{searchRequest.categories[").append(i).append("]} ");
+                categoryConditions.append("OR lc.middle_category = #{searchRequest.categories[").append(i).append("]} ");
+                categoryConditions.append("OR lc.subcategory = #{searchRequest.categories[").append(i).append("]} ");
+
+                // 계층 구조 지원: 대분류가 일치하는 모든 중분류, 소분류 포함
+                categoryConditions.append("OR (lc.parent_category = #{searchRequest.categories[").append(i).append("]} AND lc.middle_category IS NOT NULL) ");
+                categoryConditions.append("OR (lc.parent_category = #{searchRequest.categories[").append(i).append("]} AND lc.subcategory IS NOT NULL) ");
+
+                // 중분류가 일치하는 모든 소분류 포함
+                categoryConditions.append("OR (lc.middle_category = #{searchRequest.categories[").append(i).append("]} AND lc.subcategory IS NOT NULL) ");
+                categoryConditions.append(")");
+            }
+
+            categoryConditions.append(")");
+            sql.WHERE(categoryConditions.toString());
         }
 
         if (searchRequest.minPrice() != null) {
@@ -108,6 +131,9 @@ public class LectureSqlProvider {
     /**
      * 강의 목록 총 개수 조회를 위한 동적 SQL 생성
      */
+    /**
+     * 강의 목록 총 개수 조회를 위한 동적 SQL 생성
+     */
     public String countLectures(@Param("searchRequest") LectureSearchRequest searchRequest) {
         // 서브쿼리를 문자열로 직접 구성
         StringBuilder subQuery = new StringBuilder();
@@ -132,10 +158,31 @@ public class LectureSqlProvider {
             subQuery.append("OR u.nickname LIKE CONCAT('%', #{searchRequest.keyword}, '%')) ");
         }
 
-        if (searchRequest.category() != null) {
-            subQuery.append("AND (lc.parent_category = #{searchRequest.category} ");
-            subQuery.append("OR lc.middle_category = #{searchRequest.category} ");
-            subQuery.append("OR lc.subcategory = #{searchRequest.category}) ");
+        // 카테고리 검색 수정 - 다중 카테고리 및 계층 구조 지원
+        if (searchRequest.categories() != null && !searchRequest.categories().isEmpty()) {
+            subQuery.append("AND (");
+
+            for (int i = 0; i < searchRequest.categories().size(); i++) {
+                if (i > 0) {
+                    subQuery.append(" OR ");
+                }
+
+                // 각 카테고리에 대해 대/중/소분류 검색 조건 추가
+                subQuery.append("(");
+                subQuery.append("lc.parent_category = #{searchRequest.categories[").append(i).append("]} ");
+                subQuery.append("OR lc.middle_category = #{searchRequest.categories[").append(i).append("]} ");
+                subQuery.append("OR lc.subcategory = #{searchRequest.categories[").append(i).append("]} ");
+
+                // 계층 구조 지원: 대분류가 일치하는 모든 중분류, 소분류 포함
+                subQuery.append("OR (lc.parent_category = #{searchRequest.categories[").append(i).append("]} AND lc.middle_category IS NOT NULL) ");
+                subQuery.append("OR (lc.parent_category = #{searchRequest.categories[").append(i).append("]} AND lc.subcategory IS NOT NULL) ");
+
+                // 중분류가 일치하는 모든 소분류 포함
+                subQuery.append("OR (lc.middle_category = #{searchRequest.categories[").append(i).append("]} AND lc.subcategory IS NOT NULL) ");
+                subQuery.append(")");
+            }
+
+            subQuery.append(") ");
         }
 
         if (searchRequest.minPrice() != null) {
