@@ -171,4 +171,15 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
+
+    /**
+     * 처리되지 않은 IllegalStateException이 500으로 응답되는 문제를 방지하고,
+     * 예외 메시지를 클라이언트에 전달하기 위한 공용 핸들러
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
 }
