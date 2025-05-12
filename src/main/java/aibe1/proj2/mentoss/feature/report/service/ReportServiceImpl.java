@@ -24,10 +24,10 @@ public class ReportServiceImpl implements ReportService {
     private final ReviewMapper reviewMapper;
 
     @Override
-    public void createReport(CreateReportRequestDto req) {
+    public void createReport(CreateReportRequestDto req, Long reporterId) {
         String type = req.targetType();
         int count = reportMapper.countByReporterAndTarget(
-                req.reporterId(), req.targetType(), req.targetId()
+                reporterId, req.targetType(), req.targetId()
         );
         if (!TargetType.contains(type)) {
             throw new InvalidTargetTypeException();
@@ -37,6 +37,7 @@ public class ReportServiceImpl implements ReportService {
                 if (reportMapper.countUserById(req.targetId()) == 0) {
                     throw new ResourceNotFoundException(type, req.targetId());
                 }
+
                 if (!reviewMapper.isUserAccessible(req.targetId())) {
                     throw new ResourceAccessDeniedException(type, req.targetId());
                 }
@@ -65,7 +66,7 @@ public class ReportServiceImpl implements ReportService {
             throw new DuplicateReportException();
         }
         Report report = Report.builder()
-                .reporterId(req.reporterId())
+                .reporterId(reporterId)
                 .targetType(type)
                 .targetId(req.targetId())
                 .reason(req.reason())
