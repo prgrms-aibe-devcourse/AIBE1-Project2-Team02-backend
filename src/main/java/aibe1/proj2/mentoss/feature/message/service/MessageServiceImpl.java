@@ -66,4 +66,36 @@ public class MessageServiceImpl implements MessageService{
         messageMapper.insert(message);
         return message.getMessageId();
     }
+
+    @Override
+    public void deleteMessages(List<Long> messageIds, Long userId) {
+        for (Long messageId : messageIds) {
+            Message message = messageMapper.findById(messageId, userId);
+
+            if (message == null) {
+                throw new IllegalArgumentException("해당 메시지를 찾을 수 없습니다. ID: " + messageId);
+            }
+
+            // 사용자 권한 확인
+            boolean isSender = userId.equals(message.getSenderId());
+            boolean isReceiver = userId.equals(message.getReceiverId());
+
+            if (!isSender && !isReceiver) {
+                throw new SecurityException("삭제 권한이 없습니다.");
+            }
+
+            if (isSender) {
+                messageMapper.markSenderDeleted(messageId);
+            }
+
+            if (isReceiver) {
+                messageMapper.markReceiverDeleted(messageId);
+            }
+
+            Message updated = messageMapper.findDeletedStatus(messageId);
+            if (Boolean.TRUE.equals(updated.getSenderDeleted()) && Boolean.TRUE.equals(updated.getReceiverDeleted())) {
+                messageMapper.markDeletedAtNow(messageId);
+            }
+        }
+    }
 }
