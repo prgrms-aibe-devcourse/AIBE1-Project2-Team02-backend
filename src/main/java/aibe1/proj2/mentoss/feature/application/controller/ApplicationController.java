@@ -44,7 +44,7 @@ public class ApplicationController {
 
     @Operation(
             summary = "신청한 멘티 리스트 조회",
-            description = "특정 과외에 대해 신청한 멘티들의 목록을 조회합니다."
+            description = "멘토한테 신청된 전체 과외 목록을 조회합니다."
     )
     @GetMapping("/applicants")
     public ResponseEntity<ApiResponseFormat<List<LectureApplicantDto>>> getLectureApplicants(

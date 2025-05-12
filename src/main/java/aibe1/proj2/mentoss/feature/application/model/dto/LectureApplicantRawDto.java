@@ -1,13 +1,12 @@
 package aibe1.proj2.mentoss.feature.application.model.dto;
 
-import java.util.List;
 
-public record LectureApplicantDto(
+public record LectureApplicantRawDto(
         Long applicationId,
         String nickname,
         String lectureTitle,
         String createdAt,
         String profileImage,
-        TimeSlot requestedTimeSlot
+        String requestedTimeSlots // JSON 문자열
 ) {
 }

@@ -1,7 +1,7 @@
 package aibe1.proj2.mentoss.feature.report.service;
 
 
-import aibe1.proj2.mentoss.feature.report.model.dto.CreateReportRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.CreateReportRequestDto;
 import aibe1.proj2.mentoss.feature.report.model.mapper.ReportMapper;
 import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
 import aibe1.proj2.mentoss.global.entity.Report;
@@ -15,8 +15,6 @@ import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
@@ -24,10 +22,10 @@ public class ReportServiceImpl implements ReportService {
     private final ReviewMapper reviewMapper;
 
     @Override
-    public void createReport(CreateReportRequestDto req) {
+    public void createReport(CreateReportRequestDto req, Long reporterId) {
         String type = req.targetType();
         int count = reportMapper.countByReporterAndTarget(
-                req.reporterId(), req.targetType(), req.targetId()
+                reporterId, req.targetType(), req.targetId()
         );
         if (!TargetType.contains(type)) {
             throw new InvalidTargetTypeException();
@@ -37,6 +35,7 @@ public class ReportServiceImpl implements ReportService {
                 if (reportMapper.countUserById(req.targetId()) == 0) {
                     throw new ResourceNotFoundException(type, req.targetId());
                 }
+
                 if (!reviewMapper.isUserAccessible(req.targetId())) {
                     throw new ResourceAccessDeniedException(type, req.targetId());
                 }
@@ -65,7 +64,7 @@ public class ReportServiceImpl implements ReportService {
             throw new DuplicateReportException();
         }
         Report report = Report.builder()
-                .reporterId(req.reporterId())
+                .reporterId(reporterId)
                 .targetType(type)
                 .targetId(req.targetId())
                 .reason(req.reason())
@@ -73,6 +72,27 @@ public class ReportServiceImpl implements ReportService {
                 .isProcessed(false)
                 .build();
         reportMapper.insertReport(report);
+        Long id = req.targetId();
+        switch (type) {
+            case "USER" -> {
+                reportMapper.incrementUserReportCount(id);
+                if (reportMapper.getUserReportCount(id) >= 30) {
+                    reportMapper.suspendUser(id);
+                }
+            }
+            case "LECTURE" -> {
+                reportMapper.incrementLectureReportCount(id);
+                if (reportMapper.getLectureReportCount(id) >= 30) {
+                    reportMapper.suspendLecture(id);
+                }
+            }
+            case "REVIEW" -> {
+                reportMapper.incrementReviewReportCount(id);
+                if (reportMapper.getReviewReportCount(id) >= 30) {
+                    reportMapper.suspendReview(id);
+                }
+            }
+        }
     }
 
 }

@@ -12,11 +12,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -42,6 +48,25 @@ public class SecurityConfig {
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
+    //백엔드 페이지 직접접근 시 어드민 로그인 요구
+    @Value("${admin.username}")
+    private String adminUsername;
+    @Value("${admin.password}")
+    private String adminPassword;
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+        UserDetails admin = User.withUsername(adminUsername)
+                .password(passwordEncoder().encode(adminPassword))
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(admin);
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     /**
      * CORS 설정
      * - 프론트엔드 도메인에서 백엔드 API에 접근 가능하도록 허용
@@ -65,7 +90,34 @@ public class SecurityConfig {
         return source;
     }
 
+
+    // 백엔드 서버 직접 접근 시 로그인 창 띄우도록 우선 적용 FilterChain
+    // 어드민 관련 엔드포인트에만 적용됨
     @Bean
+    @Order(1)
+    public SecurityFilterChain adminPageSecurity(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/logout", "/login","/adminPage/**", "/api/admin/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().hasRole("ADMIN")
+                )
+                .formLogin(form -> form
+                        .defaultSuccessUrl("/adminPage", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .permitAll()
+                )
+                .csrf(csrf -> csrf.disable());
+        return http.build();
+    }
+
+
+    // 일반적인 접근에 대한 SecurityFilterChain
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // @formatter:off
         http
@@ -80,12 +132,8 @@ public class SecurityConfig {
                                 "/api/test/**", "/api/auth/test/public",
                                 "/css/**", "/js/**", "/images/**",
                                 "/api/ping", "/api/categories/**", "/api/regions/**",
-                                "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error"
-                                //, "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
-                                 )
+                                "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error")
                         .permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("adminPage").permitAll()  // 로그인 토큰 백엔드에서 받아오는거 구현 전까지 일단 오픈
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {

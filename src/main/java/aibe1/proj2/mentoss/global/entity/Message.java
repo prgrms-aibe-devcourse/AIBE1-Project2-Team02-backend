@@ -21,6 +21,6 @@ public class Message {
     private Boolean isDeleted = false;
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
-
-
+    private Boolean senderDeleted;
+    private Boolean receiverDeleted;
 }
