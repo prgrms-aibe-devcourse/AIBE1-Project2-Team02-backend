@@ -16,16 +16,26 @@ public class XssSanitizer {
             return null;
         }
 
-        // HTML 태그 제거
-        String sanitized = input.replaceAll("<[^>]*>", "");
+        // <img> 태그만 허용하고 나머지 태그 제거
+        String sanitized = input.replaceAll("(?i)<(?!img\\b)[^>]*>", ""); // <img>만 통과
 
-        // 특수 문자 이스케이프 처리
+        // <script>, javascript: 등 위험한 img src 차단
+        sanitized = sanitized.replaceAll("(?i)<img[^>]*src=['\"]?javascript:[^>]*>", "");
+
+        // 특수 문자 이스케이프 처리하되 <img>는 복원
         sanitized = sanitized.replace("&", "&amp;")
-                            .replace("<", "&lt;")
-                            .replace(">", "&gt;")
-                            .replace("\"", "&quot;")
-                            .replace("'", "&#x27;")
-                            .replace("/", "&#x2F;");
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#x27;")
+                .replace("/", "&#x2F;");
+
+        // <img ...> 복원
+        sanitized = sanitized.replace("&lt;img", "<img")
+                .replace("&gt;", ">")
+                .replace("&quot;", "\"")
+                .replace("&#x2F;", "/");
+
 
         return sanitized;
     }
