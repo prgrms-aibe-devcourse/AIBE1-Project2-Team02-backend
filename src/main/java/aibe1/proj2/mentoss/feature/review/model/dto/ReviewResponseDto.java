@@ -7,8 +7,10 @@ public record ReviewResponseDto(
         Long lectureId,
         Long mentorId,
         Long writerId,
+        String writerNickname,
+        String writerProfileImage,
         String content,
         Long rating,
-        LocalDateTime createdAt
-) {
-}
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {}

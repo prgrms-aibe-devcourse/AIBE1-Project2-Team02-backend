@@ -10,7 +10,7 @@ public interface ReviewService{
 
     void updateReview(Long reviewId, String content, Long rating, Long currentUserId);
 
-    void createReview(CreateReviewRequestDto req, Long currentUserId);
+    Long createReview(CreateReviewRequestDto req, Long currentUserId);
 
     void deleteReview(Long reviewId, Long currentUserId);
 
@@ -19,4 +19,6 @@ public interface ReviewService{
     AverageRatingResponseDto getAverageRatingByLectureId(Long lectureId);
 
     AverageRatingResponseDto getAverageRatingByMentorId(Long mentorId);
+
+    boolean hasReviewed(Long lectureId, Long writerId);
 }

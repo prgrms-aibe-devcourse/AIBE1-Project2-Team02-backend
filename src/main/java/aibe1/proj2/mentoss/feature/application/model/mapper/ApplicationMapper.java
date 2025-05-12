@@ -246,9 +246,13 @@ public interface ApplicationMapper {
             JOIN lecture l ON lm.lecture_id = l.lecture_id
             JOIN app_user u ON lm.mentee_id = u.user_id
             JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
+            JOIN application a ON a.lecture_id = lm.lecture_id
+                AND a.mentee_id = lm.mentee_id
             WHERE
                 mp.user_id = #{mentorId}
                 AND l.is_deleted = 0
+                AND a.status = 'APPROVED'
+                AND a.is_deleted = FALSE
             ORDER BY
                 lm.joined_at DESC
         """)
@@ -261,4 +265,18 @@ public interface ApplicationMapper {
               AND status = 'PENDING'
             """)
     int countDuplicateApplication(Long lectureId, Long menteeId);
+
+    @Select("""
+            SELECT lecture_id
+            FROM application 
+            WHERE application_id = #{applicationId}
+            """)
+    Long findLectureIdByApplicationId(Long applicationId);
+
+    @Update("""
+        UPDATE application
+        SET status = #{status}, updated_at = #{updatedTime}
+        WHERE application_id = #{applicationId}
+        """)
+    void updateApplicationStatus(Long applicationId, String status, LocalDateTime updatedTime);
 }
