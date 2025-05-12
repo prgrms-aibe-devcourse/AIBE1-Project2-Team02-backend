@@ -1,9 +1,11 @@
 package aibe1.proj2.mentoss.feature.review.model.mapper;
 
+import aibe1.proj2.mentoss.feature.review.model.dto.ReviewResponseDto;
 import aibe1.proj2.mentoss.global.entity.Review;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -22,7 +24,11 @@ public interface ReviewMapper {
         return countActiveReview(reviewId) > 0;
     }
 
-    @Select("SELECT COUNT(*) FROM app_user WHERE user_id = #{userId}")
+    @Select("""
+        SELECT COUNT(*)
+        FROM app_user
+        WHERE user_id = #{userId}
+        """)
     int countUser(Long userId);
     default boolean existsUser(Long userId) {
         return countUser(userId) > 0;
@@ -34,7 +40,12 @@ public interface ReviewMapper {
         return countActiveLecture(userId) > 0;
     }
 
-    @Select("SELECT COUNT(*) FROM lecture WHERE lecture_id = #{lectureId}")
+    @Select("""
+            SELECT COUNT(*)
+            FROM lecture
+            WHERE lecture_id = #{lectureId}
+            """
+    )
     int countLecture(Long lectureId);
     default boolean existsLecture(Long lectureId) {
         return countLecture(lectureId) > 0;
@@ -52,18 +63,37 @@ public interface ReviewMapper {
         return countMentor(mentorId) > 0;
     }
 
-    @Select("SELECT user_id FROM mentor_profile WHERE mentor_id=#{mentorId}")
-    Long getUserByMentorId(Long mentorId);
-
-    @Select("SELECT * FROM review WHERE lecture_id = #{lectureId} AND is_deleted = FALSE")
-    @Results({
-            @Result(property = "reviewId",  column = "review_id"),
-            @Result(property = "lectureId", column = "lecture_id"),
-            @Result(property = "mentorId",  column = "mentor_id"),
-            @Result(property = "writerId",  column = "writer_id"),
-            @Result(property = "createdAt", column = "created_at")
+    @Select("""
+    SELECT
+      r.review_id       AS reviewId,
+      r.lecture_id      AS lectureId,
+      r.mentor_id       AS mentorId,
+      r.writer_id       AS writerId,
+      u.nickname        AS writerNickname,
+      u.profile_image   AS writerProfileImage,
+      r.content,
+      r.rating,
+      r.created_at      AS createdAt,
+      r.updated_at      AS updatedAt
+    FROM review r
+    JOIN app_user u ON u.user_id = r.writer_id
+    WHERE r.lecture_id = #{lectureId}
+      AND r.is_deleted = FALSE
+    ORDER BY r.created_at DESC
+  """)
+    @ConstructorArgs({
+            @Arg(column="reviewId",            javaType=Long.class,            id=true),
+            @Arg(column="lectureId",           javaType=Long.class),
+            @Arg(column="mentorId",            javaType=Long.class),
+            @Arg(column="writerId",            javaType=Long.class),
+            @Arg(column="writerNickname",      javaType=String.class),
+            @Arg(column="writerProfileImage",  javaType=String.class),
+            @Arg(column="content",             javaType=String.class),
+            @Arg(column="rating",              javaType=Long.class),
+            @Arg(column="createdAt",           javaType= LocalDateTime.class),
+            @Arg(column="updatedAt",           javaType= LocalDateTime.class)
     })
-    List<Review> findByLectureId(Long lectureId);
+    List<ReviewResponseDto> findByLectureId(Long lectureId);
 
     @Insert("""
     INSERT INTO review (lecture_id, mentor_id, writer_id, content, rating,
@@ -71,6 +101,7 @@ public interface ReviewMapper {
     VALUES (#{lectureId}, #{mentorId}, #{writerId}, #{content}, #{rating}, 
             #{status}, #{reportCount}, #{isDeleted}, #{deletedAt}, #{createdAt})
   """)
+    @Options(useGeneratedKeys = true, keyProperty = "reviewId", keyColumn = "review_id")
     void createReview(Review review);
 
     @Update("""
@@ -83,12 +114,13 @@ public interface ReviewMapper {
 
     @Update("""
         UPDATE review
-        SET content = #{content}, rating  = #{rating}
+        SET content = #{content}, rating  = #{rating}, updated_at = #{updatedAt}
         WHERE review_id = #{reviewId}
     """)
     void updateReview(@Param("reviewId") Long reviewId,
                       @Param("content")  String content,
-                      @Param("rating")   Long rating);
+                      @Param("rating")   Long rating,
+                      @Param("updatedAt") LocalDateTime updatedAt);
 
 
     @Select("""
@@ -133,6 +165,8 @@ public interface ReviewMapper {
          INNER JOIN lecture l
             ON r.lecture_id = l.lecture_id
          WHERE l.mentor_id = #{mentorId}
+         AND r.status = 'AVAILABLE'
+         AND r.is_deleted = FALSE
         """)
     Long countReviewsByMentorId(@Param("mentorId") Long mentorId);
 
@@ -140,7 +174,21 @@ public interface ReviewMapper {
         SELECT COUNT(*) 
           FROM review
          WHERE lecture_id = #{lectureId}
+        AND status = 'AVAILABLE'
+        AND is_deleted = FALSE
         """)
     Long countReviewsByLectureId(@Param("lectureId") Long lectureId);
+
+
+    @Select("""
+    SELECT COUNT(*) 
+    FROM review 
+    WHERE lecture_id = #{lectureId} 
+      AND writer_id  = #{writerId}
+      AND status = 'AVAILABLE'
+      AND is_deleted = FALSE
+  """)
+    int countByLectureAndWriter(@Param("lectureId") Long lectureId,
+                                @Param("writerId")  Long writerId);
 
 }

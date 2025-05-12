@@ -12,6 +12,7 @@ import aibe1.proj2.mentoss.global.exception.ResourceAccessDeniedException;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
+import aibe1.proj2.mentoss.global.exception.review.UniqueReviewException;
 import aibe1.proj2.mentoss.global.moderation.model.ModerationResult;
 import aibe1.proj2.mentoss.global.moderation.service.ContentModerationService;
 import aibe1.proj2.mentoss.global.util.XssSanitizer;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final ContentModerationService contentModerationService;
 
     @Override
-    public void createReview(CreateReviewRequestDto req, Long currentUserId) {
+    public Long createReview(CreateReviewRequestDto req, Long currentUserId) {
         if (!reviewMapper.existsUser(currentUserId)) {
             throw new ResourceNotFoundException("User", currentUserId);
         }
@@ -44,6 +46,10 @@ public class ReviewServiceImpl implements ReviewService{
         }
         if (!reviewMapper.hasAttendedLecture(req.lectureId(), currentUserId)) {
             throw new NotAttendedLectureException();
+        }
+        int existing = reviewMapper.countByLectureAndWriter(req.lectureId(), currentUserId);
+        if (existing > 0) {
+            throw new UniqueReviewException("이미 이 강의에 대한 후기를 작성하셨습니다.");
         }
 
         // XSS 방지를 위한 입력값 정화
@@ -66,9 +72,11 @@ public class ReviewServiceImpl implements ReviewService{
                 .status("AVAILABLE")
                 .reportCount(0L)
                 .isDeleted(false)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
         reviewMapper.createReview(review);
+        return review.getReviewId();
     }
 
     @Override
@@ -96,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService{
             throw new InappropriateContentException(moderationResult.getReason());
         }
 
-        reviewMapper.updateReview(reviewId, sanitizedContent, rating);
+        reviewMapper.updateReview(reviewId, sanitizedContent, rating, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
     }
 
@@ -123,22 +131,7 @@ public class ReviewServiceImpl implements ReviewService{
         if (!reviewMapper.isLectureAccessible(lectureId)) {
             throw new ResourceAccessDeniedException("Lecture", lectureId);
         }
-        return reviewMapper.findByLectureId(lectureId)
-                .stream()
-                .map(this::reviewToResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    private ReviewResponseDto reviewToResponseDto(Review r) {
-        return new ReviewResponseDto(
-                r.getReviewId(),
-                r.getLectureId(),
-                r.getMentorId(),
-                r.getWriterId(),
-                r.getContent(),
-                r.getRating(),
-                r.getCreatedAt()
-        );
+        return reviewMapper.findByLectureId(lectureId);
     }
 
     @Override
@@ -178,5 +171,11 @@ public class ReviewServiceImpl implements ReviewService{
 
     private Long getCountByMentorId(Long mentorId){
         return reviewMapper.countReviewsByMentorId(mentorId);
+    }
+
+
+    @Override
+    public boolean hasReviewed(Long lectureId, Long writerId) {
+        return reviewMapper.countByLectureAndWriter(lectureId, writerId) > 0;
     }
 }
