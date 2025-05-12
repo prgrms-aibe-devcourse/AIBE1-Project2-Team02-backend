@@ -37,7 +37,7 @@ public interface ReviewMapper {
     @Select("SELECT COUNT(*) FROM app_user WHERE user_id = #{userId} AND status = 'AVAILABLE' AND is_deleted = FALSE")
     int countActiveUser(Long userId);
     default boolean isUserAccessible(Long userId) {
-        return countActiveLecture(userId) > 0;
+        return countActiveUser(userId) > 0;
     }
 
     @Select("""
