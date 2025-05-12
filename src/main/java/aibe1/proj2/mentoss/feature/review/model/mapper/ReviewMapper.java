@@ -101,6 +101,7 @@ public interface ReviewMapper {
     VALUES (#{lectureId}, #{mentorId}, #{writerId}, #{content}, #{rating}, 
             #{status}, #{reportCount}, #{isDeleted}, #{deletedAt}, #{createdAt})
   """)
+    @Options(useGeneratedKeys = true, keyProperty = "reviewId", keyColumn = "review_id")
     void createReview(Review review);
 
     @Update("""
@@ -113,12 +114,13 @@ public interface ReviewMapper {
 
     @Update("""
         UPDATE review
-        SET content = #{content}, rating  = #{rating}
+        SET content = #{content}, rating  = #{rating}, updated_at = #{updatedAt}
         WHERE review_id = #{reviewId}
     """)
     void updateReview(@Param("reviewId") Long reviewId,
                       @Param("content")  String content,
-                      @Param("rating")   Long rating);
+                      @Param("rating")   Long rating,
+                      @Param("updatedAt") LocalDateTime updatedAt);
 
 
     @Select("""

@@ -99,9 +99,9 @@ public class ReviewController {
             """)))
     })
     @PostMapping
-    public ResponseEntity<ApiResponseFormat<Void>> createReview(@AuthenticationPrincipal CustomUserDetails user, @RequestBody CreateReviewRequestDto dto) {
-        reviewService.createReview(dto, user.getUserId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(null));
+    public ResponseEntity<ApiResponseFormat<Long>> createReview(@AuthenticationPrincipal CustomUserDetails user, @RequestBody CreateReviewRequestDto dto) {
+        Long id = reviewService.createReview(dto, user.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseFormat.ok(id));
     }
 
 
