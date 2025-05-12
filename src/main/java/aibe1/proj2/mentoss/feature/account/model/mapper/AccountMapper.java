@@ -83,9 +83,14 @@ public interface AccountMapper {
     int anonymizeDeletedUser(AppUser appUser);
 
     @Select("""
-        SELECT lecture_id
-          FROM lecture_mentee
-         WHERE mentee_id = #{userId}
-        """)
+        SELECT lm.lecture_id
+          FROM lecture_mentee lm
+          JOIN application a 
+              ON a.lecture_id = lm.lecture_id 
+                     AND a.mentee_id = lm.mentee_id
+         WHERE lm.mentee_id = #{userId}
+           AND a.status = 'APPROVED'
+           AND a.is_deleted = FALSE
+    """)
     List<Long> findLectureByUserId(@Param("userId") Long userId);
 }
