@@ -125,9 +125,13 @@ public interface ReviewMapper {
 
     @Select("""
       SELECT COUNT(*) 
-        FROM lecture_mentee 
-       WHERE lecture_id = #{lectureId}
-         AND mentee_id  = #{userId}
+        FROM lecture_mentee lm
+        JOIN application a ON a.lecture_id = lm.lecture_id
+            AND a.mentee_id = lm.mentee_id
+       WHERE lm.lecture_id = #{lectureId}
+         AND lm.mentee_id  = #{userId}
+         AND a.status = 'APPROVED'
+         AND a.is_deleted = FALSE
     """)
     int countLectureMentee(@Param("lectureId") Long lectureId,
                            @Param("userId")    Long userId);

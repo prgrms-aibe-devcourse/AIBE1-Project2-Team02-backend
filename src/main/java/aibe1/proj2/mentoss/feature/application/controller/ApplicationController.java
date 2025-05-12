@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -117,5 +118,16 @@ public class ApplicationController {
         Long userId = userDetails.getUserId();
         List<MenteeResponseDto> result = applicationService.getMatchedMenteesByMentor(userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(result));
+    }
+
+    @Operation(summary = "매칭 취소", description = "승인된 과외 매칭을 취소합니다. 매칭된 멘토만 취소할 수 있으며, 상태를 CANCELLED로 변경합니다.")
+    @PostMapping("/cancel/{applicationId}")
+    public ResponseEntity<ApiResponseFormat<Void>> cancelApplication(
+            @PathVariable Long applicationId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        applicationService.cancelApplication(applicationId, userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 }
