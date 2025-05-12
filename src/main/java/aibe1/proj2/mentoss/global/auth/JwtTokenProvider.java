@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.global.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -127,5 +128,19 @@ public class JwtTokenProvider {
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSecretKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return false;
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
