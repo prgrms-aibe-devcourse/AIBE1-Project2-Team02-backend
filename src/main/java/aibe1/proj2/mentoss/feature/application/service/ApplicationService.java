@@ -25,4 +25,6 @@ public interface ApplicationService {
     List<MenteeResponseDto> getMatchedMenteesByMentor(Long mentorId);
 
     void cancelApplication(Long applicationId, Long userId);
+
+    void cancelMatchById(Long matchId, Long userId);
 }
