@@ -1,5 +1,6 @@
 //const API = 'https://mentoss.onrender.com/api/admin';
-const API = 'http://localhost:8081/api/admin';
+//const API = 'http://localhost:8081/api/admin';
+const API = 'https://mentoss-test.onrender.com/api/admin';
 
 document.getElementById('btn-query').addEventListener('click', async () => {
     const type = document.getElementById('query-type').value;
