@@ -27,7 +27,10 @@ public class MessageSqlProvider {
 
         // ✅ WHERE 조건
         String userCondition = isSent ? "m.sender_id = #{userId}" : "m.receiver_id = #{userId}";
-        sql.append("WHERE ").append(userCondition).append(" AND m.is_deleted = 0 ");
+        String deleteCondition = isSent ? "m.sender_deleted = FALSE" : "m.receiver_deleted = FALSE";
+
+        sql.append("WHERE ").append(userCondition)
+                .append(" AND ").append(deleteCondition).append(" ");
 
         // ✅ 검색 조건
         String filterBy = (String) params.get("filterBy");
@@ -59,7 +62,6 @@ public class MessageSqlProvider {
     private String buildCountQuery(Map<String, Object> params, boolean isSent) {
         StringBuilder sql = new StringBuilder();
 
-        // ✅ count만 반환
         sql.append("SELECT COUNT(*) FROM message m ");
 
         if (isSent) {
@@ -69,7 +71,10 @@ public class MessageSqlProvider {
         }
 
         String userCondition = isSent ? "m.sender_id = #{userId}" : "m.receiver_id = #{userId}";
-        sql.append("WHERE ").append(userCondition).append(" AND m.is_deleted = 0 ");
+        String deleteCondition = isSent ? "m.sender_deleted = FALSE" : "m.receiver_deleted = FALSE";
+
+        sql.append("WHERE ").append(userCondition)
+                .append(" AND ").append(deleteCondition).append(" ");
 
         String filterBy = (String) params.get("filterBy");
         String keyword = (String) params.get("keyword");

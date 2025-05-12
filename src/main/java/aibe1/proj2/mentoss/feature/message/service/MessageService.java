@@ -16,4 +16,5 @@ public interface MessageService {
 
     Long sendMessage(MessageSendRequestDto dto, Long senderId);
 
+    void deleteMessages(List<Long> messageIds, Long userId);
 }
