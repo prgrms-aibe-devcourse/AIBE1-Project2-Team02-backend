@@ -1,4 +1,4 @@
-package aibe1.proj2.mentoss.feature.report.model.dto;
+package aibe1.proj2.mentoss.feature.report.model.dto.request;
 
 public record ReportProcessRequestDto(
         Long reportId,

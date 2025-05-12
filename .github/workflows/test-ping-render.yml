@@ -1,0 +1,15 @@
+name: 🕒 Keep Render Server Awake
+
+# 👉 워크플로우 실행 조건
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # ⏰ 매 5분마다 실행 (UTC 기준 → 한국 기준으로는 매 5분)
+  workflow_dispatch:       # 👤 수동 실행도 가능 (GitHub에서 직접 Run Workflow 가능)
+
+jobs:
+  ping-render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔔 Render 서버에 ping 요청 보내기
+        run: curl -s https://mentoss-test.onrender.com/api/ping  # Render 서버의 ping 엔드포인트 호출

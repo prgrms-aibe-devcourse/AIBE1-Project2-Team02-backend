@@ -1,23 +1,22 @@
 package aibe1.proj2.mentoss.feature.report.service;
 
 import aibe1.proj2.mentoss.feature.report.model.dto.*;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.RecoverRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.ReportProcessRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.SoftDeleteRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.StatusUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.report.model.mapper.AdminMapper;
 import aibe1.proj2.mentoss.feature.report.model.mapper.ReportMapper;
-import aibe1.proj2.mentoss.feature.review.model.mapper.ReviewMapper;
 import aibe1.proj2.mentoss.global.entity.AdminAction;
-import aibe1.proj2.mentoss.global.entity.Report;
 import aibe1.proj2.mentoss.global.entity.enums.ActionType;
-import aibe1.proj2.mentoss.global.entity.enums.TargetType;
 import aibe1.proj2.mentoss.global.exception.DatabaseException;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
-import aibe1.proj2.mentoss.global.exception.report.InvalidActionTypeException;
-import aibe1.proj2.mentoss.global.exception.report.InvalidSuspendPeriodException;
-import aibe1.proj2.mentoss.global.exception.report.InvalidTargetTypeException;
-import aibe1.proj2.mentoss.global.exception.report.ReportListException;
+import aibe1.proj2.mentoss.global.exception.report.*;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.DataException;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -43,6 +42,66 @@ public class AdminServiceImpl implements AdminService {
         }
         catch(Exception e) {
             throw new ReportListException(e);
+        }
+    }
+
+    @Override
+    public UserDataResponseDto getUserDataById(Long userId) {
+        try{
+            return adminMapper.findUserById(userId);
+        }
+        catch(Exception e){
+            throw new GetDataException();
+        }
+    }
+
+    @Override
+    public LectureDataResponseDto getLectureDataById(Long lectureId) {
+        try{
+            return adminMapper.findLectureById(lectureId);
+        }
+        catch(Exception e){
+            throw new GetDataException();
+        }
+    }
+
+    @Override
+    public MentorDataResponseDto getMentorDataById(Long mentorId) {
+        try{
+            return adminMapper.findMentorById(mentorId);
+        }
+        catch(Exception e){
+            throw new GetDataException();
+        }
+    }
+
+    @Override
+    public MessageDataResponseDto getMessageDataById(Long messageId) {
+        try{
+            return adminMapper.findMessageById(messageId);
+        }
+        catch(Exception e){
+            throw new GetDataException();
+        }
+    }
+
+    @Override
+    public ApplicationDataResponseDto getApplicationDataById(Long applicationId) {
+        try{
+            return adminMapper.findApplicationById(applicationId);
+        }
+        catch(Exception e){
+            throw new GetDataException();
+        }
+    }
+
+    @Override
+    public ReviewDataResponseDto getReviewDataById(Long reviewId) {
+        try{
+            return adminMapper.findReviewById(reviewId);
+        }
+        catch(Exception e){
+            throw new GetDataException();
         }
     }
 

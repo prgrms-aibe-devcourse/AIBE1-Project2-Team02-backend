@@ -1,6 +1,10 @@
 package aibe1.proj2.mentoss.feature.report.controller;
 
-import aibe1.proj2.mentoss.feature.report.model.dto.*;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.RecoverRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.ReportProcessRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.SoftDeleteRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.StatusUpdateRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.response.*;
 import aibe1.proj2.mentoss.feature.report.service.AdminService;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
@@ -119,6 +123,42 @@ public class AdminController {
     public ResponseEntity<ApiResponseFormat<List<ReportResponseDto>>> getNotProcessedReports() {
         List<ReportResponseDto> list = adminService.getReportsNotProcessed();
         return ResponseEntity.ok(ApiResponseFormat.ok(list));
+    }
+
+    @GetMapping("/data/user/{userId}")
+    public ResponseEntity<ApiResponseFormat<UserDataResponseDto>> getUserData(@PathVariable Long userId){
+        UserDataResponseDto data = adminService.getUserDataById(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(data));
+    }
+
+    @GetMapping("/data/lecture/{lectureId}")
+    public ResponseEntity<ApiResponseFormat<LectureDataResponseDto>> getLectureData(@PathVariable Long lectureId){
+        LectureDataResponseDto data = adminService.getLectureDataById(lectureId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(data));
+    }
+
+    @GetMapping("/data/mentor/{mentorId}")
+    public ResponseEntity<ApiResponseFormat<MentorDataResponseDto>> getMentorData(@PathVariable Long mentorId){
+        MentorDataResponseDto data = adminService.getMentorDataById(mentorId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(data));
+    }
+
+    @GetMapping("/data/application/{applicationId}")
+    public ResponseEntity<ApiResponseFormat<ApplicationDataResponseDto>> getApplicationData(@PathVariable Long applicationId){
+        ApplicationDataResponseDto data = adminService.getApplicationDataById(applicationId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(data));
+    }
+
+    @GetMapping("/data/message/{messageId}")
+    public ResponseEntity<ApiResponseFormat<MessageDataResponseDto>> getMessageData(@PathVariable Long messageId){
+        MessageDataResponseDto data = adminService.getMessageDataById(messageId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(data));
+    }
+
+    @GetMapping("/data/review/{reviewId}")
+    public ResponseEntity<ApiResponseFormat<ReviewDataResponseDto>> getReviewData(@PathVariable Long reviewId){
+        ReviewDataResponseDto data = adminService.getReviewDataById(reviewId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(data));
     }
 
 
