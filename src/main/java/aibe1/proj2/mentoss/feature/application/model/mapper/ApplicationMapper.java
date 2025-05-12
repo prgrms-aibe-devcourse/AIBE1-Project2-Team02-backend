@@ -252,4 +252,12 @@ public interface ApplicationMapper {
                 lm.joined_at DESC
         """)
     List<MenteeResponseDto> findMatchedMenteesByMentorId(Long mentorId);
+    @Select("""
+            SELECT COUNT(*)
+            FROM application
+            WHERE lecture_id = #{lectureId}
+              AND mentee_id = #{menteeId}
+              AND status = 'PENDING'
+            """)
+    int countDuplicateApplication(Long lectureId, Long menteeId);
 }
