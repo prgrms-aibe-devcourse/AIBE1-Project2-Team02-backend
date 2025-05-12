@@ -37,7 +37,31 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<LectureApplicantDto> getApplicantsByLecture(Long userId) {
-        return applicationMapper.findApplicantsByLecture(userId);
+        List<LectureApplicantRawDto> rawDtos = applicationMapper.findApplicantsByLecture(userId);
+
+        return rawDtos.stream().map(rawDto -> {
+            TimeSlot timeSlot;
+            try {
+                List<TimeSlot> timeSlotList = objectMapper.readValue(
+                        rawDto.requestedTimeSlots(),
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, TimeSlot.class)
+                );
+
+                timeSlot = timeSlotList.isEmpty() ? null : timeSlotList.get(0);
+
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("신청 시간 정보 파싱 실패", e);
+            }
+
+            return new LectureApplicantDto(
+                    rawDto.applicationId(),
+                    rawDto.nickname(),
+                    rawDto.lectureTitle(),
+                    rawDto.createdAt(),
+                    rawDto.profileImage(),
+                    timeSlot
+            );
+        }).toList();
     }
 
     @Transactional
