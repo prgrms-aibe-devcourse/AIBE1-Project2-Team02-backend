@@ -23,4 +23,6 @@ public interface ApplicationService {
     void applyForLecture(LectureApplyRequestDto dto, Long menteeId);
 
     List<MenteeResponseDto> getMatchedMenteesByMentor(Long mentorId);
+
+    void cancelApplication(Long applicationId, Long userId);
 }

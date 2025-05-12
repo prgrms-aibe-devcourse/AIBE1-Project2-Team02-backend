@@ -178,4 +178,45 @@ public class ApplicationServiceImpl implements ApplicationService {
     public List<MenteeResponseDto> getMatchedMenteesByMentor(Long mentorId) {
         return applicationMapper.findMatchedMenteesByMentorId(mentorId);
     }
+
+    @Override
+    public void cancelApplication(Long applicationId, Long userId) {
+        ApplicationInfoDto info = applicationMapper.findApplicationInfo(applicationId);
+
+        if (info == null) {
+            throw new ResourceNotFoundException("Application", applicationId);
+        }
+
+        String currentStatus = applicationMapper.findStatusByApplicationId(applicationId);
+        if(!ApplicationStatus.APPROVED.name().equals(currentStatus)) {
+            throw new IllegalStateException("취소할 수 있는 상태가 아닙니다: " + currentStatus);
+        }
+
+        Long lectureId = applicationMapper.findLectureIdByApplicationId(applicationId);
+
+        LectureSimpleInfoDto lectureInfo = applicationMapper.findLectureSimpleInfo(lectureId);
+        if (lectureInfo == null) {
+            throw new ResourceNotFoundException("Lecture", lectureId);
+        }
+
+        Long mentorId = lectureInfo.mentorId();
+
+        if (!mentorId.equals(userId) && !info.menteeId().equals(userId)) {
+            throw new IllegalStateException("매칭 취소 권한이 없습니다.");
+        }
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        applicationMapper.updateApplicationStatus(applicationId, ApplicationStatus.CANCELLED.name(), currentTime);
+
+        String content;
+        String cancelReson = mentorId.equals(userId) ? "멘토 사정으로 인해" : "멘티 사정으로 인해";
+
+        if (mentorId.equals(userId)) {
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReson);
+            messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content), userId);
+        } else {
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReson);
+            messageService.sendMessage(new MessageSendRequestDto(mentorId, content), userId);
+        }
+    }
 }
