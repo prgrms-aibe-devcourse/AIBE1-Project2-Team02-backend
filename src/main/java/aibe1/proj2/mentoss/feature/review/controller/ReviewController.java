@@ -85,6 +85,17 @@ public class ReviewController {
             "message": "Lecture (id=1234) 가 존재하지 않습니다.",
             "data": null
             }
+            """))),
+            @ApiResponse(responseCode = "409", description = "후기 중복 작성)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ApiResponseFormat.class,
+                                    example = """
+            {
+            "success": false,
+            "message": "이미 이 강의에 대한 후기를 작성하셨습니다.",
+            "data": null
+            }
             """)))
     })
     @PostMapping
@@ -360,6 +371,14 @@ public class ReviewController {
             @RequestBody AverageRatingRequestDto dto) {
         AverageRatingResponseDto response = reviewService.getAverageRatingByMentorId(dto.id());
         return ResponseEntity.ok(ApiResponseFormat.ok(response));
+    }
+
+    @GetMapping("/check/{lectureId}")
+    public ResponseEntity<ApiResponseFormat<CheckReviewResponseDto>> checkReview(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long lectureId) {
+        boolean hasReview = reviewService.hasReviewed(lectureId, user.getUserId());
+        return ResponseEntity.ok(ApiResponseFormat.ok(new CheckReviewResponseDto(hasReview)));
     }
 
 
