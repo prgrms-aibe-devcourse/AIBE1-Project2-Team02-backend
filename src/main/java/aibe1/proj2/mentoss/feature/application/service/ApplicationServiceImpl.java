@@ -180,20 +180,25 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Transactional
     public void cancelApplication(Long applicationId, Long userId) {
+        // 1. 신청 정보 확인
         ApplicationInfoDto info = applicationMapper.findApplicationInfo(applicationId);
 
         if (info == null) {
             throw new ResourceNotFoundException("Application", applicationId);
         }
 
+        // 2. 현재 상태 확인
         String currentStatus = applicationMapper.findStatusByApplicationId(applicationId);
-        if(!ApplicationStatus.APPROVED.name().equals(currentStatus)) {
+        if (!ApplicationStatus.APPROVED.name().equals(currentStatus)) {
             throw new IllegalStateException("취소할 수 있는 상태가 아닙니다: " + currentStatus);
         }
 
+        // 3. 강의 ID 가져오기
         Long lectureId = applicationMapper.findLectureIdByApplicationId(applicationId);
 
+        // 4. 매칭된 멘토 정보 확인
         LectureSimpleInfoDto lectureInfo = applicationMapper.findLectureSimpleInfo(lectureId);
         if (lectureInfo == null) {
             throw new ResourceNotFoundException("Lecture", lectureId);
@@ -201,22 +206,39 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Long mentorId = lectureInfo.mentorId();
 
+        // 5. 권한 확인 (멘토 또는 매칭된 멘티만 취소 가능)
         if (!mentorId.equals(userId) && !info.menteeId().equals(userId)) {
             throw new IllegalStateException("매칭 취소 권한이 없습니다.");
         }
 
+        // 6. 상태를 CANCELLED로 변경
         LocalDateTime currentTime = LocalDateTime.now();
         applicationMapper.updateApplicationStatus(applicationId, ApplicationStatus.CANCELLED.name(), currentTime);
 
+        // 7. 취소 알림 쪽지 전송
         String content;
-        String cancelReson = mentorId.equals(userId) ? "멘토 사정으로 인해" : "멘티 사정으로 인해";
+        String cancelReason = mentorId.equals(userId) ? "멘토 사정으로 인해" : "멘티 사정으로 인해";
 
         if (mentorId.equals(userId)) {
-            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReson);
+            // 멘토가 취소한 경우
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReason);
             messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content), userId);
         } else {
-            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReson);
+            // 멘티가 취소한 경우
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReason);
             messageService.sendMessage(new MessageSendRequestDto(mentorId, content), userId);
         }
+    }
+
+    @Override
+    @Transactional
+    public void cancelMatchById(Long matchId, Long userId) {
+        Long applicationId = applicationMapper.findApplicationIdByMatchId(matchId);
+
+        if (applicationId == null) {
+            throw new ResourceNotFoundException("Match", matchId);
+        }
+
+        cancelApplication(applicationId, userId);
     }
 }

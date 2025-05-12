@@ -130,4 +130,15 @@ public class ApplicationController {
         applicationService.cancelApplication(applicationId, userId);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
+
+    @Operation(summary = "매칭 ID로 매칭 취소", description = "matchId로 승인된 과외 매칭을 취소합니다.")
+    @PostMapping("/cancel/match/{matchId}")
+    public ResponseEntity<ApiResponseFormat<Void>> cancelMatchById(
+            @PathVariable Long matchId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        applicationService.cancelMatchById(matchId, userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
+    }
 }
