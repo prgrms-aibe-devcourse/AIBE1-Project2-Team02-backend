@@ -2,9 +2,9 @@
 //메인서버
 //const API = 'https://mentoss.onrender.com/api/admin';
 //로컬서버
-//const API = 'http://localhost:8081/api/admin';
+const API = 'http://localhost:8081/api/admin';
 //테스트서버
-const API = 'https://mentoss-test.onrender.com/api/admin';
+//const API = 'https://mentoss-test.onrender.com/api/admin';
 
 document.getElementById('btn-query').addEventListener('click', async () => {
     const type = document.getElementById('query-type').value;
