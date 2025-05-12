@@ -7,6 +7,7 @@ import aibe1.proj2.mentoss.feature.message.service.MessageService;
 import aibe1.proj2.mentoss.global.entity.enums.ApplicationStatus;
 import aibe1.proj2.mentoss.global.entity.enums.EntityStatus;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
+import aibe1.proj2.mentoss.global.exception.application.DuplicateApplicationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -141,6 +142,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional
     public void applyForLecture(LectureApplyRequestDto dto, Long menteeId) {
+
+        int count = applicationMapper.countDuplicateApplication(dto.lectureId(), menteeId);
+
+        if (count > 0) {
+            throw new DuplicateApplicationException("[DUPLICATE_APPLICATION]");
+        }
+
         String timeSlotsJson;
         try {
             timeSlotsJson = objectMapper.writeValueAsString(dto.requestedTimeSlots());
