@@ -226,4 +226,8 @@ public interface LectureMapper {
             "AND is_closed = FALSE " +
             "AND is_deleted = FALSE")
     int closeAllOpenLecturesByMentorId(Long mentorId);
+
+
+
+
 }
