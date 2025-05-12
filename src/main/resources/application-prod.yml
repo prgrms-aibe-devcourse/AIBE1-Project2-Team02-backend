@@ -68,3 +68,6 @@ gemini:
     endpoint: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent
     key: ${GEMINI_API_KEY}
   prompt: ${GEMINI_PROMPT_MODERATION}
+admin:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}

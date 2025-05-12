@@ -1,12 +1,11 @@
 package aibe1.proj2.mentoss.feature.report.controller;
 
 
-import aibe1.proj2.mentoss.feature.report.model.dto.CreateReportRequestDto;
-import aibe1.proj2.mentoss.feature.report.model.dto.ReportResponseDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.request.CreateReportRequestDto;
+import aibe1.proj2.mentoss.feature.report.model.dto.response.ReportResponseDto;
 import aibe1.proj2.mentoss.feature.report.service.ReportService;
 import aibe1.proj2.mentoss.global.auth.CustomUserDetails;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
-import aibe1.proj2.mentoss.global.entity.Report;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
