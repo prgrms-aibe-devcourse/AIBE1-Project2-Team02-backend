@@ -76,7 +76,6 @@ public class ApplicationController {
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 
-
     @Operation(summary = "강의 상태 변경", description = "강의 마감 여부 상태를 변경합니다.")
     @PatchMapping("/lecture/status/{lectureId}")
     public ResponseEntity<ApiResponseFormat<String>> updateLectureStatus(
@@ -88,7 +87,6 @@ public class ApplicationController {
         return ResponseEntity.ok(ApiResponseFormat.ok("강의 상태가 변경되었습니다."));
     }
 
-
     @Operation(summary = "과외 신청 폼 데이터 조회", description = "과외 ID를 통해 신청 폼에 필요한 정보를 조회합니다.")
     @GetMapping("/{lectureId}/form/list")
     public ResponseEntity<ApiResponseFormat<LectureApplyFormDto>> getLectureApplyForm(
@@ -97,7 +95,6 @@ public class ApplicationController {
         LectureApplyFormDto dto = applicationService.getLectureApplyForm(lectureId);
         return ResponseEntity.ok(ApiResponseFormat.ok(dto));
     }
-
 
     @Operation(summary = "과외 신청", description = "특정 과외에 대해 신청을 보냅니다. 신청 시간과 선택 메시지를 포함합니다.")
     @PostMapping("/apply")
