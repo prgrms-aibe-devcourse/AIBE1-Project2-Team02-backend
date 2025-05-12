@@ -19,5 +19,5 @@ public class Report {
     private String reason;
     private String reasonType;
     private Boolean isProcessed = false;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
