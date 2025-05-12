@@ -13,6 +13,29 @@
 <h1>관리자 대시보드</h1>
 
 <section>
+    <h2>데이터 조회</h2>
+    <form id="form-query">
+        <label>
+            타입:
+            <select id="query-type">
+                <option value="USER">USER</option>
+                <option value="LECTURE">LECTURE</option>
+                <option value="MENTOR">MENTOR</option>
+                <option value="MESSAGE">MESSAGE</option>
+                <option value="REVIEW">REVIEW</option>
+            </select>
+        </label>
+        <label>
+            ID: <input type="number" id="query-id" required />
+        </label>
+        <button type="button" id="btn-query">조회</button>
+    </form>
+    <div id="query-result" style="margin-top:1rem;"></div>
+</section>
+
+<hr/>
+
+<section>
     <h2>상태 변경</h2>
     <form id="form-status">
         <label>

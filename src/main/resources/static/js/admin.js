@@ -1,6 +1,44 @@
 //const API = 'https://mentoss.onrender.com/api/admin';
 const API = 'http://localhost:8081/api/admin';
 
+document.getElementById('btn-query').addEventListener('click', async () => {
+    const type = document.getElementById('query-type').value;
+    const id   = Number(document.getElementById('query-id').value);
+    const container = document.getElementById('query-result');
+    container.innerHTML = '';
+
+    try {
+        const res = await fetch(`${API}/data/${type.toLowerCase()}/${id}`, {
+            credentials: 'include'
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { data } = await res.json();
+
+        // 표 형식으로 렌더링
+        const table = document.createElement('table');
+        table.border = 1;
+        const tbody = document.createElement('tbody');
+        Object.entries(data).forEach(([key, val]) => {
+            const tr = document.createElement('tr');
+            if(key == "createdAt"){
+                let timetext = `${val[0]}-${val[1]}-${val[2]} ${val[3]}:${val[4]}:${val[5]}`;
+                tr.innerHTML = `<th>${key}</th><td>${timetext}</td>`;
+            }
+            else{
+                tr.innerHTML = `<th>${key}</th><td>${val}</td>`;
+            }
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        container.appendChild(table);
+
+    } catch (e) {
+        console.error('데이터 조회 실패', e);
+        container.textContent = '조회 중 오류가 발생했습니다.';
+    }
+});
+
+
 //신고 리스트
 async function loadReports() {
     try {
@@ -47,7 +85,7 @@ function renderNotProcessed(list) {
     `;
         const td = document.createElement('td');
         const btn = document.createElement('button');
-        btn.textContent = '처리완료';
+        btn.textContent = '처리 기록';
         btn.addEventListener('click', () => showProcessModal(r.reportId));
         td.appendChild(btn);
         tr.appendChild(td);
