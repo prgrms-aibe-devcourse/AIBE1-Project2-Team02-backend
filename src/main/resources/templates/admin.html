@@ -7,167 +7,258 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <script th:src="@{/js/admin.js}" defer></script>
 </head>
 <body>
-<h1>관리자 대시보드</h1>
-
-<section>
-    <h2>데이터 조회</h2>
-    <form id="form-query">
-        <label>
-            타입:
-            <select id="query-type">
-                <option value="USER">USER</option>
-                <option value="LECTURE">LECTURE</option>
-                <option value="MENTOR">MENTOR</option>
-                <option value="MESSAGE">MESSAGE</option>
-                <option value="REVIEW">REVIEW</option>
-            </select>
-        </label>
-        <label>
-            ID: <input type="number" id="query-id" required />
-        </label>
-        <button type="button" id="btn-query">조회</button>
-    </form>
-    <div id="query-result" style="margin-top:1rem;"></div>
-</section>
-
-<hr/>
-
-<section>
-    <h2>상태 변경</h2>
-    <form id="form-status">
-        <label>
-            타입:
-            <select id="status-type">
-                <option value="USER">USER</option>
-                <option value="LECTURE">LECTURE</option>
-                <option value="REVIEW">REVIEW</option>
-            </select>
-        </label>
-        <label>
-            ID: <input type="number" id="status-id" required />
-        </label>
-        <label>
-            새 상태:
-            <select id="status-value">
-                <option value="AVAILABLE">AVAILABLE</option>
-                <option value="SUSPENDED">SUSPENDED</option>
-                <option value="BANNED">BANNED</option>
-            </select>
-        </label>
-        <button type="submit">변경</button>
-    </form>
-</section>
-
-<hr/>
-
-<section>
-    <h2>삭제 및 복구</h2>
-    <form id="form-delete">
-        <label>
-            타입:
-            <select id="delete-type">
-                <option value="USER">USER</option>
-                <option value="LECTURE">LECTURE</option>
-                <option value="REVIEW">REVIEW</option>
-            </select>
-        </label>
-        <label>
-            ID: <input type="number" id="delete-id" required />
-        </label>
-        <label>
-            액션:
-            <select id="delete-action">
-                <option value="soft-delete">삭제</option>
-                <option value="recover">복구</option>
-            </select>
-        </label>
-        <button type="submit">적용</button>
-    </form>
-</section>
-
-<hr/>
-
-<section>
-    <h2>신고 목록</h2>
-    <button id="btn-loadReports">신고 목록 새로고침</button>
-    <div style="display:flex; gap:2rem; margin-top:1rem;">
-        <div>
-            <h3>미처리 신고</h3>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>신고ID</th>
-                    <th>신고자ID</th>
-                    <th>타입</th>
-                    <th>대상ID</th>
-                    <th>사유</th>
-                    <th>완료</th>
-                </tr>
-                </thead>
-                <tbody id="tbl-notProcessed">
-
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <h3>처리 완료 신고</h3>
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>신고ID</th>
-                    <th>신고자ID</th>
-                    <th>타입</th>
-                    <th>대상ID</th>
-                    <th>신고 사유</th>
-                    <th>처리일시</th>
-                    <th>담당자</th>
-                    <th>조치 종류</th>
-                    <th>조치 사유</th>
-                    <th>제재 기간</th>
-                </tr>
-                </thead>
-                <tbody id="tbl-processed">
-
-                </tbody>
-            </table>
+<!-- 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/adminPage">Mentoss Admin</a>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#adminNavbar"
+                aria-controls="adminNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNavbar">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://mentoss.vercel.app/">홈으로</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">로그아웃</a>
+                </li>
+            </ul>
         </div>
     </div>
-</section>
+</nav>
 
+<div class="container">
+    <h1 class="mb-4">관리자 대시보드</h1>
+
+    <!-- 1. 데이터 조회 카드 -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">데이터 조회</h5>
+        </div>
+        <div class="card-body">
+            <form id="form-query" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="query-type" class="form-label">타입</label>
+                    <select id="query-type" class="form-select">
+                        <option value="USER">USER</option>
+                        <option value="LECTURE">LECTURE</option>
+                        <option value="MENTOR">MENTOR</option>
+                        <option value="MESSAGE">MESSAGE</option>
+                        <option value="REVIEW">REVIEW</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="query-id" class="form-label">ID</label>
+                    <input
+                            type="number"
+                            id="query-id"
+                            class="form-control"
+                            placeholder="숫자 입력"
+                            required
+                    />
+                </div>
+                <div class="col-md-3">
+                    <button
+                            type="button"
+                            id="btn-query"
+                            class="btn btn-primary w-100"
+                    >
+                        조회
+                    </button>
+                </div>
+            </form>
+            <div id="query-result" class="mt-4"></div>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- 2. 상태 변경 카드 -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">상태 변경</h5>
+        </div>
+        <div class="card-body">
+            <form id="form-status" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="status-type" class="form-label">타입</label>
+                    <select id="status-type" class="form-select">
+                        <option value="USER">USER</option>
+                        <option value="LECTURE">LECTURE</option>
+                        <option value="REVIEW">REVIEW</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="status-id" class="form-label">ID</label>
+                    <input
+                            type="number"
+                            id="status-id"
+                            class="form-control"
+                            placeholder="숫자 입력"
+                            required
+                    />
+                </div>
+                <div class="col-md-3">
+                    <label for="status-value" class="form-label">새 상태</label>
+                    <select id="status-value" class="form-select">
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="SUSPENDED">SUSPENDED</option>
+                        <option value="BANNED">BANNED</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-warning w-100">
+                        변경
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- 3. 삭제 / 복구 카드 -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">삭제 및 복구</h5>
+        </div>
+        <div class="card-body">
+            <form id="form-delete" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="delete-type" class="form-label">타입</label>
+                    <select id="delete-type" class="form-select">
+                        <option value="USER">USER</option>
+                        <option value="LECTURE">LECTURE</option>
+                        <option value="REVIEW">REVIEW</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="delete-id" class="form-label">ID</label>
+                    <input
+                            type="number"
+                            id="delete-id"
+                            class="form-control"
+                            placeholder="숫자 입력"
+                            required
+                    />
+                </div>
+                <div class="col-md-3">
+                    <label for="delete-action" class="form-label">액션</label>
+                    <select id="delete-action" class="form-select">
+                        <option value="soft-delete">삭제</option>
+                        <option value="recover">복구</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-danger w-100">
+                        적용
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- 4. 신고 목록 카드 -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">신고 목록</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <h6>처리 전 신고</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>신고ID</th>
+                            <th>타깃종류</th>
+                            <th>타깃ID</th>
+                            <th>작성자ID</th>
+                            <th>사유</th>
+                            <th>완료</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbl-notProcessed"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <h6>처리 완료 신고</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>신고ID</th>
+                            <th>타깃종류</th>
+                            <th>타깃ID</th>
+                            <th>작성자ID</th>
+                            <th>사유</th>
+                            <th>처리자ID</th>
+                            <th>조치 종류</th>
+                            <th>조치 사유</th>
+                            <th>제재 기간</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbl-processed"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 백드롭 & 모달 (기존 유지) -->
 <div id="modal-backdrop"></div>
-
 <div id="process-modal">
-    <form id="form-process" novalidate>
-        <h3>신고 처리 정보 입력</h3>
+    <form id="form-process" novalidate class="p-4 bg-white rounded shadow">
+        <h5 class="mb-3">신고 처리 정보 입력</h5>
         <input type="hidden" id="process-reportId" />
-        <label>
-            담당자 ID :
-            <input type="number" id="process-adminId" required/>
-        </label>
-        <label>
-            조치 종류 :
-            <select id="process-actionType">
-                <option value="FREE">FREE</option>
+        <div class="mb-3">
+            <label class="form-label">담당자 ID</label>
+            <input type="number" id="process-adminId" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">조치 종류</label>
+            <select id="process-type" class="form-select">
                 <option value="WARN">WARN</option>
                 <option value="SUSPEND">SUSPEND</option>
                 <option value="BAN">BAN</option>
             </select>
-        </label>
-        <label>
-            조치 사유 :
-            <input type="text" id="process-reason" required/>
-        </label>
-        <label>
-            제제 기간 :
-            <input type="number" id="process-suspendPeriod" min="0" value="0"/>
-        </label>
-        <button id="process-confirm">확인</button>
-        <button id="process-cancel">취소</button>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">조치 사유</label>
+            <input type="text" id="process-reason" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">제재 기간(일)</label>
+            <input
+                    type="number"
+                    id="process-suspendPeriod"
+                    class="form-control"
+                    min="0"
+                    value="0"
+            />
+        </div>
+        <div class="text-end">
+            <button id="process-confirm" class="btn btn-primary me-2">확인</button>
+            <button id="process-cancel" class="btn btn-secondary">취소</button>
+        </div>
     </form>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
 </html>

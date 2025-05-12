@@ -107,7 +107,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf.disable());

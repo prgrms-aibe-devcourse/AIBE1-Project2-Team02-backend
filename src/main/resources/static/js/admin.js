@@ -1,5 +1,9 @@
+
+//메인서버
 //const API = 'https://mentoss.onrender.com/api/admin';
+//로컬서버
 //const API = 'http://localhost:8081/api/admin';
+//테스트서버
 const API = 'https://mentoss-test.onrender.com/api/admin';
 
 document.getElementById('btn-query').addEventListener('click', async () => {
@@ -86,7 +90,7 @@ function renderNotProcessed(list) {
     `;
         const td = document.createElement('td');
         const btn = document.createElement('button');
-        btn.textContent = '처리 기록';
+        btn.textContent = '기록하기';
         btn.addEventListener('click', () => showProcessModal(r.reportId));
         td.appendChild(btn);
         tr.appendChild(td);
