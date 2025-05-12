@@ -1,5 +1,6 @@
 package aibe1.proj2.mentoss.feature.message.controller;
 
+import aibe1.proj2.mentoss.feature.message.model.dto.MessageDeleteRequestDto;
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageResponseDto;
 import aibe1.proj2.mentoss.feature.message.model.dto.MessageSendRequestDto;
 import aibe1.proj2.mentoss.feature.message.model.dto.PageResponse;
@@ -69,5 +70,16 @@ public class MessageController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponseFormat.ok(messageId));
+    }
+
+    @Operation(summary = "쪽지 삭제", description = "사용자가 보낸/받은 쪽지를 삭제합니다.")
+    @PostMapping("/delete")
+    public ResponseEntity<ApiResponseFormat<Void>> deleteMessages(
+            @RequestBody MessageDeleteRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUserId();
+        messageService.deleteMessages(dto.messageIds(), userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(null));
     }
 }
