@@ -1,6 +1,7 @@
 package aibe1.proj2.mentoss.global.exception;
 
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
+import aibe1.proj2.mentoss.global.exception.application.DuplicateApplicationException;
 import aibe1.proj2.mentoss.global.exception.report.*;
 import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
@@ -180,6 +181,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseFormat<Void>> handleIllegalState(IllegalStateException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+
+    @ExceptionHandler(DuplicateApplicationException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleDuplicateApplication(DuplicateApplicationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 }

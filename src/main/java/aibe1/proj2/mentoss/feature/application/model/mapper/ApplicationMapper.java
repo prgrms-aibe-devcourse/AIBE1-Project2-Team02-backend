@@ -231,5 +231,12 @@ public interface ApplicationMapper {
             """)
     LectureSimpleInfoDto findLectureSimpleInfo(Long lectureId);
 
-
+    @Select("""
+            SELECT COUNT(*)
+            FROM application
+            WHERE lecture_id = #{lectureId}
+              AND mentee_id = #{menteeId}
+              AND status = 'PENDING'
+            """)
+    int countDuplicateApplication(Long lectureId, Long menteeId);
 }
