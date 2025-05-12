@@ -124,6 +124,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             originalNickname = "멘티";
         }
 
+        if (originalNickname.length() > 11) {
+            originalNickname = originalNickname.substring(0, 11);
+        }
+
         String uniqueNickname;
         int maxAttempts = 10;
         int attempts = 0;

@@ -43,6 +43,10 @@ public class AccountController {
             Authentication authentication,
             @RequestBody ProfileUpdateRequestDto requestDto
     ) {
+        if (requestDto.nickname() != null && requestDto.nickname().length() > 15) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("닉네임은 15자 이하로 입력해주세요."));
+        }
+
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         accountService.updateProfile(userId, requestDto);
         return ResponseEntity.ok(ApiResponseFormat.ok(null));
@@ -100,6 +104,15 @@ public class AccountController {
     ) {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         MentorProfileResponseDto mentorProfile = accountService.getMentorProfile(userId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(mentorProfile));
+    }
+
+    @Operation(summary = "멘토 ID 기반 프로필 조회", description = "멘토 ID를 기반으로 해당 멘토의 전체 프로필을 조회합니다")
+    @GetMapping("/mentor/{mentorId}/public-profile")
+    public ResponseEntity<ApiResponseFormat<MentorPublicProfileDto>> getMentorPublicProfile(
+            @PathVariable Long mentorId
+    ) {
+        MentorPublicProfileDto mentorProfile = accountService.getMentorPublicProfile(mentorId);
         return ResponseEntity.ok(ApiResponseFormat.ok(mentorProfile));
     }
 
