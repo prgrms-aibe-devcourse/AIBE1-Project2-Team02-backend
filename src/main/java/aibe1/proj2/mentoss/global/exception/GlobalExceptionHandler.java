@@ -3,10 +3,7 @@ package aibe1.proj2.mentoss.global.exception;
 import aibe1.proj2.mentoss.global.dto.ApiResponseFormat;
 import aibe1.proj2.mentoss.global.exception.application.DuplicateApplicationException;
 import aibe1.proj2.mentoss.global.exception.report.*;
-import aibe1.proj2.mentoss.global.exception.review.InvalidRatingException;
-import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
-import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
-import aibe1.proj2.mentoss.global.exception.review.TogetherApiException;
+import aibe1.proj2.mentoss.global.exception.review.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.jdi.InvalidTypeException;
 import jakarta.persistence.EntityNotFoundException;
@@ -199,6 +196,16 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DuplicateApplicationException.class)
     public ResponseEntity<ApiResponseFormat<Void>> handleDuplicateApplication(DuplicateApplicationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponseFormat.fail(ex.getMessage()));
+    }
+
+    /**
+     *  중복 후기 작성 예외 처리
+     */
+    @ExceptionHandler(UniqueReviewException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleUniqueReviewException(UniqueReviewException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ApiResponseFormat.fail(ex.getMessage()));

@@ -19,4 +19,6 @@ public interface ReviewService{
     AverageRatingResponseDto getAverageRatingByLectureId(Long lectureId);
 
     AverageRatingResponseDto getAverageRatingByMentorId(Long mentorId);
+
+    boolean hasReviewed(Long lectureId, Long writerId);
 }

@@ -24,7 +24,11 @@ public interface ReviewMapper {
         return countActiveReview(reviewId) > 0;
     }
 
-    @Select("SELECT COUNT(*) FROM app_user WHERE user_id = #{userId}")
+    @Select("""
+        SELECT COUNT(*)
+        FROM app_user
+        WHERE user_id = #{userId}
+        """)
     int countUser(Long userId);
     default boolean existsUser(Long userId) {
         return countUser(userId) > 0;
@@ -36,7 +40,12 @@ public interface ReviewMapper {
         return countActiveLecture(userId) > 0;
     }
 
-    @Select("SELECT COUNT(*) FROM lecture WHERE lecture_id = #{lectureId}")
+    @Select("""
+            SELECT COUNT(*)
+            FROM lecture
+            WHERE lecture_id = #{lectureId}
+            """
+    )
     int countLecture(Long lectureId);
     default boolean existsLecture(Long lectureId) {
         return countLecture(lectureId) > 0;
@@ -54,9 +63,6 @@ public interface ReviewMapper {
         return countMentor(mentorId) > 0;
     }
 
-    @Select("SELECT user_id FROM mentor_profile WHERE mentor_id=#{mentorId}")
-    Long getUserByMentorId(Long mentorId);
-
     @Select("""
     SELECT
       r.review_id       AS reviewId,
@@ -67,7 +73,7 @@ public interface ReviewMapper {
       u.profile_image   AS writerProfileImage,
       r.content,
       r.rating,
-      r.created_at      AS createdAt
+      r.created_at      AS createdAt,
       r.updated_at      AS updatedAt
     FROM review r
     JOIN app_user u ON u.user_id = r.writer_id
@@ -157,6 +163,8 @@ public interface ReviewMapper {
          INNER JOIN lecture l
             ON r.lecture_id = l.lecture_id
          WHERE l.mentor_id = #{mentorId}
+         AND r.status = 'AVAILABLE'
+         AND r.is_deleted = FALSE
         """)
     Long countReviewsByMentorId(@Param("mentorId") Long mentorId);
 
@@ -164,7 +172,21 @@ public interface ReviewMapper {
         SELECT COUNT(*) 
           FROM review
          WHERE lecture_id = #{lectureId}
+        AND status = 'AVAILABLE'
+        AND is_deleted = FALSE
         """)
     Long countReviewsByLectureId(@Param("lectureId") Long lectureId);
+
+
+    @Select("""
+    SELECT COUNT(*) 
+    FROM review 
+    WHERE lecture_id = #{lectureId} 
+      AND writer_id  = #{writerId}
+      AND status = 'AVAILABLE'
+      AND is_deleted = FALSE
+  """)
+    int countByLectureAndWriter(@Param("lectureId") Long lectureId,
+                                @Param("writerId")  Long writerId);
 
 }

@@ -12,6 +12,7 @@ import aibe1.proj2.mentoss.global.exception.ResourceAccessDeniedException;
 import aibe1.proj2.mentoss.global.exception.ResourceNotFoundException;
 import aibe1.proj2.mentoss.global.exception.review.NotAttendedLectureException;
 import aibe1.proj2.mentoss.global.exception.review.NotOwnerException;
+import aibe1.proj2.mentoss.global.exception.review.UniqueReviewException;
 import aibe1.proj2.mentoss.global.moderation.model.ModerationResult;
 import aibe1.proj2.mentoss.global.moderation.service.ContentModerationService;
 import aibe1.proj2.mentoss.global.util.XssSanitizer;
@@ -44,6 +45,10 @@ public class ReviewServiceImpl implements ReviewService{
         }
         if (!reviewMapper.hasAttendedLecture(req.lectureId(), currentUserId)) {
             throw new NotAttendedLectureException();
+        }
+        int existing = reviewMapper.countByLectureAndWriter(req.lectureId(), currentUserId);
+        if (existing > 0) {
+            throw new UniqueReviewException("이미 이 강의에 대한 후기를 작성하셨습니다.");
         }
 
         // XSS 방지를 위한 입력값 정화
@@ -163,5 +168,11 @@ public class ReviewServiceImpl implements ReviewService{
 
     private Long getCountByMentorId(Long mentorId){
         return reviewMapper.countReviewsByMentorId(mentorId);
+    }
+
+
+    @Override
+    public boolean hasReviewed(Long lectureId, Long writerId) {
+        return reviewMapper.countByLectureAndWriter(lectureId, writerId) > 0;
     }
 }
