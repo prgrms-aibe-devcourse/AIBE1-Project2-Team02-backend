@@ -184,7 +184,19 @@ public class GlobalExceptionHandler {
                 .body(ApiResponseFormat.fail(ex.getMessage()));
     }
 
+    /**
+     * AI 유해 콘텐츠 필터링에 걸린 경우 처리
+     */
+    @ExceptionHandler(InappropriateContentException.class)
+    public ResponseEntity<ApiResponseFormat<Void>> handleInappropriateContent(InappropriateContentException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseFormat.fail(ex.getReason()));
+    }
 
+    /**
+     *  중복 데이터 예외 처리
+     */
     @ExceptionHandler(DuplicateApplicationException.class)
     public ResponseEntity<ApiResponseFormat<Void>> handleDuplicateApplication(DuplicateApplicationException ex) {
         return ResponseEntity

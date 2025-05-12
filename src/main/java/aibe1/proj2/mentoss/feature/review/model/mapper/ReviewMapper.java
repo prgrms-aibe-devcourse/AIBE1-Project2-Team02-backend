@@ -117,11 +117,13 @@ public interface ReviewMapper {
     Double findAverageRatingByLectureId(Long lectureId);
 
     @Select("""
-      SELECT AVG(rating)
-        FROM review
-       WHERE mentor_id = #{mentorId}
-         AND status = 'AVAILABLE'
-         AND is_deleted = FALSE
+      SELECT AVG(r.rating)
+        FROM review r
+       INNER JOIN lecture l
+          ON r.lecture_id = l.lecture_id
+       WHERE l.mentor_id = #{mentorId}
+         AND r.status = 'AVAILABLE'
+         AND r.is_deleted = FALSE
     """)
     Double findAverageRatingByMentorId(Long mentorId);
 

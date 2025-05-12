@@ -232,6 +232,27 @@ public interface ApplicationMapper {
     LectureSimpleInfoDto findLectureSimpleInfo(Long lectureId);
 
     @Select("""
+            SELECT
+                lm.match_id,
+                lm.lecture_id,
+                lm.mentee_id,
+                u.nickname,
+                u.profile_image,
+                l.lecture_title,
+                lm.matched_time_slots,
+                lm.joined_at
+            FROM lecture_mentee lm
+            JOIN lecture l ON lm.lecture_id = l.lecture_id
+            JOIN app_user u ON lm.mentee_id = u.user_id
+            JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
+            WHERE
+                mp.user_id = #{mentorId}
+                AND l.is_deleted = 0
+            ORDER BY
+                lm.joined_at DESC
+        """)
+    List<MenteeResponseDto> findMatchedMenteesByMentorId(Long mentorId);
+    @Select("""
             SELECT COUNT(*)
             FROM application
             WHERE lecture_id = #{lectureId}

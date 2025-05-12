@@ -18,7 +18,7 @@ public record LectureResponse(
         String description,
         Long price,
         String curriculum,
-        String regions,
+        Object regions,
         String timeSlots,
         Long authorUserId,
 
