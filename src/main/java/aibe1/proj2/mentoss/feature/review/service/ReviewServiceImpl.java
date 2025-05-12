@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final ContentModerationService contentModerationService;
 
     @Override
-    public void createReview(CreateReviewRequestDto req, Long currentUserId) {
+    public Long createReview(CreateReviewRequestDto req, Long currentUserId) {
         if (!reviewMapper.existsUser(currentUserId)) {
             throw new ResourceNotFoundException("User", currentUserId);
         }
@@ -71,9 +72,11 @@ public class ReviewServiceImpl implements ReviewService{
                 .status("AVAILABLE")
                 .reportCount(0L)
                 .isDeleted(false)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .updatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
         reviewMapper.createReview(review);
+        return review.getReviewId();
     }
 
     @Override
@@ -101,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService{
             throw new InappropriateContentException(moderationResult.getReason());
         }
 
-        reviewMapper.updateReview(reviewId, sanitizedContent, rating);
+        reviewMapper.updateReview(reviewId, sanitizedContent, rating, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
     }
 
