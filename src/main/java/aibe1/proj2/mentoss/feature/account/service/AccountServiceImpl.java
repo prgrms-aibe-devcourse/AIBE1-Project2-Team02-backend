@@ -54,6 +54,10 @@ public class AccountServiceImpl implements AccountService {
         AppUser appUser = accountMapper.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
 
+        if (requestDto.nickname() != null && requestDto.nickname().length() > 15) {
+            throw new IllegalArgumentException("닉네임은 15자 이하로 입력해주세요.");
+        }
+
         if (!appUser.getNickname().equals(requestDto.nickname())
                 && appUserMapper.nicknameExists(requestDto.nickname())){
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해주세요.");
