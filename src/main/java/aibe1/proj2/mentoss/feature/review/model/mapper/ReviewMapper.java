@@ -68,6 +68,7 @@ public interface ReviewMapper {
       r.content,
       r.rating,
       r.created_at      AS createdAt
+      r.updated_at      AS updatedAt
     FROM review r
     JOIN app_user u ON u.user_id = r.writer_id
     WHERE r.lecture_id = #{lectureId}
@@ -83,7 +84,8 @@ public interface ReviewMapper {
             @Arg(column="writerProfileImage",  javaType=String.class),
             @Arg(column="content",             javaType=String.class),
             @Arg(column="rating",              javaType=Long.class),
-            @Arg(column="createdAt",           javaType= LocalDateTime.class)
+            @Arg(column="createdAt",           javaType= LocalDateTime.class),
+            @Arg(column="updatedAt",           javaType= LocalDateTime.class)
     })
     List<ReviewResponseDto> findByLectureId(Long lectureId);
 

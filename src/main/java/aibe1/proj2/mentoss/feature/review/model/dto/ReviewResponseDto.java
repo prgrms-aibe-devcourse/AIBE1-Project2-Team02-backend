@@ -11,5 +11,6 @@ public record ReviewResponseDto(
         String writerProfileImage,
         String content,
         Long rating,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {}
