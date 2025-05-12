@@ -26,6 +26,8 @@ public interface AccountService {
 
     MentorProfileResponseDto getMentorProfile(Long userId);
 
+    MentorPublicProfileDto getMentorPublicProfile(Long mentorId);
+
     void applyMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException;
 
     void updateMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException;
