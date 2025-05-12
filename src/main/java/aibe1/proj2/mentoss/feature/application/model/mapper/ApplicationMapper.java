@@ -100,14 +100,15 @@ public interface ApplicationMapper {
             """)
     List<LectureResponseDto> findLecturesByMentorId(Long mentorId);
 
-    // 특정 강의에 대한 신청 리스트
+    // 신청된 과외 리스트
     @Select("""
                 SELECT
                     a.application_id,
                     u.nickname,
                     l.lecture_title,
                     DATE(a.created_at) AS created_at,
-                    u.profile_image
+                    u.profile_image,
+                    a.requested_time_slots
                 FROM application a
                 JOIN app_user u ON a.mentee_id = u.user_id
                 JOIN lecture l ON a.lecture_id = l.lecture_id
@@ -119,7 +120,7 @@ public interface ApplicationMapper {
                 ORDER BY
                     a.application_id
             """)
-    List<LectureApplicantDto> findApplicantsByLecture(Long userId);
+    List<LectureApplicantRawDto> findApplicantsByLecture(Long userId);
 
     // 수락 처리
     @Update("""
