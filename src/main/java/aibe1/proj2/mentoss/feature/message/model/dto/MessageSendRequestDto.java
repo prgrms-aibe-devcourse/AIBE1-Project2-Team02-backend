@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 public record MessageSendRequestDto(
         Long receiverId,
-        String content
+        String content,
+        Boolean skipNotification
 ) {
     public Message toEntity(Long senderId) {
         Message m = new Message();

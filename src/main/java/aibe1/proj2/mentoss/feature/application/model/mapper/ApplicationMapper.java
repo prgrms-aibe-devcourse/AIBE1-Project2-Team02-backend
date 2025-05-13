@@ -234,28 +234,32 @@ public interface ApplicationMapper {
 
     @Select("""
             SELECT
-                 lm.match_id,
-                 lm.lecture_id,
-                 lm.mentee_id,
-                 u.nickname,
-                 u.profile_image,
-                 l.lecture_title,
-                 lm.matched_time_slots,
-                 lm.joined_at
-             FROM lecture_mentee lm
-             JOIN lecture l ON lm.lecture_id = l.lecture_id
-             JOIN app_user u ON lm.mentee_id = u.user_id
-             JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
-             JOIN (
-                 SELECT DISTINCT lecture_id, mentee_id
-                 FROM application
-                 WHERE status = 'APPROVED' AND is_deleted = FALSE
-             ) a ON a.lecture_id = lm.lecture_id AND a.mentee_id = lm.mentee_id
-             WHERE
-                 mp.user_id = #{mentorId}
-                 AND l.is_deleted = 0
-             ORDER BY
-                 lm.joined_at DESC
+                  lm.match_id,
+                  lm.lecture_id,
+                  lm.mentee_id,
+                  u.nickname,
+                  u.profile_image,
+                  l.lecture_title,
+                  lm.matched_time_slots,
+                  lm.joined_at
+              FROM lecture_mentee lm
+              JOIN lecture l ON lm.lecture_id = l.lecture_id
+              JOIN app_user u ON lm.mentee_id = u.user_id
+              JOIN mentor_profile mp ON l.mentor_id = mp.mentor_id
+              WHERE
+                  mp.user_id = #{mentorId}
+                  AND l.is_deleted = 0
+                  AND EXISTS (
+                      SELECT 1
+                      FROM application a
+                      WHERE a.lecture_id = lm.lecture_id
+                      AND a.mentee_id = lm.mentee_id
+                      AND a.status = 'APPROVED'
+                      AND a.is_deleted = FALSE
+                      AND a.updated_at <= lm.joined_at  -- 매칭 생성 이전에 승인된 신청
+                  )
+              ORDER BY
+                  lm.joined_at DESC
         """)
     List<MenteeResponseDto> findMatchedMenteesByMentorId(Long mentorId);
 
@@ -265,8 +269,9 @@ public interface ApplicationMapper {
             WHERE lecture_id = #{lectureId}
               AND mentee_id = #{menteeId}
               AND status = 'PENDING'
+              AND JSON_CONTAINS(requested_time_slots, CAST(#{timeSlotsJson} AS JSON))
             """)
-    int countDuplicateApplication(Long lectureId, Long menteeId);
+    int countDuplicateApplication(Long lectureId, Long menteeId, String timeSlotsJson);
 
     @Select("""
             SELECT lecture_id
@@ -289,6 +294,9 @@ public interface ApplicationMapper {
         WHERE lm.match_id = #{matchId}
         AND a.status = 'APPROVED'
         AND a.is_deleted = FALSE
-        """)
+        AND a.updated_at <= lm.joined_at
+        ORDER BY a.updated_at DESC
+        LIMIT 1
+    """)
     Long findApplicationIdByMatchId(Long matchId);
 }

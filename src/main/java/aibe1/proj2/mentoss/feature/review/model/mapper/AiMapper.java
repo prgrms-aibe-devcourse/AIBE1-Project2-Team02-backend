@@ -16,19 +16,23 @@ import java.util.List;
 public interface AiMapper {
     @Select("""
     SELECT
-      review_id        AS reviewId,
-      lecture_id       AS lectureId,
-      mentor_id        AS mentorId,
-      writer_id        AS writerId,
-      content,
-      rating,
-      created_at       AS createdAt
-    FROM review
-    WHERE mentor_id = #{mentorId}
-      AND is_deleted = FALSE
-    ORDER BY created_at DESC
+      r.review_id          AS reviewId,
+      r.lecture_id         AS lectureId,
+      r.mentor_id          AS mentorId,
+      r.writer_id          AS writerId,
+      u.nickname           AS writerNickname,       
+      u.profile_image      AS writerProfileImage,   
+      r.content            AS content,              
+      r.rating             AS rating,               
+      r.created_at         AS createdAt,            
+      r.updated_at         AS updatedAt             
+    FROM review r
+    JOIN app_user u ON r.writer_id = u.user_id
+    WHERE r.mentor_id = #{mentorId}
+      AND r.is_deleted = FALSE
+    ORDER BY r.created_at DESC
     LIMIT 10
-    """)
+""")
     List<ReviewResponseDto> selectReviewsByMentorId(@Param("mentorId") Long mentorId);
 
 
@@ -45,4 +49,13 @@ public interface AiMapper {
         FROM mentor_profile
     """)
     List<MentorProfile> findAllMentor();
+
+    @Select("""
+        SELECT
+          COUNT(*) 
+        FROM review
+        WHERE mentor_id = #{mentorId}
+          AND is_deleted = FALSE
+        """)
+    int selectReviewCountByMentorId(@Param("mentorId") Long mentorId);
 }
