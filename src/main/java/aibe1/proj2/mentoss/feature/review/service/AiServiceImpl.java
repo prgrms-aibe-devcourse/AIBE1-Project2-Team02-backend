@@ -66,6 +66,9 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public TagResponseDto answer(String prompt){
+        if (prompt.equals("-")) {
+            return new TagResponseDto("");
+        }
         int attempts = apiKeys.size();
         for (int i = 0; i < attempts; i++) {
             String currentKey = nextApiKey();
@@ -112,12 +115,18 @@ public class AiServiceImpl implements AiService {
         if (!reviewMapper.existsMentor(mentorId)) {
             throw new ResourceNotFoundException("Mentor", mentorId);
         }
-        List<ReviewResponseDto> reviews = aiMapper.selectReviewsByMentorId(mentorId);
-        String allContents = reviews.stream()
-                .map(ReviewResponseDto::content)
-                .collect(Collectors.joining("\n"));
+        if (aiMapper.selectReviewCountByMentorId(mentorId) > 0) {
+            List<ReviewResponseDto> reviews = aiMapper.selectReviewsByMentorId(mentorId);
+            String allContents = reviews.stream()
+                    .map(ReviewResponseDto::content)
+                    .collect(Collectors.joining("\n"));
+            return prePrompt + allContents;
+        }
+        else{
+            return "-";
+        }
 
-        return prePrompt + allContents;
+
     }
 
     @Override

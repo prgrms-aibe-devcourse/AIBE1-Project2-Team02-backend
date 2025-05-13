@@ -269,8 +269,9 @@ public interface ApplicationMapper {
             WHERE lecture_id = #{lectureId}
               AND mentee_id = #{menteeId}
               AND status = 'PENDING'
+              AND JSON_CONTAINS(requested_time_slots, CAST(#{timeSlotsJson} AS JSON))
             """)
-    int countDuplicateApplication(Long lectureId, Long menteeId);
+    int countDuplicateApplication(Long lectureId, Long menteeId, String timeSlotsJson);
 
     @Select("""
             SELECT lecture_id
