@@ -17,6 +17,7 @@ public record MentorPublicProfileDto(
         String education,
         String major,
         String content,
+        String tag,
         String appealFileUrl,
         boolean isCertified
 ) {
@@ -32,6 +33,7 @@ public record MentorPublicProfileDto(
                 mentorProfile.getEducation(),
                 mentorProfile.getMajor(),
                 mentorProfile.getContent(),
+                mentorProfile.getTag(),
                 mentorProfile.getAppealFileUrl(),
                 mentorProfile.getIsCertified()
         );
