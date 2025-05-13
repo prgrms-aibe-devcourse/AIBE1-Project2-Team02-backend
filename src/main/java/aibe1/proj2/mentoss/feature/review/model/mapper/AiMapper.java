@@ -49,4 +49,13 @@ public interface AiMapper {
         FROM mentor_profile
     """)
     List<MentorProfile> findAllMentor();
+
+    @Select("""
+        SELECT
+          COUNT(*) 
+        FROM review
+        WHERE mentor_id = #{mentorId}
+          AND is_deleted = FALSE
+        """)
+    int selectReviewCountByMentorId(@Param("mentorId") Long mentorId);
 }
