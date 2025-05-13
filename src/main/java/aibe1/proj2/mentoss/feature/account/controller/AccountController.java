@@ -43,8 +43,8 @@ public class AccountController {
             Authentication authentication,
             @RequestBody ProfileUpdateRequestDto requestDto
     ) {
-        if (requestDto.nickname() != null && requestDto.nickname().length() > 15) {
-            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("닉네임은 15자 이하로 입력해주세요."));
+        if (requestDto.nickname() != null && requestDto.nickname().length() > 12) {
+            return ResponseEntity.badRequest().body(ApiResponseFormat.fail("닉네임은 12자 이하로 입력해주세요."));
         }
 
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();

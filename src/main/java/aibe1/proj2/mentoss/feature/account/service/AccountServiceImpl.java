@@ -55,7 +55,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("AppUser", userId));
 
         if (requestDto.nickname() != null && requestDto.nickname().length() > 15) {
-            throw new IllegalArgumentException("닉네임은 15자 이하로 입력해주세요.");
+            throw new IllegalArgumentException("닉네임은 12자 이하로 입력해주세요.");
         }
 
         if (!appUser.getNickname().equals(requestDto.nickname())
