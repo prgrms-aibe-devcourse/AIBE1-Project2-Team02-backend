@@ -191,22 +191,22 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional
     public void applyForLecture(LectureApplyRequestDto dto, Long menteeId) {
 
-        int count = applicationMapper.countDuplicateApplication(dto.lectureId(), menteeId);
-
-        if (count > 0) {
-            throw new DuplicateApplicationException("[DUPLICATE_APPLICATION]");
-        }
-
         String timeSlotsJson;
         try {
             timeSlotsJson = objectMapper.writeValueAsString(dto.requestedTimeSlots());
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("요청 시간대를 처리하는 중 오류 발생: " + e.getMessage());
         }
+
+        int count = applicationMapper.countDuplicateApplication(dto.lectureId(), menteeId, timeSlotsJson);
+
+        if (count > 0) {
+            throw new DuplicateApplicationException("[DUPLICATE_APPLICATION]");
+        }
+
         LocalDateTime time = LocalDateTime.now();
         applicationMapper.insertApplication(dto.lectureId(), menteeId, timeSlotsJson, time);
 
-        // 3. 쪽지 전송
         LectureSimpleInfoDto info = applicationMapper.findLectureSimpleInfo(dto.lectureId());
         if (info == null) {
             throw new ResourceNotFoundException("Lecture", dto.lectureId());
