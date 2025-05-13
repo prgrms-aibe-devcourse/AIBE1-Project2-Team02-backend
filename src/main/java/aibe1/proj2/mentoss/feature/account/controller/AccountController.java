@@ -107,6 +107,15 @@ public class AccountController {
         return ResponseEntity.ok(ApiResponseFormat.ok(mentorProfile));
     }
 
+    @Operation(summary = "멘토 ID 기반 프로필 조회", description = "멘토 ID를 기반으로 해당 멘토의 전체 프로필을 조회합니다")
+    @GetMapping("/mentor/{mentorId}/public-profile")
+    public ResponseEntity<ApiResponseFormat<MentorPublicProfileDto>> getMentorPublicProfile(
+            @PathVariable Long mentorId
+    ) {
+        MentorPublicProfileDto mentorProfile = accountService.getMentorPublicProfile(mentorId);
+        return ResponseEntity.ok(ApiResponseFormat.ok(mentorProfile));
+    }
+
     @Operation(summary = "멘토 신청", description = "멘토 프로필을 생성하고 역할을 업데이트합니다")
     @PostMapping(value = "/mentor/apply", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponseFormat<Void>> applyMentorProfile(

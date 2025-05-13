@@ -198,6 +198,22 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public MentorPublicProfileDto getMentorPublicProfile(Long mentorId) {
+        MentorProfile mentorProfile = mentorMapper.findByMentorId(mentorId)
+                .orElseThrow(() -> new ResourceNotFoundException("MentorProfile", mentorId));
+
+        AppUser user = accountMapper.findByUserId(mentorProfile.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("AppUser", mentorProfile.getUserId()));
+
+        List<Region> regionList = accountMapper.findRegionByUserId(user.getUserId());
+        List<RegionDto> regions = regionList.stream()
+                .map(r -> new RegionDto(r.getRegionCode(), r.getSido(), r.getSigungu(), r.getDong(), formatRegionDisplayName(r)))
+                .toList();
+
+        return MentorPublicProfileDto.of(user, mentorProfile, regions);
+    }
+
+    @Override
     @Transactional
     public void applyMentorProfile(Long userId, MentorProfileRequestDto requestDto) throws IOException {
         if (mentorMapper.existsByUserId(userId)) {
