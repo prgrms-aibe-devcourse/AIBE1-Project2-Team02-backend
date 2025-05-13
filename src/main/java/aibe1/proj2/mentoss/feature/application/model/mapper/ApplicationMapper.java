@@ -293,6 +293,9 @@ public interface ApplicationMapper {
         WHERE lm.match_id = #{matchId}
         AND a.status = 'APPROVED'
         AND a.is_deleted = FALSE
-        """)
+        AND a.updated_at <= lm.joined_at
+        ORDER BY a.updated_at DESC
+        LIMIT 1
+    """)
     Long findApplicationIdByMatchId(Long matchId);
 }
