@@ -33,7 +33,11 @@ public interface MessageMapper {
                                ELSE m.sender_id
                              END
             WHERE m.message_id = #{id}
-              AND m.is_deleted = 0
+              AND (
+                (m.sender_id = #{userId} AND m.sender_deleted = FALSE)
+                OR
+                (m.receiver_id = #{userId} AND m.receiver_deleted = FALSE)
+              )
             """)
     Message findById(Long id, Long userId);
 
@@ -53,8 +57,36 @@ public interface MessageMapper {
 
     @Update("""
                 UPDATE message
-                SET is_deleted = TRUE, deleted_at = CURRENT_TIMESTAMP
+                SET sender_deleted = TRUE, receiver_deleted = TRUE, deleted_at = CURRENT_TIMESTAMP
                 WHERE sender_id = #{userId} OR receiver_id = #{userId}
             """)
     void softDeleteMessagesByUserId(Long userId);
+
+    @Update("""
+                UPDATE message
+                SET sender_deleted = TRUE
+                WHERE message_id = #{messageId}
+            """)
+    void markSenderDeleted(Long messageId);
+
+    @Update("""
+                UPDATE message
+                SET receiver_deleted = TRUE
+                WHERE message_id = #{messageId}
+            """)
+    void markReceiverDeleted(Long messageId);
+
+    @Update("""
+                UPDATE message
+                SET deleted_at = CURRENT_TIMESTAMP
+                WHERE message_id = #{messageId}
+            """)
+    void markDeletedAtNow(Long messageId);
+
+    @Select("""
+                SELECT sender_deleted, receiver_deleted
+                FROM message
+                WHERE message_id = #{messageId}
+            """)
+    Message findDeletedStatus(Long messageId);
 }

@@ -239,6 +239,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Transactional
     public void cancelApplication(Long applicationId, Long userId) {
         ApplicationInfoDto info = applicationMapper.findApplicationInfo(applicationId);
 
@@ -267,14 +268,21 @@ public class ApplicationServiceImpl implements ApplicationService {
         LocalDateTime currentTime = LocalDateTime.now();
         applicationMapper.updateApplicationStatus(applicationId, ApplicationStatus.CANCELLED.name(), currentTime);
 
+        // 7. 취소 알림 쪽지 전송
         String content;
-        String cancelReson = mentorId.equals(userId) ? "멘토 사정으로 인해" : "멘티 사정으로 인해";
+        String cancelReason = mentorId.equals(userId) ? "멘토 사정으로 인해" : "멘티 사정으로 인해";
 
         if (mentorId.equals(userId)) {
-            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReson);
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReason);
+            messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content, true), userId);
+            // 멘토가 취소한 경우
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReason);
             messageService.sendMessage(new MessageSendRequestDto(info.menteeId(), content, true), userId);
         } else {
-            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReson);
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReason);
+            messageService.sendMessage(new MessageSendRequestDto(mentorId, content, true), userId);
+            // 멘티가 취소한 경우
+            content = String.format("'%s' 과외 매칭이 %s 취소되었습니다.", info.lectureTitle(), cancelReason);
             messageService.sendMessage(new MessageSendRequestDto(mentorId, content, true), userId);
         }
 
@@ -287,5 +295,17 @@ public class ApplicationServiceImpl implements ApplicationService {
                 applicationId,
                 "/questions"
         );
+    }
+
+    @Override
+    @Transactional
+    public void cancelMatchById(Long matchId, Long userId) {
+        Long applicationId = applicationMapper.findApplicationIdByMatchId(matchId);
+
+        if (applicationId == null) {
+            throw new ResourceNotFoundException("Match", matchId);
+        }
+
+        cancelApplication(applicationId, userId);
     }
 }

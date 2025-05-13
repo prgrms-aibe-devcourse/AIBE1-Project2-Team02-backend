@@ -16,6 +16,11 @@ public interface MentorMapper {
             "AND u.is_deleted = FALSE")
     Optional<MentorProfile> findByUserId(Long userId);
 
+
+    @Select("SELECT * FROM mentor_profile WHERE mentor_id = #{mentorId}")
+    Optional<MentorProfile> findByMentorId(Long mentorId);
+
+
     @Select("SELECT COUNT(*) > 0 FROM mentor_profile mp " +
             "JOIN app_user u ON mp.user_id = u.user_id " +
             "WHERE mp.user_id = #{userId} " +

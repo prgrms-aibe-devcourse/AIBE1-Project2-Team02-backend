@@ -130,7 +130,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/oauth2/**", "/login/**", "/test/**",
                                 "/api/test/**", "/api/auth/test/public",
-                                "/css/**", "/js/**", "/images/**",
+                                "/css/**", "/js/**", "/images/**", "/api/account/mentor/*/public-profile",
                                 "/api/ping", "/api/categories/**", "/api/regions/**",
                                 "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error")
                         .permitAll()
