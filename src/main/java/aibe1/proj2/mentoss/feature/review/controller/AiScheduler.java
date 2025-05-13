@@ -20,9 +20,8 @@ import java.util.logging.Logger;
 public class AiScheduler {
     private final AiMapper aiMapper;
     private final AiService aiService;
-    //@Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
-    @Scheduled(initialDelay = 1000,  // 기동 후 1초 뒤
-            fixedRate = 24 * 60 * 60 * 1000)
+    @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
+    //@Scheduled(initialDelay = 1000, fixedRate = 24 * 60 * 60 * 1000)
     public void generateTagsForAllMentors() {
         List<MentorProfile> allMentor = aiMapper.findAllMentor();
 
