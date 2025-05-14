@@ -132,7 +132,7 @@ public class SecurityConfig {
                                 "/api/test/**", "/api/auth/test/public",
                                 "/css/**", "/js/**", "/images/**", "/api/account/mentor/*/public-profile",
                                 "/api/ping", "/api/categories/**", "/api/regions/**",
-                                "/api/lectures/**", "/default-ui.css", "/favicon.ico, /error")
+                                "/api/lectures/**", "/default-ui.css", "/favicon.ico", "/error", "/api/review/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions

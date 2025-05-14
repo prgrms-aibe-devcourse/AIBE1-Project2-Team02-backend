@@ -21,6 +21,7 @@ public class AiScheduler {
     private final AiMapper aiMapper;
     private final AiService aiService;
     @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
+    //@Scheduled(initialDelay = 1000, fixedRate = 24 * 60 * 60 * 1000)
     public void generateTagsForAllMentors() {
         List<MentorProfile> allMentor = aiMapper.findAllMentor();
 
@@ -33,8 +34,8 @@ public class AiScheduler {
                 aiService.updateMentorTag(m.getMentorId(), dto.tag());
             } catch (TogetherApiException tae) {
                 if (tae.getStatus() == 429) {
-                    log.warn("🔔 레이트 리밋 감지 — 스케줄러 종료, 다음 사이클로 넘깁니다.");
-                    break;
+                    log.warn("🔔 레이트 리밋 감지 — 다음 대상으로 넘깁니다.");
+                    continue;
                 } else {
                     log.error("❌ 멘토[{}] 오류", m.getMentorId(), tae);
                 }
