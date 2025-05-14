@@ -17,7 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.DataSource;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -37,6 +41,7 @@ public class AccountServiceImpl implements AccountService {
     private final LectureMapper lectureMapper;
     private final MessageMapper messageMapper;
     private final AppUserMapper appUserMapper;
+    private final DataSource dataSource;
 
     @Override
     public ProfileResponseDto getProfile(Long userId) {
