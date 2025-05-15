@@ -14,9 +14,9 @@
 
 <br />
 
-# MEN:TOSS
+<img src="src/main/resources/static/img/og-image.png">
 
-> 멘토와 멘티를 쉽고 빠르게 매칭해 주는 과외 매칭 서비스
+> 멘토의 재능을 토스하다 | 1:1 재능 매칭 플랫폼, MEN:TOSS
 
 ---
 
@@ -33,7 +33,7 @@
 ---
 
 ## 프로젝트 소개
-`MEN:TOSS`는 멘토(MENTO)를 “TOSS”한다는 컨셉의 1대1 과외 매칭 플랫폼입니다.
+`MEN:TOSS`는 멘토와 멘티를 쉽고 빠르게 매칭해 주는 1대1 과외 매칭 플랫폼입니다.
 
 - **배포 사이트**: https://mentoss.vercel.app/
 - **프론트엔드 레포**: https://github.com/dldudqlsdlqslek/Mentos
