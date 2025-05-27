@@ -12,4 +12,4 @@ jobs:
 
     steps:
       - name: 🔔 Render 서버에 ping 요청 보내기
-        run: curl -s https://mentoss.onrender.com/api/ping  # Render 서버의 ping 엔드포인트 호출
+        run: curl -s https://mentoss-uc3h.onrender.com/api/ping  # Render 서버의 ping 엔드포인트 호출

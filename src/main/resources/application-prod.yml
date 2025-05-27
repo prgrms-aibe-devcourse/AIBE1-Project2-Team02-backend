@@ -25,11 +25,11 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: email, profile
-            redirect-uri: "https://mentoss.onrender.com/login/oauth2/code/google"
+            redirect-uri: "https://mentoss-uc3h.onrender.com/login/oauth2/code/google"
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: "https://mentoss.onrender.com/login/oauth2/code/kakao"
+            redirect-uri: "https://mentoss-uc3h.onrender.com/login/oauth2/code/kakao"
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
             client-name: Kakao
